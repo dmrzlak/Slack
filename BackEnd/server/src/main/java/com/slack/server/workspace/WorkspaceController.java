@@ -17,6 +17,13 @@ public class WorkspaceController {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+
+    /**
+     * Create and put a Workspaceinto the table
+     * @param name
+     * @return
+     * @author Dylan Mrzlak
+     */
     @GetMapping(path="/add") // Map ONLY POST Requests
     public @ResponseBody ResponseEntity addNewWorkspace (@RequestParam String name) {
         // @ResponseBody means the returned String is the response, not a view name
@@ -28,6 +35,11 @@ public class WorkspaceController {
         return new ResponseEntity(n, HttpStatus.OK);
     }
 
+    /**
+     * Get all workspaces in DB
+     * @return
+     * @Author Dylan Mrzlak
+     */
     @GetMapping(path="")
     public @ResponseBody ResponseEntity getAllWorkspaces() {
         // This returns a JSON or XML with the workspaces
@@ -35,6 +47,12 @@ public class WorkspaceController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
+    /**
+     * Get a workspace by name from the DB
+     * @param name
+     * @return
+     * @Author Dylan Mrzlak
+     */
     @GetMapping(path="/get")
     public @ResponseBody ResponseEntity getWorkspaceByName(@RequestParam String name){
         if(workspaceRepository.existsByName(name)) return new ResponseEntity(workspaceRepository.findbyName(name), HttpStatus.OK);

@@ -27,6 +27,14 @@ public class UserController {
     @Autowired
     private WorkspaceXRefRepository wXRefRepo;
 
+
+    /**
+     * Create a user for the DB and put them into the table
+     * @param username
+     * @param password
+     * @return
+     * @author Dylan Mrzlak
+     */
     @GetMapping(path="/add") // Map ONLY POST Requests
     public @ResponseBody ResponseEntity createUser(@RequestParam String username, @RequestParam String password){
         if(uRepo.existsByName(username)) return new ResponseEntity("Username is taken", HttpStatus.NOT_ACCEPTABLE);
@@ -37,6 +45,11 @@ public class UserController {
         return new ResponseEntity(u, HttpStatus.OK);
     }
 
+    /**
+     * Gets all the users in the DB
+     * @return
+     * @author Dylan
+     */
     @GetMapping(path="")
     public @ResponseBody ResponseEntity getAllUsers() {
         // This returns a JSON or XML with the workspaces
@@ -54,17 +67,33 @@ public class UserController {
 
     }
 
+    /**
+     * When accessed, will add a user to a workspace. In the workspaceXRef table, if a user and a workspace are in the
+     * same row, then that user is in the workspace
+     * @param workspaceName
+     * @param name
+     * @return
+     * @author Dylan Mrzlak
+     */
     @GetMapping(path="/join")
     public @ResponseBody ResponseEntity joinWorkspace(@RequestParam String workspaceName, @RequestParam String name){
+        //Get Workspace, we will use its ID later
         Workspace w = wRepo.findbyName(workspaceName);
         if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        //Get the user, we will use their ID later
         User u = uRepo.findbyName(name);
         if(u == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        //Chack that the user isn't already in the workspace
         if(wXRefRepo.exists(w.getId(), u.getId())) return new ResponseEntity("User already in Workspace", HttpStatus.NOT_ACCEPTABLE);
+
+        //Create the XREF and put it in DB
         WorkspaceXRef x = new WorkspaceXRef();
         x.setwId(w.getId());
         x.setuId(u.getId());
         wXRefRepo.save(x);
+
+        //Return OK status (200) and Xref
         return new ResponseEntity(x, HttpStatus.OK);
     }
 }

@@ -1,7 +1,10 @@
 package com.slack.server.messages;
 
 import javax.persistence.*;
-
+/**
+ * Model for the Message Table. Essentially this is what the table will contain
+ * @Author Dylan Mrzlak
+ */
 @Entity
 public class Message {
 

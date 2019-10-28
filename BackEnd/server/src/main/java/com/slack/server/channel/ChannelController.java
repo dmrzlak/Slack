@@ -23,6 +23,13 @@ public class ChannelController {
     @Autowired
     private ChannelRepository channelRepository;
 
+    /**
+     * Create a channel for the DB and put them into the table
+     * @param workspaceName
+     * @param name
+     * @return
+     * @author Dylan Mrzlak
+     */
     @GetMapping(path="/add") // Map ONLY POST Requests
     public @ResponseBody ResponseEntity addNewChannel(@RequestParam String workspaceName, @RequestParam String name){
         Workspace w = workspaceRepository.findbyName(workspaceName);
@@ -35,6 +42,11 @@ public class ChannelController {
         return new ResponseEntity(c, HttpStatus.OK);
     }
 
+    /**
+     * Gets all the Channels in the DB
+     * @return
+     * @author Dylan
+     */
     @GetMapping(path="")
     public @ResponseBody ResponseEntity getAllChannels() {
         // This returns a JSON or XML with the workspaces
@@ -42,10 +54,20 @@ public class ChannelController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
+
+    /**
+     * Gets a certain Channel in the DB
+     * @param workspaceName
+     * @param name
+     * @return
+     * @author Dylan
+     */
     @GetMapping(path="/get")
     public @ResponseBody ResponseEntity getChannel(@RequestParam String workspaceName, @RequestParam String name){
+        //Check that the workspace itself exists
         Workspace w = workspaceRepository.findbyName(workspaceName);
         if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        //Return the channel and HttpStatus.200 if it exists, or a 404 and a detail
         if(channelRepository.exists(w.getId(), name)){
             Channel c = channelRepository.find(w.getId(), name);
             return new ResponseEntity(c, HttpStatus.OK);

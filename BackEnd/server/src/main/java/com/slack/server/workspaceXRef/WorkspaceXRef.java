@@ -2,6 +2,12 @@ package com.slack.server.workspaceXRef;
 
 import javax.persistence.*;
 
+
+/**
+ * Model for the WorkspaceXRef Table. Essentially this is what the table will contain
+ * If a row exists in this table the User with uID belongs to the workspace with wId
+ * @Author Dylan Mrzlak
+ */
 @Entity
 public class WorkspaceXRef {
     //We will use this table to represent a user being a part of a workspace.

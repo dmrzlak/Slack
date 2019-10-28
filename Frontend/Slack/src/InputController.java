@@ -7,6 +7,8 @@ import java.util.Scanner;
  *
  * It will take the initial input for User Input
  *  and then pass it along to other classes to handle the actual functionality
+ * @Author Dylan Mrzlak
+ *      Original Framework and Use handle for CREATE_WORkSPACE and JOIN_WORKSPACE
  */
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";

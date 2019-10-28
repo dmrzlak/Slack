@@ -6,6 +6,10 @@ import org.hibernate.validator.constraints.UniqueElements;
 import javax.persistence.*;
 import java.util.Set;
 
+/**
+ * Model for the Workspace Table. Essentially this is what the table will contain
+ * @Author Dylan Mrzlak
+ */
 @Entity // This tells Hibernate to make a table out of this class
 public class Workspace {
     @Id
