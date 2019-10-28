@@ -28,6 +28,7 @@ public class Workspace {
     public static boolean createWorkspace(String name){
         Workspace w = new Workspace(name);
         DBSupport.HTTPResponse result = DBSupport.putWorkspace(name);
+
         return result.code < 300;
     }
 

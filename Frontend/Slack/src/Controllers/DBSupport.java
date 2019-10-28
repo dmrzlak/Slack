@@ -96,6 +96,15 @@ public class DBSupport {
       }
     }
 
+    public static HTTPResponse joinWorkspace(String workspaceName, String name) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.joinWorkspace(workspaceName, name));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -128,7 +137,7 @@ public class DBSupport {
             return BASE_URL+"workspace/add?name="+name;
         }
 
-        public static String JoinWorkspace(String workspaceName, String username){
+        public static String joinWorkspace(String workspaceName, String username){
             return BASE_URL+"user/join?workspaceName="+workspaceName+"&name="+username;
         }
     }
