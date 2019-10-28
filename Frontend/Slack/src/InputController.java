@@ -1,3 +1,5 @@
+import Models.Workspace;
+
 import java.util.Scanner;
 
 /**
@@ -19,10 +21,10 @@ public class InputController {
           //By forcing commands to be in a format of COMMAND - ARGUMENT
           //We can easily manage the input and decide what is needed
           int substringBegin = userInput.indexOf('-');
-          String command = userInput.substring(substringBegin);
+          String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
-                  //we want to pass onto the USER (A controller maybe?) and then validate there
+                  Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
                   break;
               case JOIN_WORKSPACE:
 

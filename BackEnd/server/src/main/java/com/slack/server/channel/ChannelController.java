@@ -4,6 +4,8 @@ import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,31 +24,33 @@ public class ChannelController {
     private ChannelRepository channelRepository;
 
     @GetMapping(path="/add") // Map ONLY POST Requests
-    public @ResponseBody Pair<Integer, String> addNewChannel(@RequestParam String workspaceName, @RequestParam String name){
+    public @ResponseBody ResponseEntity addNewChannel(@RequestParam String workspaceName, @RequestParam String name){
         Workspace w = workspaceRepository.findbyName(workspaceName);
-        if(w == null) return new Pair<>(404, "Error Workspace " + workspaceName + "not found");
-        if(channelRepository.exists(w.getId(), name))
-            return new Pair<>(404, "Error channel " + workspaceName + "/" + name + " does not exists");
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        if(channelRepository.exists(w.getId(), name)) return new ResponseEntity("Channel Already Exists", HttpStatus.NOT_ACCEPTABLE);
         Channel c = new Channel();
         c.setwId(w.getId());
         c.setName(name);
         channelRepository.save(c);
-        return new Pair<>(200, "Channel " + w.getName() + "/" + name + " saved");
+        return new ResponseEntity(c, HttpStatus.OK);
     }
 
     @GetMapping(path="")
-    public @ResponseBody Iterable<Channel> getAllChannels() {
+    public @ResponseBody ResponseEntity getAllChannels() {
         // This returns a JSON or XML with the workspaces
-        return channelRepository.findAll();
+        Iterable<Channel> list = channelRepository.findAll();
+        return new ResponseEntity(list, HttpStatus.OK);
     }
 
     @GetMapping(path="/get")
-    public @ResponseBody Pair<Integer, Channel> getChannel(@RequestParam String workspaceName, @RequestParam String name){
+    public @ResponseBody ResponseEntity getChannel(@RequestParam String workspaceName, @RequestParam String name){
         Workspace w = workspaceRepository.findbyName(workspaceName);
-        if(w == null) return new Pair<>(404, null);
-        return  (channelRepository.exists(w.getId(), name) ?
-                new Pair<>(200, channelRepository.find(w.getId(), name))
-                : new Pair<>(404, null));
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        if(channelRepository.exists(w.getId(), name)){
+            Channel c = channelRepository.find(w.getId(), name);
+            return new ResponseEntity(c, HttpStatus.OK);
+        }
+        return new ResponseEntity("Channel Does Not Exist", HttpStatus.NOT_FOUND);
 
     }
 }

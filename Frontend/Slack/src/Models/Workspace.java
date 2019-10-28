@@ -1,6 +1,6 @@
 package Models;
 
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
+import Controllers.DBSupport;
 
 public class Workspace {
 
@@ -16,10 +16,10 @@ public class Workspace {
        this.id = -1;
     }
 
-    boolean createWorkspace(String name){
+    public static boolean createWorkspace(String name){
         Workspace w = new Workspace(name);
-
-        return true;
+        DBSupport.HTTPResponse result = DBSupport.putWorkspace(name);
+        return result.code < 300;
     }
 
     String getName(){

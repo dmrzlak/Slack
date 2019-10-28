@@ -6,6 +6,8 @@ import com.slack.server.workspaceXRef.WorkspaceXRef;
 import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,39 +28,43 @@ public class UserController {
     private WorkspaceXRefRepository wXRefRepo;
 
     @GetMapping(path="/add") // Map ONLY POST Requests
-    public @ResponseBody Pair<Integer, String> createUser(@RequestParam String username, @RequestParam String password){
-        if(uRepo.existsByName(username)) return new Pair<>(400, "Username: " + username + " is taken");
+    public @ResponseBody ResponseEntity createUser(@RequestParam String username, @RequestParam String password){
+        if(uRepo.existsByName(username)) return new ResponseEntity("Username is taken", HttpStatus.NOT_ACCEPTABLE);
         User u = new User();
         u.setName(username);
         u.setPassword(password);
         uRepo.save(u);
-        return new Pair<>(200, "User " + username + " saved");
+        return new ResponseEntity(u, HttpStatus.OK);
     }
 
     @GetMapping(path="")
-    public @ResponseBody Iterable<User> getAllChannels() {
+    public @ResponseBody ResponseEntity getAllUsers() {
         // This returns a JSON or XML with the workspaces
-        return uRepo.findAll();
+        Iterable<User> list = uRepo.findAll();
+        return new ResponseEntity(list, HttpStatus.OK);
     }
 
     @GetMapping(path="/get")
-    public @ResponseBody Pair<Integer, User> getChannel(@RequestParam String name){
-        return  (uRepo.existsByName(name) ?
-                new Pair<>(200, uRepo.findbyName(name))
-                : new Pair<>(404, null));
+    public @ResponseBody ResponseEntity getChannel(@RequestParam String name){
+        if(uRepo.existsByName(name)){
+            User u = uRepo.findbyName(name);
+            return new ResponseEntity(u, HttpStatus.OK);
+        }
+        return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
     }
 
     @GetMapping(path="/join")
-    public @ResponseBody Pair<Integer, String> joinWorkspace(@RequestParam String workspaceName, @RequestParam String name){
+    public @ResponseBody ResponseEntity joinWorkspace(@RequestParam String workspaceName, @RequestParam String name){
         Workspace w = wRepo.findbyName(workspaceName);
-        if(w == null) return new Pair<>(404, "Workspace" + workspaceName +" does not exists");
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         User u = uRepo.findbyName(name);
-        if(u == null) return new Pair<>(404, "User" + name +" does not exists");
-        if(wXRefRepo.exists(w.getId(), u.getId())) return new Pair<>(400, "User" + name +" is already in Workspace " + workspaceName);
+        if(u == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        if(wXRefRepo.exists(w.getId(), u.getId())) return new ResponseEntity("User already in Workspace", HttpStatus.NOT_ACCEPTABLE);
         WorkspaceXRef x = new WorkspaceXRef();
         x.setwId(w.getId());
         x.setuId(u.getId());
         wXRefRepo.save(x);
-        return new Pair<>(200, "User" + name +" has joined Workspace " + workspaceName);
+        return new ResponseEntity(x, HttpStatus.OK);
     }
 }
