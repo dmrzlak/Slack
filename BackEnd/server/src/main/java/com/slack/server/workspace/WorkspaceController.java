@@ -1,5 +1,7 @@
 package com.slack.server.workspace;
 
+import com.slack.server.user.User;
+import com.slack.server.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
+
 @Controller    // This means that this class is a Controller
 @RequestMapping(path="/workspace") // This means URL's start with /demo (after Application path)
 public class WorkspaceController {
@@ -17,6 +21,8 @@ public class WorkspaceController {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * Create and put a Workspaceinto the table
@@ -57,7 +63,12 @@ public class WorkspaceController {
     public @ResponseBody ResponseEntity getWorkspaceByName(@RequestParam String name){
         if(workspaceRepository.existsByName(name)) return new ResponseEntity(workspaceRepository.findbyName(name), HttpStatus.OK);
         return new ResponseEntity("Workspace does not exist", HttpStatus.NOT_FOUND);
+    }
 
+    @GetMapping(path="/getUsers")
+    public @ResponseBody  ResponseEntity getUsersInWorkspace(@RequestParam String name){
+        Iterable<String> list = userRepository.findUsers(name);
+        return new ResponseEntity(list, HttpStatus.OK);
     }
 
 

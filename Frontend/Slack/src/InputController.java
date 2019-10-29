@@ -1,5 +1,8 @@
+
+import Controllers.DBSupport;
 import Models.User;
 import Models.Workspace;
+import com.google.gson.Gson;
 
 import java.util.Scanner;
 
@@ -19,12 +22,13 @@ public class InputController {
     private static String workspaceName;
 
     public static void main(String[] args){
-
+        Gson gson = new Gson();
+        User thisUser = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
 
       System.out.println("Please enter username:\n");
-      User current = new User();
+      User current = new User("", "");
       System.out.println("Please enter your password!\n");
       String password = input.nextLine();
 
@@ -36,14 +40,22 @@ public class InputController {
           String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
-                  workspaceName = userInput.substring(substringBegin + 1).trim()
-                  Workspace.createWorkspace(workspaceName);
+                  DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  if (wResponse.code > 300) {
+                      System.out.println(wResponse.response);
+                  } else {
+                      System.out.println("Saved Workspace");
+                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+                  }
                   break;
               case JOIN_WORKSPACE:
-                  Workspace.j
-                  break;
-              case SEND:
-
+                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), thisUser.getName());
+                  if (joinWorkspace.code > 300) {
+                      System.out.println(joinWorkspace.response);
+                  } else {
+                      System.out.println("Joining Workspace");
+                      Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
+                  }
                   break;
               case SEND_DM:
 
