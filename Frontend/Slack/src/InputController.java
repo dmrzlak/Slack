@@ -19,9 +19,10 @@ public class InputController {
     private static final String JOIN_WORKSPACE = "join";
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
-    private static String workspaceName;
+
 
     public static void main(String[] args){
+        Workspace curWorkspace;
         Gson gson = new Gson();
         User thisUser = null;
       Scanner input = new Scanner(System.in);
@@ -46,6 +47,7 @@ public class InputController {
                   } else {
                       System.out.println("Saved Workspace");
                       Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+                      curWorkspace = w;
                   }
                   break;
               case JOIN_WORKSPACE:
@@ -55,6 +57,7 @@ public class InputController {
                   } else {
                       System.out.println("Joining Workspace");
                       Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
+                      curWorkspace = w;
                   }
                   break;
               case SEND_DM:
