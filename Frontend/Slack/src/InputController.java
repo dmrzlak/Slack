@@ -1,4 +1,7 @@
+import Controllers.DBSupport;
+import Models.User;
 import Models.Workspace;
+import com.google.gson.Gson;
 
 import java.util.Scanner;
 
@@ -15,7 +18,8 @@ public class InputController {
     private static final String JOIN_WORKSPACE = "join";
 
     public static void main(String[] args){
-
+        Gson gson = new Gson();
+        User thisUser = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
       do {
@@ -26,10 +30,22 @@ public class InputController {
           String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
-                  Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  if (wResponse.code > 300) {
+                      System.out.println(wResponse.response);
+                  } else {
+                      System.out.println("Saved Workspace");
+                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+                  }
                   break;
               case JOIN_WORKSPACE:
-
+                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), thisUser.getName());
+                  if (joinWorkspace.code > 300) {
+                      System.out.println(joinWorkspace.response);
+                  } else {
+                      System.out.println("Joining Workspace");
+                      Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
+                  }
                   break;
               default:
                   System.out.println("Invalid Input please try again :(");
