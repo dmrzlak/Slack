@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5a8aef1-40bf-4257-9787-6949973c1314" name="Default Changelist" comment="" />
+    <list default="true" id="a5a8aef1-40bf-4257-9787-6949973c1314" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/../BackEnd/server/src/main/java/com/slack/server/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/server/src/main/java/com/slack/server/user/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Slack/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Slack/Slack.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/Slack.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Slack/src/InputController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/src/InputController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Slack/src/Models/Workspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/src/Models/Workspace.java" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,6 +55,7 @@
       <option name="presentableId" value="Default" />
       <updated>1572220182266</updated>
       <workItem from="1572220236369" duration="116000" />
+      <workItem from="1572379170396" duration="768000" />
     </task>
     <servers />
   </component>
@@ -59,7 +67,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
