@@ -25,12 +25,15 @@ public class Workspace {
      * Create a workspace and call for the DBSUpport to request it put into the DB
      * @Author Dylan Mrzlak
      */
-    public static boolean createWorkspace(String name){
+    public static DBSupport.HTTPResponse createWorkspace(String name){
         Workspace w = new Workspace(name);
-        DBSupport.HTTPResponse result = DBSupport.putWorkspace(name);
-
-        return result.code < 300;
+        return DBSupport.putWorkspace(name);
     }
+
+    public static DBSupport.HTTPResponse joinWorkspace(String workspaceName, String name){
+        return DBSupport.joinWorkspace(workspaceName, name);
+    }
+
 
     String getName(){
         return name;

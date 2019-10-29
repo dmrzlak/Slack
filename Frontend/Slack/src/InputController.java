@@ -1,3 +1,4 @@
+import Controllers.DBSupport;
 import Models.Workspace;
 
 import java.util.Scanner;
@@ -27,9 +28,23 @@ public class InputController {
           switch (command){
               case CREATE_WORKSPACE:
                   Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  if (wResponse.code > 300) {
+                      System.out.println(wResponse.response);
+                  } else {
+                      System.out.println("Saved Workspace");
+                      //Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+                  }
                   break;
               case JOIN_WORKSPACE:
 
+                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), "");
+                  if (joinWorkspace.code > 300) {
+                      System.out.println(joinWorkspace.response);
+                  } else {
+                      System.out.println("Joining Workspace");
+                      //Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
+                  }
                   break;
               default:
                   System.out.println("Invalid Input please try again :(");
