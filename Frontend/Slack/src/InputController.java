@@ -1,3 +1,4 @@
+import Models.User;
 import Models.Workspace;
 
 import java.util.Scanner;
@@ -13,11 +14,20 @@ import java.util.Scanner;
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
     private static final String JOIN_WORKSPACE = "join";
+    private static final String SEND = "send";
+    private static final String SEND_DM = "send to";
+    private static String workspaceName;
 
     public static void main(String[] args){
 
       Scanner input = new Scanner(System.in);
       String userInput = "";
+
+      System.out.println("Please enter username:\n");
+      User current = new User();
+      System.out.println("Please enter your password!\n");
+      String password = input.nextLine();
+
       do {
           userInput = input.nextLine();
           //By forcing commands to be in a format of COMMAND - ARGUMENT
@@ -26,12 +36,20 @@ public class InputController {
           String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
-                  Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  workspaceName = userInput.substring(substringBegin + 1).trim()
+                  Workspace.createWorkspace(workspaceName);
                   break;
               case JOIN_WORKSPACE:
+                  Workspace.j
+                  break;
+              case SEND:
 
                   break;
-              default:
+              case SEND_DM:
+
+                  break;
+
+                  default:
                   System.out.println("Invalid Input please try again :(");
           }
       } while (input.hasNextLine());
