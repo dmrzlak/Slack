@@ -1,7 +1,6 @@
 package Models;
 
 import Controllers.DBSupport;
-
 /**
  * Model for the Workspace within the front end. Will contain the data and methods required of the workspace
  * @Author Dylan Mrzlak
@@ -26,12 +25,13 @@ public class Workspace {
      * @Author Dylan Mrzlak
      */
     public static DBSupport.HTTPResponse createWorkspace(String name){
-        Workspace w = new Workspace(name);
-        return DBSupport.putWorkspace(name);
+        DBSupport.HTTPResponse res = DBSupport.putWorkspace(name);
+        return res;
     }
 
-    public static DBSupport.HTTPResponse joinWorkspace(String workspaceName, String name){
-        return DBSupport.joinWorkspace(workspaceName, name);
+    public static DBSupport.HTTPResponse joinWorkspace(String name, String username){
+        DBSupport.HTTPResponse res = DBSupport.joinWorkspace(name, username);
+        return res;
     }
 
 
