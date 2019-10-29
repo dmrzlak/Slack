@@ -1,6 +1,7 @@
 package com.slack.server.workspace;
 
 import com.slack.server.channel.Channel;
+import com.slack.server.user.User;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
