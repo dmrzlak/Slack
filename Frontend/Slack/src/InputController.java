@@ -27,7 +27,7 @@ public class InputController {
           //By forcing commands to be in a format of COMMAND - ARGUMENT
           //We can easily manage the input and decide what is needed
           int substringBegin = userInput.indexOf('-');
-          if(substringBegin == -1){ substring 
+          if(substringBegin == -1) substringBegin = 0;
           String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
