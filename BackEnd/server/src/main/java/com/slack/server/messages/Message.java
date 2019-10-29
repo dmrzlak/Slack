@@ -1,5 +1,8 @@
 package com.slack.server.messages;
 
+
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 /**
  * Model for the Message Table. Essentially this is what the table will contain
@@ -14,6 +17,7 @@ public class Message {
 
     private Integer senderId;
 
+    @Nullable
     private Integer wId;
 
     private Integer cID;

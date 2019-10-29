@@ -11,5 +11,5 @@ public interface UserRepository extends CrudRepository<User, Integer>{
     boolean existsByName(@Param("name") String name);
 
     @Query("SELECT u FROM User u WHERE u.name = :name")
-    User findbyName(@Param("name") String name);
+    User findByName(@Param("name") String name);
 }
