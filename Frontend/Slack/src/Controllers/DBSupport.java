@@ -124,7 +124,6 @@ public class DBSupport {
      */
     public static HTTPResponse pinMessage(Integer id) {
         try{
-            //TODO JOE -- Pin Message Param Builder
             HTTPResponse response = serverRequest(ParamBuilder.pinMessage(id));
             return response;
         }  catch(Exception e){
@@ -160,6 +159,9 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
+
+
+        // BASE_URL+"message/pinMessage?messageID=mID
         public static String createWorkspace(String name){
             return BASE_URL+"workspace/add?name="+name;
         }
@@ -170,6 +172,10 @@ public class DBSupport {
 
         public static String createUser(String name, String password){
             return BASE_URL+"user/add?username="+name+"&password="+password;
+        }
+
+        public static String pinMessage(int mId){
+            return BASE_URL+"message/pinMessage?messageID=" + mId;
         }
     }
 }

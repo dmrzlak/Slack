@@ -20,6 +20,26 @@ public class Workspace {
        this.id = -1;
     }
 
+    String getName(){
+        return name;
+    }
+
+    int getwId(){
+        return id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     /**
      * Create a workspace and call for the DBSUpport to request it put into the DB
      * @Author Dylan Mrzlak
@@ -34,13 +54,9 @@ public class Workspace {
         return res;
     }
 
-
-    //TODO JOE -- PinMessage in here
-
-    String getName(){
-        return name;
+    public static DBSupport.HTTPResponse pinMessage(String mId) {
+        DBSupport.HTTPResponse res = DBSupport.pinMessage(Integer.parseInt(mId));
+        return res;
     }
-    int getwId(){
-        return id;
-    }
+
 }

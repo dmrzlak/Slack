@@ -105,10 +105,11 @@ public class InputController {
                   DBSupport.HTTPResponse pinMessage = Workspace.pinMessage(userArgs[0]);
                   if (pinMessage.code > 300) {
                       System.out.println(pinMessage.response);
-                  } else {
+                  }
+                  else {
                       System.out.println("Pinned message");
-                      Message m = gson.fromJson(pinMessage.response, Message.class);
-
+                      //TODO NEED A MESSAGE MODEL
+                      //Message m = gson.fromJson(pinMessage.response, Message.class);
                   }
                   break;
               case SEND_DM:
