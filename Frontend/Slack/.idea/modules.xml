@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Slack.iml" filepath="$PROJECT_DIR$/Slack.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Slack.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Slack.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Slack.test.iml" filepath="$PROJECT_DIR$/.idea/modules/Slack.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend.main.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/frontend.test.iml" filepath="$PROJECT_DIR$/.idea/modules/frontend.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Slack.iml" filepath="$PROJECT_DIR$/.idea/Slack.iml" />
     </modules>
   </component>
 </project>

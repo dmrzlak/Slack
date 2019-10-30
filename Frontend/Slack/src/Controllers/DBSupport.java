@@ -41,7 +41,9 @@ public class DBSupport {
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
-        con.setRequestProperty("Content-Type", "application/json");
+//        con.setRequestProperty("Content-Type", "application/json");
+
+        con.setRequestProperty("Content-Type", "application/xml");
         String contentType = con.getHeaderField("Content-Type");
 
         //We want to know if we did good, or if Big Backend is mad at us
@@ -105,6 +107,29 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse createUser(String name, String password) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.createUser(name, password));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    /**
+     * Sets a message as pinned
+     * @param id
+     * @return
+     * @Author Joseph Hudson
+     */
+    public static HTTPResponse pinMessage(Integer id) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.pinMessage(id));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -120,7 +145,7 @@ public class DBSupport {
     }
 
     /**
-     * Staatic class to build our URL's to Strings.
+     * Static class to build our URL's to Strings.
      * Makes it a lot better to send it out to here, rather than build them in other methods
      */
     private static class ParamBuilder{
@@ -133,12 +158,23 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
+
+
+        // BASE_URL+"message/pinMessage?messageID=mID
         public static String createWorkspace(String name){
             return BASE_URL+"workspace/add?name="+name;
         }
 
         public static String joinWorkspace(String workspaceName, String username){
             return BASE_URL+"user/join?workspaceName="+workspaceName+"&name="+username;
+        }
+
+        public static String createUser(String name, String password){
+            return BASE_URL+"user/add?username="+name+"&password="+password;
+        }
+
+        public static String pinMessage(int mId){
+            return BASE_URL+"message/pinMessage?messageID=" + mId;
         }
     }
 }
