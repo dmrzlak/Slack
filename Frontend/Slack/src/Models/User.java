@@ -28,12 +28,15 @@ public class User {
         password = username;
     }
 
-    /**
-     * Create a workspace and call for the DBSUpport to request it put into the DB
-     * @Author Dylan Mrzlak
-     */
-    public static boolean createWorkspace(String workspaceName, String name){
-        DBSupport.HTTPResponse result = DBSupport.joinWorkspace(workspaceName, name);
-        return result.code < 300;
+    DBSupport.HTTPResponse createUser(String name, String password){
+        DBSupport.HTTPResponse res = DBSupport.createUser(name, password);
+        return res;
     }
+
+    /** to go into message not user
+    DBSupport.HTTPResponse pinMessage(Integer id){
+        DBSupport.HTTPResponse res = DBSupport.pinMessage(id);
+        return res;
+    }*/
+
 }

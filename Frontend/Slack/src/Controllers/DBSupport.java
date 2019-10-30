@@ -107,6 +107,30 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse createUser(String name, String password) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.createUser(name, password));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    /**
+     * Sets a message as pinned
+     * @param id
+     * @return
+     * @Author Joseph Hudson
+     */
+    public static HTTPResponse pinMessage(Integer id) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.pinMessage(id));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -122,7 +146,7 @@ public class DBSupport {
     }
 
     /**
-     * Staatic class to build our URL's to Strings.
+     * Static class to build our URL's to Strings.
      * Makes it a lot better to send it out to here, rather than build them in other methods
      */
     private static class ParamBuilder{
@@ -141,6 +165,10 @@ public class DBSupport {
 
         public static String joinWorkspace(String workspaceName, String username){
             return BASE_URL+"user/join?workspaceName="+workspaceName+"&name="+username;
+        }
+
+        public static String createUser(String name, String password){
+            return BASE_URL+"user/add?username="+name+"&password="+password;
         }
     }
 }
