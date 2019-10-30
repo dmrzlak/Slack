@@ -26,6 +26,12 @@ public class Message {
 
     private String content;
 
+    private Boolean pinned;
+
+    public Boolean isPinned() { return pinned; }
+
+    public void setPinned(Boolean pinned) { this.pinned = pinned; }
+
     public Integer getId() {
         return id;
     }
