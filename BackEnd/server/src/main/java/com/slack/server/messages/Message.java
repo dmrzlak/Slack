@@ -22,6 +22,8 @@ public class Message {
 
     private String content;
 
+    private Boolean pinned;
+
     public Integer getId() {
         return id;
     }
@@ -68,5 +70,13 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Boolean getPinned() {
+        return pinned;
+    }
+
+    public void setPinned(Boolean pinned) {
+        this.pinned = pinned;
     }
 }

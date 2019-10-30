@@ -93,7 +93,7 @@ public class UserController {
         x.setuId(u.getId());
         wXRefRepo.save(x);
 
-        //Return OK status (200) and Xref
-        return new ResponseEntity(x, HttpStatus.OK);
+        //Return OK status (200) and workspace
+        return new ResponseEntity(w, HttpStatus.OK);
     }
 }
