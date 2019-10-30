@@ -31,10 +31,12 @@ public class InputController {
       Scanner input = new Scanner(System.in);
       String userInput = "";
 
+      /*
       System.out.println("Please enter username:\n");
       User current = new User("", "");
       System.out.println("Please enter your password!\n");
       String password = input.nextLine();
+       */
 
       do {
           userInput = input.nextLine();
@@ -50,6 +52,15 @@ public class InputController {
                       System.out.println("Invalid Number or Arguments");
                       break;
                   }
+                  DBSupport.HTTPResponse uResponse = User.createUser(userArgs[0], userArgs[1]);
+                  if (uResponse.code > 300) {
+                      System.out.println(uResponse.response);
+                  } else {
+                      System.out.println("Saved User");
+                      User u = gson.fromJson(uResponse.response, User.class);
+                      thisUser = u;
+                  }
+                  break;
               case CREATE_WORKSPACE:
                   if(userArgs.length != 1) {
                       System.out.println("Invalid Number or Arguments");
@@ -92,12 +103,12 @@ public class InputController {
                       break;
                   }
                   DBSupport.HTTPResponse pinMessage = Workspace.pinMessage(userArgs[0]);
-                  if (pinMessage.code) {
+                  if (pinMessage.code > 300) {
                       System.out.println(pinMessage.response);
                   } else {
                       System.out.println("Pinned message");
                       Message m = gson.fromJson(pinMessage.response, Message.class);
-                      cur = m;
+
                   }
                   break;
               case SEND_DM:

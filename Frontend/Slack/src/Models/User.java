@@ -28,15 +28,9 @@ public class User {
         password = username;
     }
 
-    DBSupport.HTTPResponse createUser(String name, String password){
+    public static DBSupport.HTTPResponse createUser(String name, String password){
         DBSupport.HTTPResponse res = DBSupport.createUser(name, password);
         return res;
     }
-
-    /** to go into message not user
-    DBSupport.HTTPResponse pinMessage(Integer id){
-        DBSupport.HTTPResponse res = DBSupport.pinMessage(id);
-        return res;
-    }*/
 
 }

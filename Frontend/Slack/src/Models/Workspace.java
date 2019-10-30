@@ -35,6 +35,8 @@ public class Workspace {
     }
 
 
+    //TODO JOE -- PinMessage in here
+
     String getName(){
         return name;
     }
