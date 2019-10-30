@@ -19,6 +19,32 @@ public class Message {
 
     private Boolean pinned;
 
+    public Message(Integer id, Integer senderId, Integer wId, Integer cID, Integer recipientID, String content, Boolean pinned) {
+        this.id = id;
+        this.senderId = senderId;
+        this.wId = wId;
+        this.cID = cID;
+        this.recipientID = recipientID;
+        this.content = content;
+        this.pinned = pinned;
+    }
+
+    public Message(Integer id, Integer senderId, Integer recipientID, String content) {
+        this.id = id;
+        this.senderId = senderId;
+        this.recipientID = recipientID;
+        this.content = content;
+    }
+
+    public Message(Integer id, Integer senderId, Integer wId, Integer cID, String content, Boolean pinned) {
+        this.id = id;
+        this.senderId = senderId;
+        this.wId = wId;
+        this.cID = cID;
+        this.content = content;
+        this.pinned = pinned;
+    }
+
     public Integer getId() {
         return id;
     }

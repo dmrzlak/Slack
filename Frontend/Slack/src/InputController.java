@@ -1,5 +1,6 @@
 
 import Controllers.DBSupport;
+import Models.Message;
 import Models.User;
 import Models.Workspace;
 import java.util.Scanner;
@@ -116,7 +117,6 @@ public class InputController {
                   }
                   else {
                       System.out.println("Pinned message");
-                      git push
                       Message m = gson.fromJson(pinMessage.response, Message.class);
                   }
                   break;
