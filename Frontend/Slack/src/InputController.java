@@ -11,11 +11,13 @@ import com.google.gson.Gson;
  * It will take the initial input for User Input
  *  and then pass it along to other classes to handle the actual functionality
  * @Author Dylan Mrzlak
- *      Original Framework and Use handle for CREATE_WORkSPACE and JOIN_WORKSPACE
+ *      Original Framework and Use handle for CREATE_WORKSPACE and JOIN_WORKSPACE
  */
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
     private static final String JOIN_WORKSPACE = "join";
+    private static final String CREATE_CHANNEL = "create channel";
+    private static final String VIEW_USERS = "view users";
 
     public static void main(String[] args){
         Gson gson = new Gson();
@@ -37,7 +39,7 @@ public class InputController {
                       System.out.println(wResponse.response);
                   } else {
                       System.out.println("Saved Workspace");
-                     Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
                   }
                   break;
               case JOIN_WORKSPACE:
@@ -50,8 +52,33 @@ public class InputController {
                       cur = w;
                   }
                   break;
+              case CREATE_CHANNEL:
+                  if (cur == null) {
+                      System.out.println("User not in workspace");
+                      break;
+                  }
+                  if (userInput.substring(substringBegin + 1).trim().slice().size() > 2) {
+                      System.out.println("Too many arguments. Try: create channel - <workspace> \"name\" ");
+                  }
+                  DBSupport.HTTPResponse cResponse = Channel.createChannel(userInput.substring((substringBegin + 1), substring.indexOf(' ')),
+                                                                                                userInput.substring((substringBegin + 1).trim().indexOf(' ') + 1));
+                  if (cResponse.code > 300) {
+                      System.out.println(cResponse.response);
+                  } else {
+                      System.out.println("Saved Channel");
+                      Channel c = gson.fromJson(cResponse.response, Channel.class);
+                  }
+                  break;
+              case VIEW_USERS:
+                  DBSupport.HTTPResponse viewUsers = Workspace.getUsersInWorkspace(userInput.substring(substringBegin + 1).trim());
+                  if(viewUsers.code > 300) {
+                      System.out.println("There are no users in this workspace");
+                  }
+                  System.out.println(viewUser.response);
+                  break;
+
               default:
-                  System.out.println("Invalid Input please try again :(");
+                  System.out.println("Invalid Input. Please try again :(");
           }
       } while (input.hasNextLine());
 
