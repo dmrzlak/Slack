@@ -32,6 +32,14 @@ public class InputController {
       String userInput = "";
 
       /*
+      * We want to handle all forms of input via commands. THat is everything is in the switch case.
+      * Eventtually, logan or I will get HELP commands in here. Probably just listing the commands and arguments
+      * Possisble allowing "HELP - COMMAND" which will explain what the command does and the arguments/preconditions
+      *
+      *
+      *
+      *
+      * 
       System.out.println("Please enter username:\n");
       User current = new User("", "");
       System.out.println("Please enter your password!\n");
