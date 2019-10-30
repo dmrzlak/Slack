@@ -116,8 +116,8 @@ public class InputController {
                   }
                   else {
                       System.out.println("Pinned message");
-                      //TODO NEED A MESSAGE MODEL
-                      //Message m = gson.fromJson(pinMessage.response, Message.class);
+                      git push
+                      Message m = gson.fromJson(pinMessage.response, Message.class);
                   }
                   break;
               case SEND_DM:
