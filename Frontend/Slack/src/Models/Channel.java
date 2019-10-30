@@ -34,6 +34,12 @@ public class Channel {
     public Channel(String name, int wID){
         this.name = name;
         this.id = -1;
-        this.wID = wID;
+        this.wId = wID;
+    }
+
+    public Channel(String name, int wID, int id){
+        this.name = name;
+        this.id = id;
+        this.wId = wID;
     }
 }

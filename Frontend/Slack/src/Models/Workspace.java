@@ -20,6 +20,11 @@ public class Workspace {
        this.id = -1;
     }
 
+    public Workspace(String name, int id){
+        this.name = name;
+        this.id = id;
+    }
+
     public String getName(){
         return name;
     }

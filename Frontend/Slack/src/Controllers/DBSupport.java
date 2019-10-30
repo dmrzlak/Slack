@@ -158,9 +158,6 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
-
-
-        // BASE_URL+"message/pinMessage?messageID=mID
         public static String createWorkspace(String name){
             return BASE_URL+"workspace/add?name="+name;
         }

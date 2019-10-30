@@ -132,7 +132,12 @@ public class InputController {
                   if(viewUsers.code > 300) {
                       System.out.println("There are no users in this workspace");
                   }
-                  System.out.println(viewUsers.response);
+                  String[] userList = gson.fromJson(viewUsers.response, String[].class);
+                  System.out.println("\nUsers in workspace: " + cur.getName());
+                  for(int i = 0; i < userList.length; i++){
+                      System.out.println("\t"+userList[i]);
+                  }
+                  System.out.println("\n");
                   break;
               case PIN_MESSAGE:
                   if(thisUser == null) {
