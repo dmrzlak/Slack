@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping(path="/get")
-    public @ResponseBody ResponseEntity getChannel(@RequestParam String name){
+    public @ResponseBody ResponseEntity getUser(@RequestParam String name){
         if(uRepo.existsByName(name)){
             User u = uRepo.findbyName(name);
             return new ResponseEntity(u, HttpStatus.OK);
