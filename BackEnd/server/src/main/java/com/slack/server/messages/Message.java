@@ -28,13 +28,6 @@ public class Message {
 
     private Boolean pinned;
 
-<<<<<<< HEAD
-    public Boolean isPinned() { return pinned; }
-
-    public void setPinned(Boolean pinned) { this.pinned = pinned; }
-
-=======
->>>>>>> master
     public Integer getId() {
         return id;
     }
