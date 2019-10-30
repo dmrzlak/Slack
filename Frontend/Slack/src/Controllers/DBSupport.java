@@ -130,6 +130,23 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse createChannel(String workspaceName, String name) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.addNewChannel(workspaceName, name));
+            return response;
+        }   catch (Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse viewUsers(String workspaceName) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.getUsersInWorkspace(workspaceName));
+            return response;
+        }   catch (Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -172,6 +189,14 @@ public class DBSupport {
 
         public static String pinMessage(int mId){
             return BASE_URL+"message/pinMessage?messageID=" + mId;
+        }
+
+        public static String getUsersInWorkspace(String workspaceName) {
+            return BASE_URL+"workspace/getUsers/?name="+workspaceName;
+        }
+
+        public static String addNewChannel(String workspaceName, String name) {
+            return BASE_URL+"channel/add/?name="+workspaceName+"&name="+name;
         }
     }
 }
