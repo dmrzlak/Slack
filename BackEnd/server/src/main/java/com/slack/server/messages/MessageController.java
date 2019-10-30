@@ -85,13 +85,13 @@ public class MessageController {
     @RequestMapping(path="/pinMessage")
     @ResponseBody
     ResponseEntity pinMessage(@RequestParam Integer messageID){
-        if(!messageRepository.existsByID(messageID))
-            return new ResponseEntity("No message with that ID is found", HttpStatus.NOT_ACCEPTABLE);
-        Message m = messageRepository.getByID(messageID);
+        if(!messageRepository.existsByID(messageID)) return new ResponseEntity("No message with that ID is found", HttpStatus.NOT_ACCEPTABLE);
+        Message m = messageRepository.findByID(messageID);
         m.setPinned(true);
         messageRepository.save(m);
 
         return new ResponseEntity(m, HttpStatus.OK);
+
     }
 
 }

@@ -60,7 +60,7 @@ public class UserController {
     @GetMapping(path="/get")
     public @ResponseBody ResponseEntity getUser(@RequestParam String name){
         if(uRepo.existsByName(name)){
-            User u = uRepo.findbyName(name);
+            User u = uRepo.findByName(name);
             return new ResponseEntity(u, HttpStatus.OK);
         }
         return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
@@ -81,7 +81,7 @@ public class UserController {
         Workspace w = wRepo.findbyName(workspaceName);
         if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         //Get the user, we will use their ID later
-        User u = uRepo.findbyName(name);
+        User u = uRepo.findByName(name);
         if(u == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
 
         //Chack that the user isn't already in the workspace
