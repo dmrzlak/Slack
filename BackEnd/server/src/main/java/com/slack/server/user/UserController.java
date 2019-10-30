@@ -45,6 +45,15 @@ public class UserController {
         return new ResponseEntity(u, HttpStatus.OK);
     }
 
+    @GetMapping(path="/login")
+    public @ResponseBody ResponseEntity login(@RequestParam String username, @RequestParam String password){
+        if(!uRepo.existsByName(username)) return new ResponseEntity("No User found", HttpStatus.NOT_FOUND);
+        User u = uRepo.findByName(username);
+        if(password.equals(u.getPassword())) return new ResponseEntity(u, HttpStatus.OK);
+        return new ResponseEntity("Incorrect Password", HttpStatus.NOT_ACCEPTABLE);
+    }
+
+
     /**
      * Gets all the users in the DB
      * @return

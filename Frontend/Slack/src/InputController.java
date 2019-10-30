@@ -19,9 +19,12 @@ public class InputController {
     private static final String JOIN_WORKSPACE = "join";
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
+    private static final String ADD_USER = "create user";
+    private static final String LOGIN = "login";
 
     public static void main(String[] args){
-      Gson gson = new Gson();
+      //If this line get mad, check your dependencies, may have dropped
+        Gson gson = new Gson();
       User thisUser = null;
       Workspace cur = null;
       Scanner input = new Scanner(System.in);
@@ -39,19 +42,37 @@ public class InputController {
           int substringBegin = userInput.indexOf('-');
           if(substringBegin == -1) substringBegin = 0;
           String command = userInput.substring(0, substringBegin).trim();
+          String[] userArgs = userInput.substring(substringBegin + 1).trim().split(" ");
           switch (command){
+              case ADD_USER:
+                  if(userArgs.length != 2) {
+                      System.out.println("Invalid Number or Arguments");
+                      break;
+                  }
               case CREATE_WORKSPACE:
-                  DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userInput.substring(substringBegin + 1).trim());
+                  if(userArgs.length != 1) {
+                      System.out.println("Invalid Number or Arguments");
+                      break;
+                  }
+                  DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userArgs[0]);
                   if (wResponse.code > 300) {
                       System.out.println(wResponse.response);
                   } else {
                      System.out.println("Saved Workspace");
                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
-		     cur = w;
+		            cur = w;
                   }
                   break;
               case JOIN_WORKSPACE:
-                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), "dylan3");
+                  if(thisUser == null) {
+                      System.out.println("You need to create a user or sign in to continue");
+                      break;
+                  }
+                  if(userArgs.length != 1) {
+                      System.out.println("Invalid Number or Arguments");
+                      break;
+                  }
+                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userArgs[0], thisUser.getName());
                   if (joinWorkspace.code > 300) {
                       System.out.println(joinWorkspace.response);
                   } else {
