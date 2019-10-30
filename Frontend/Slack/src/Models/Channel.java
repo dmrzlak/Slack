@@ -1,11 +1,18 @@
 package Models;
 
+import Controllers.DBSupport;
+
 public class Channel {
     private Integer id;
 
     private Integer wId;
 
     private String name;
+
+    public static DBSupport.HTTPResponse createChannel(String workspaceName, String name) {
+        DBSupport.HTTPResponse res = DBSupport.createChannel(workspaceName, name);
+        return res;
+    }
 
     public Integer getId() {
         return id;
@@ -34,6 +41,8 @@ public class Channel {
     public Channel(String name, int wID){
         this.name = name;
         this.id = -1;
-        this.wID = wID;
+        this.wId = wID;
     }
+
+
 }

@@ -18,16 +18,13 @@ import com.google.gson.Gson;
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
     private static final String JOIN_WORKSPACE = "join";
-<<<<<<< HEAD
     private static final String CREATE_CHANNEL = "create channel";
     private static final String VIEW_USERS = "view users";
-=======
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
     private static final String LOGIN = "login";
     private static final String PIN_MESSAGE = "pin message";
->>>>>>> master
 
     public static void main(String[] args){
       //If this line get mad, check your dependencies, may have dropped
