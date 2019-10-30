@@ -1,23 +1,14 @@
-package com.slack.server.messages;
-
-
-import org.springframework.lang.Nullable;
-
-import javax.persistence.*;
+package Models;
 /**
  * Model for the Message Table. Essentially this is what the table will contain
  * @Author Dylan Mrzlak
  */
-@Entity
 public class Message {
 
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
 
     private Integer senderId;
 
-    @Nullable
     private Integer wId;
 
     private Integer cID;

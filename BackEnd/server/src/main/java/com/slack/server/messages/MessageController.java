@@ -76,4 +76,23 @@ public class MessageController {
         return new ResponseEntity(m, HttpStatus.OK);
     }
 
+    /**
+     * sets a messages pinned status to true
+     * @param messageID
+     * @return error if ID doesn't match any existing messages.
+     * @author Joseph Hudson
+     */
+    @RequestMapping(path="/pinMessage")
+    @ResponseBody
+    ResponseEntity pinMessage(@RequestParam Integer messageID){
+        if(!messageRepository.existsByID(messageID)) return new ResponseEntity("No message with that ID is found", HttpStatus.NOT_ACCEPTABLE);
+        Message m = messageRepository.findByID(messageID);
+        m.setPinned(true);
+        messageRepository.save(m);
+
+        return new ResponseEntity(m, HttpStatus.OK);
+
+    }
+
 }
+

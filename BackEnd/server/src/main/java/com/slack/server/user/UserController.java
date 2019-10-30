@@ -4,7 +4,7 @@ import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
 import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
-import javafx.util.Pair;
+//import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +45,15 @@ public class UserController {
         return new ResponseEntity(u, HttpStatus.OK);
     }
 
+    @GetMapping(path="/login")
+    public @ResponseBody ResponseEntity login(@RequestParam String username, @RequestParam String password){
+        if(!uRepo.existsByName(username)) return new ResponseEntity("No User found", HttpStatus.NOT_FOUND);
+        User u = uRepo.findByName(username);
+        if(password.equals(u.getPassword())) return new ResponseEntity(u, HttpStatus.OK);
+        return new ResponseEntity("Incorrect Password", HttpStatus.NOT_ACCEPTABLE);
+    }
+
+
     /**
      * Gets all the users in the DB
      * @return
@@ -58,9 +67,9 @@ public class UserController {
     }
 
     @GetMapping(path="/get")
-    public @ResponseBody ResponseEntity getChannel(@RequestParam String name){
+    public @ResponseBody ResponseEntity getUser(@RequestParam String name){
         if(uRepo.existsByName(name)){
-            User u = uRepo.findbyName(name);
+            User u = uRepo.findByName(name);
             return new ResponseEntity(u, HttpStatus.OK);
         }
         return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
@@ -81,7 +90,7 @@ public class UserController {
         Workspace w = wRepo.findbyName(workspaceName);
         if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         //Get the user, we will use their ID later
-        User u = uRepo.findbyName(name);
+        User u = uRepo.findByName(name);
         if(u == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
 
         //Chack that the user isn't already in the workspace
