@@ -21,6 +21,7 @@ public class InputController {
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
     private static final String LOGIN = "login";
+    private static final String PIN_MESSAGE = "pin message";
 
     public static void main(String[] args){
       //If this line get mad, check your dependencies, may have dropped
@@ -30,10 +31,12 @@ public class InputController {
       Scanner input = new Scanner(System.in);
       String userInput = "";
 
+      /*
       System.out.println("Please enter username:\n");
       User current = new User("", "");
       System.out.println("Please enter your password!\n");
       String password = input.nextLine();
+       */
 
       do {
           userInput = input.nextLine();
@@ -49,6 +52,15 @@ public class InputController {
                       System.out.println("Invalid Number or Arguments");
                       break;
                   }
+                  DBSupport.HTTPResponse uResponse = User.createUser(userArgs[0], userArgs[1]);
+                  if (uResponse.code > 300) {
+                      System.out.println(uResponse.response);
+                  } else {
+                      System.out.println("Saved User");
+                      User u = gson.fromJson(uResponse.response, User.class);
+                      thisUser = u;
+                  }
+                  break;
               case CREATE_WORKSPACE:
                   if(userArgs.length != 1) {
                       System.out.println("Invalid Number or Arguments");
@@ -79,6 +91,25 @@ public class InputController {
                       System.out.println("Joining Workspace");
                       Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
                       cur = w;
+                  }
+                  break;
+              case PIN_MESSAGE:
+                  if(thisUser == null) {
+                      System.out.println("You need to create a user or sign in to continue");
+                      break;
+                  }
+                  if(userArgs.length != 1) {
+                      System.out.println("Invalid Number or Arguments");
+                      break;
+                  }
+                  DBSupport.HTTPResponse pinMessage = Workspace.pinMessage(userArgs[0]);
+                  if (pinMessage.code > 300) {
+                      System.out.println(pinMessage.response);
+                  }
+                  else {
+                      System.out.println("Pinned message");
+                      //TODO NEED A MESSAGE MODEL
+                      //Message m = gson.fromJson(pinMessage.response, Message.class);
                   }
                   break;
               case SEND_DM:

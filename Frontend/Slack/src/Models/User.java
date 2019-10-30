@@ -28,8 +28,9 @@ public class User {
         password = username;
     }
 
-    DBSupport.HTTPResponse createUser(String name, String passworo){
+    public static DBSupport.HTTPResponse createUser(String name, String password){
         DBSupport.HTTPResponse res = DBSupport.createUser(name, password);
         return res;
     }
+
 }
