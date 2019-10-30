@@ -47,6 +47,7 @@ public class MessageController {
         m.setContent(message);
         m.setwId(null);
         m.setcID(null);
+        m.setPinned(false);
         messageRepository.save(m);
         return new ResponseEntity(m, HttpStatus.OK);
     }
@@ -70,6 +71,7 @@ public class MessageController {
         m.setContent(message);
         m.setwId(workspace.getId());
         m.setcID(channel.getId());
+        m.setPinned(false);
         messageRepository.save(m);
         return new ResponseEntity(m, HttpStatus.OK);
     }
@@ -93,3 +95,4 @@ public class MessageController {
     }
 
 }
+

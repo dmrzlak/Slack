@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-<<<<<<< HEAD:Frontend/.idea/workspace.xml
-    <list default="true" id="a5a8aef1-40bf-4257-9787-6949973c1314" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../BackEnd/server/src/main/java/com/slack/server/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../BackEnd/server/src/main/java/com/slack/server/user/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Slack/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Slack/Slack.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/Slack.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Slack/src/InputController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/src/InputController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Slack/src/Models/Workspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/Slack/src/Models/Workspace.java" afterDir="false" />
-=======
     <list default="true" id="945ffc1b-3a43-423d-98e4-79cf647ea1d9" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Frontend/Slack/src/InputController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/Slack/src/InputController.java" afterDir="false" />
->>>>>>> master:.idea/workspace.xml
+      <change beforePath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/Message.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/Message.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/MessageController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/MessageRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/server/src/main/java/com/slack/server/messages/MessageRepository.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -49,15 +41,17 @@
       <created>1572393869714</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-<<<<<<< HEAD:Frontend/.idea/workspace.xml
-      <updated>1572220182266</updated>
-      <workItem from="1572220236369" duration="116000" />
-      <workItem from="1572379170396" duration="768000" />
-=======
       <updated>1572393869714</updated>
       <workItem from="1572393874169" duration="39000" />
->>>>>>> master:.idea/workspace.xml
     </task>
+    <task id="LOCAL-00001" summary="Trying to push again, I am hella out of it right now so I might've 100% fucked up.">
+      <created>1572402248181</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1572402248181</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -75,5 +69,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Trying to push again, I am hella out of it right now so I might've 100% fucked up." />
+    <option name="LAST_COMMIT_MESSAGE" value="Trying to push again, I am hella out of it right now so I might've 100% fucked up." />
   </component>
 </project>

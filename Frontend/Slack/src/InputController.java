@@ -2,9 +2,9 @@
 import Controllers.DBSupport;
 import Models.User;
 import Models.Workspace;
+import java.util.Scanner;
 import com.google.gson.Gson;
 
-import java.util.Scanner;
 
 /**
  * This will be the main controller for the application.
@@ -20,11 +20,10 @@ public class InputController {
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
 
-
     public static void main(String[] args){
-        Workspace curWorkspace;
-        Gson gson = new Gson();
-        User thisUser = null;
+      Gson gson = new Gson();
+      User thisUser = null;
+      Workspace cur = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
 
@@ -38,6 +37,7 @@ public class InputController {
           //By forcing commands to be in a format of COMMAND - ARGUMENT
           //We can easily manage the input and decide what is needed
           int substringBegin = userInput.indexOf('-');
+          if(substringBegin == -1) substringBegin = 0;
           String command = userInput.substring(0, substringBegin).trim();
           switch (command){
               case CREATE_WORKSPACE:
@@ -45,23 +45,22 @@ public class InputController {
                   if (wResponse.code > 300) {
                       System.out.println(wResponse.response);
                   } else {
-                      System.out.println("Saved Workspace");
-                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
-                      curWorkspace = w;
+                     System.out.println("Saved Workspace");
+                     Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+		     cur = w;
                   }
                   break;
               case JOIN_WORKSPACE:
-                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), thisUser.getName());
+                  DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userInput.substring(substringBegin + 1).trim(), "dylan3");
                   if (joinWorkspace.code > 300) {
                       System.out.println(joinWorkspace.response);
                   } else {
                       System.out.println("Joining Workspace");
                       Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
-                      curWorkspace = w;
+                      cur = w;
                   }
                   break;
               case SEND_DM:
-
                   break;
 
                   default:

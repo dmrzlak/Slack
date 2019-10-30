@@ -41,7 +41,9 @@ public class DBSupport {
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
-        con.setRequestProperty("Content-Type", "application/json");
+//        con.setRequestProperty("Content-Type", "application/json");
+
+        con.setRequestProperty("Content-Type", "application/xml");
         String contentType = con.getHeaderField("Content-Type");
 
         //We want to know if we did good, or if Big Backend is mad at us

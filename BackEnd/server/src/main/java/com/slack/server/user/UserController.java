@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @GetMapping(path="/get")
-    public @ResponseBody ResponseEntity getChannel(@RequestParam String name){
+    public @ResponseBody ResponseEntity getUser(@RequestParam String name){
         if(uRepo.existsByName(name)){
             User u = uRepo.findbyName(name);
             return new ResponseEntity(u, HttpStatus.OK);
@@ -93,7 +93,7 @@ public class UserController {
         x.setuId(u.getId());
         wXRefRepo.save(x);
 
-        //Return OK status (200) and Xref
-        return new ResponseEntity(x, HttpStatus.OK);
+        //Return OK status (200) and workspace
+        return new ResponseEntity(w, HttpStatus.OK);
     }
 }
