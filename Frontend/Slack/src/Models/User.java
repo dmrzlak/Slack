@@ -6,10 +6,24 @@ public class User {
 
     private String name;
     private String password;
-
+    private Integer userId;
     public User(String uName, String uPassword){
         name = uName;
         password = uPassword;
+        userId = -1;
+    }
+    public User(String uName, String uPassword, Integer uId){
+        name = uName;
+        password = uPassword;
+        userId = uId;
+    }
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getName() {

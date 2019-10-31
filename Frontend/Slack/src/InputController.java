@@ -3,6 +3,9 @@ import Controllers.DBSupport;
 import Models.Message;
 import Models.User;
 import Models.Workspace;
+
+import java.nio.channels.Channel;
+import java.util.Random;
 import java.util.Scanner;
 import com.google.gson.Gson;
 
@@ -31,6 +34,9 @@ public class InputController {
       Workspace cur = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
+      Random rand = new Random();
+      Channel curChannel;
+      int messageNumber;
 
       /*
       * We want to handle all forms of input via commands. THat is everything is in the switch case.
@@ -121,11 +127,42 @@ public class InputController {
                   }
                   break;
               case SEND_DM:
-
+                  if(userArgs.length < 2){
+                      System.out.println("Invalid number of arguments");
+                  }
+                  String directMessage = "";
+                  for(int i = 1; i < userArgs.length; i++){
+                      directMessage += userArgs[i];
+                  }
+                  DBSupport.HTTPResponse dm = Message.sendDirectMessage(thisUser.getName(), userArgs[0], directMessage);
+                  if (dm.code > 300) {
+                      System.out.println(dm.response);
+                  } else {
+                      System.out.println("Joining Workspace");
+                      Message m = gson.fromJson(dm.response, Message.class);
+                      System.out.println("Message Sent: \n\t" + m.getContent());
+                  }
                   break;
-
+              case SEND:
+                  if(userArgs.length < 1){
+                      System.out.println("Invalid number of arguments");
+                  }
+                  String message = "";
+                  for(int i = 0; i < userArgs.length; i++){
+                      message += userArgs[i];
+                  }
+                  DBSupport.HTTPResponse sendMessage = Message.sendMessage(thisUser.getName(), cur.getName(), curChannel.getName(), message);
+                  if (sendMessage.code > 300) {
+                      System.out.println(sendMessage.response);
+                  } else {
+                      System.out.println("Joining Workspace");
+                      Message m = gson.fromJson(sendMessage.response, Message.class);
+                      System.out.println("Message Sent: \n\t" + m.getContent());
+                  }
+                  break;
                   default:
                   System.out.println("Invalid Input please try again :(");
+                  break;
           }
       } while (input.hasNextLine());
 

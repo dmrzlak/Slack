@@ -1,4 +1,7 @@
 package Models;
+
+import Controllers.DBSupport;
+
 /**
  * Model for the Message Table. Essentially this is what the table will contain
  * @Author Dylan Mrzlak
@@ -28,14 +31,14 @@ public class Message {
         this.content = content;
         this.pinned = pinned;
     }
-
+    //public message
     public Message(Integer id, Integer senderId, Integer recipientID, String content) {
         this.id = id;
         this.senderId = senderId;
         this.recipientID = recipientID;
         this.content = content;
     }
-
+    //dm
     public Message(Integer id, Integer senderId, Integer wId, Integer cID, String content, Boolean pinned) {
         this.id = id;
         this.senderId = senderId;
@@ -99,5 +102,15 @@ public class Message {
 
     public void setPinned(Boolean pinned) {
         this.pinned = pinned;
+    }
+
+    public static DBSupport.HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message){
+            DBSupport.HTTPResponse res = DBSupport.sendMessage(senderName, workspaceName, channelName, message);
+            return res;
+
+    }
+    public static DBSupport.HTTPResponse sendDirectMessage(String senderName, String receiver, String message){
+        DBSupport.HTTPResponse res = DBSupport.sendDirectMessage(senderName, receiver, message);
+        return res;
     }
 }

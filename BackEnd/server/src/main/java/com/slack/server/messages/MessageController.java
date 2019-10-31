@@ -34,11 +34,11 @@ public class MessageController {
 
     @RequestMapping(path="/directMessage")
     @ResponseBody
-    ResponseEntity directMessage(@RequestParam String senderName, @RequestParam String rid, @RequestParam String message){
+    ResponseEntity directMessage(@RequestParam String senderName, @RequestParam String recieverName, @RequestParam String message){
         User sender = userRepository.findByName(senderName);
         if(sender == null)
             return new ResponseEntity("User Sender Not Found!!!", HttpStatus.NOT_FOUND);
-        User recipient = userRepository.findByName(rid);
+        User recipient = userRepository.findByName(recieverName);
         if(recipient == null)
             return new ResponseEntity("User recipient Not Found!!!", HttpStatus.NOT_FOUND);
         Message m = new Message();

@@ -1,5 +1,7 @@
 package Controllers;
 
+import Models.Message;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -130,6 +132,24 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.sendMessage(senderName, workspaceName, channelName, message));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse sendDirectMessage(String senderName, String receiver, String message) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.sendDirectMessage(senderName, receiver, message));
+            return response;
+        }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -161,6 +181,13 @@ public class DBSupport {
 
 
         // BASE_URL+"message/pinMessage?messageID=mID
+        public static String sendDirectMessage(String sender, String reciever, String message){
+            return BASE_URL+"/message/directMessage?senderName"+sender+"&recieverName="+reciever+"&message="+message;
+        }
+        public static String sendMessage(String sender, String workspace, String channelName, String message){
+            return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
+        }
+
         public static String createWorkspace(String name){
             return BASE_URL+"workspace/add?name="+name;
         }
