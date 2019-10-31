@@ -20,7 +20,12 @@ public class Workspace {
        this.id = -1;
     }
 
-    String getName(){
+    public Workspace(String name, int id){
+        this.name = name;
+        this.id = id;
+    }
+
+    public String getName(){
         return name;
     }
 
@@ -59,4 +64,8 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
+        DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
+        return res;
+    }
 }

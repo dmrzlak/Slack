@@ -1,10 +1,9 @@
-
 import Controllers.DBSupport;
 import Models.Message;
+import Models.Channel;
 import Models.User;
 import Models.Workspace;
 
-import java.nio.channels.Channel;
 import java.util.Random;
 import java.util.Scanner;
 import com.google.gson.Gson;
@@ -16,11 +15,13 @@ import com.google.gson.Gson;
  * It will take the initial input for User Input
  *  and then pass it along to other classes to handle the actual functionality
  * @Author Dylan Mrzlak
- *      Original Framework and Use handle for CREATE_WORkSPACE and JOIN_WORKSPACE
+ *      Original Framework and Use handle for CREATE_WORKSPACE and JOIN_WORKSPACE
  */
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
     private static final String JOIN_WORKSPACE = "join";
+    private static final String CREATE_CHANNEL = "create channel";
+    private static final String VIEW_USERS = "view users";
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
@@ -34,9 +35,7 @@ public class InputController {
       Workspace cur = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
-      Random rand = new Random();
-      Channel curChannel;
-      int messageNumber;
+      Channel curChannel = null;
 
       /*
       * We want to handle all forms of input via commands. THat is everything is in the switch case.
@@ -108,6 +107,39 @@ public class InputController {
                       cur = w;
                   }
                   break;
+              case CREATE_CHANNEL:
+                  if (cur == null) {
+                      System.out.println("User not in workspace");
+                      break;
+                  }
+                  if (userArgs.length != 2) {
+                      System.out.println("Wrong Number of arguments. Try: create channel - <workspace> <name> ");
+                  }
+                  DBSupport.HTTPResponse cResponse = Channel.createChannel(userArgs[0], userArgs[1]);
+                  if (cResponse.code > 300) {
+                      System.out.println(cResponse.response);
+                  } else {
+                      System.out.println("Saved Channel");
+                      Channel c = gson.fromJson(cResponse.response, Channel.class);
+                      curChannel = c;
+                  }
+                  break;
+              case VIEW_USERS:
+                  if (cur == null) {
+                      System.out.println("User not in workspace");
+                      break;
+                  }
+                  DBSupport.HTTPResponse viewUsers = Workspace.getUsersInWorkspace(cur.getName());
+                  if(viewUsers.code > 300) {
+                      System.out.println("There are no users in this workspace");
+                  }
+                  String[] userList = gson.fromJson(viewUsers.response, String[].class);
+                  System.out.println("\nUsers in workspace: " + cur.getName());
+                  for(int i = 0; i < userList.length; i++){
+                      System.out.println("\t"+userList[i]);
+                  }
+                  System.out.println("\n");
+                  break;
               case PIN_MESSAGE:
                   if(thisUser == null) {
                       System.out.println("You need to create a user or sign in to continue");
@@ -144,6 +176,18 @@ public class InputController {
                   }
                   break;
               case SEND:
+                  if(thisUser == null) {
+                      System.out.println("You need to create a user or sign in to continue");
+                      break;
+                  }
+                  if (cur == null) {
+                      System.out.println("User not in workspace");
+                      break;
+                  }
+                  if (curChannel == null) {
+                      System.out.println("User not in Channel;");
+                      break;
+                  }
                   if(userArgs.length < 1){
                       System.out.println("Invalid number of arguments");
                   }

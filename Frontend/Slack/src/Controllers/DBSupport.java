@@ -141,11 +141,29 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse createChannel(String workspaceName, String name) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.addNewChannel(workspaceName, name));
+            return response;
+        }   catch (Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     public static HTTPResponse sendDirectMessage(String senderName, String receiver, String message) {
         try{
             HTTPResponse response = serverRequest(ParamBuilder.sendDirectMessage(senderName, receiver, message));
             return response;
         }  catch(Exception e){
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse viewUsers(String workspaceName) {
+        try{
+            HTTPResponse response = serverRequest(ParamBuilder.getUsersInWorkspace(workspaceName));
+            return response;
+        }   catch (Exception e){
             return new HTTPResponse(406, handleErr());
         }
     }
@@ -178,9 +196,6 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
-
-
-        // BASE_URL+"message/pinMessage?messageID=mID
         public static String sendDirectMessage(String sender, String reciever, String message){
             return BASE_URL+"/message/directMessage?senderName"+sender+"&recieverName="+reciever+"&message="+message;
         }
@@ -202,6 +217,14 @@ public class DBSupport {
 
         public static String pinMessage(int mId){
             return BASE_URL+"message/pinMessage?messageID=" + mId;
+        }
+
+        public static String getUsersInWorkspace(String workspaceName) {
+            return BASE_URL+"workspace/getUsers/?name="+workspaceName;
+        }
+
+        public static String addNewChannel(String workspaceName, String name) {
+            return BASE_URL+"channel/add/?name="+workspaceName+"&name="+name;
         }
     }
 }
