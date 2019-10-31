@@ -27,6 +27,7 @@ public class InputController {
     private static final String ADD_USER = "create user";
     private static final String LOGIN = "login";
     private static final String PIN_MESSAGE = "pin message";
+    private static final String HELP = "help";
 
     public static void main(String[] args){
       //If this line get mad, check your dependencies, may have dropped
@@ -61,6 +62,9 @@ public class InputController {
           String command = userInput.substring(0, substringBegin).trim();
           String[] userArgs = userInput.substring(substringBegin + 1).trim().split(" ");
           switch (command){
+              case HELP:
+                  printHelp();
+                  break;
               case ADD_USER:
                   if(userArgs.length != 2) {
                       System.out.println("Invalid Number or Arguments");
@@ -212,5 +216,26 @@ public class InputController {
 
   }
 
+//    private static final String CREATE_WORKSPACE = "create workspace";
+//    private static final String JOIN_WORKSPACE = "join";
+//    private static final String CREATE_CHANNEL = "create channel";
+//    private static final String VIEW_USERS = "view users";
+//    private static final String SEND = "send";
+//    private static final String SEND_DM = "send to";
+//    private static final String ADD_USER = "create user";
+//    private static final String LOGIN = "login";
+//    private static final String PIN_MESSAGE = "pin message";
+    private String printHelp(){
+        System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
+                "using - to sepreate arguments\n\n" +
+                "create workspace: create workspace - <name of workspace>\n" +
+                "join workspace: join - <name of workspace>\n" +
+                "create channel: create channel - <workspace name> - <channel name>\n"+
+                "create user: create user - <name> - <password>\n" +
+                "veiw users: veiw users\n" +
+                "send to group: send - <message>\n" +
+                "direct message: send to - <user> - <message>\n" +
+                "pin message: pin message - <message>\n");
+    }
 
 }
