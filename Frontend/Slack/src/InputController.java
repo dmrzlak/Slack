@@ -31,13 +31,13 @@ public class InputController {
 
     public static void main(String[] args){
       //If this line get mad, check your dependencies, may have dropped
-        Gson gson = new Gson();
+      Gson gson = new Gson();
       User thisUser = null;
       Workspace cur = null;
       Scanner input = new Scanner(System.in);
       String userInput = "";
       Channel curChannel = null;
-
+      printInstructions();
       /*
       * We want to handle all forms of input via commands. THat is everything is in the switch case.
       * Eventtually, logan or I will get HELP commands in here. Probably just listing the commands and arguments
@@ -59,7 +59,15 @@ public class InputController {
           //We can easily manage the input and decide what is needed
           int substringBegin = userInput.indexOf('-');
           if(substringBegin == -1) substringBegin = 0;
-          String command = userInput.substring(0, substringBegin).trim();
+          String command = "";
+
+          if(userInput.equalsIgnoreCase("help")){
+              command = userInput;
+          }
+          else{
+              command = userInput.substring(0, substringBegin).trim();
+          }
+
           String[] userArgs = userInput.substring(substringBegin + 1).trim().split(" ");
           switch (command){
               case HELP:
@@ -216,7 +224,14 @@ public class InputController {
 
   }
 
-//    private static final String CREATE_WORKSPACE = "create workspace";
+    private static void printInstructions() {
+        System.out.println("Welcome to Slack# (patent pending), our cheeky, user un-friendly, clone of Slack\n" +
+                "\t\tTo run this god forsaken app, type in a command and its arguments.\n" +
+                "\t\tIf you dont know the commands or need a refresher. I suggest you git gud skrub\n\n\n\n" +
+                "\t\t(Or enter \"help\", I'm not your mommy lol)");
+    }
+
+    //    private static final String CREATE_WORKSPACE = "create workspace";
 //    private static final String JOIN_WORKSPACE = "join";
 //    private static final String CREATE_CHANNEL = "create channel";
 //    private static final String VIEW_USERS = "view users";
@@ -225,14 +240,14 @@ public class InputController {
 //    private static final String ADD_USER = "create user";
 //    private static final String LOGIN = "login";
 //    private static final String PIN_MESSAGE = "pin message";
-    private String printHelp(){
+    private static void printHelp(){
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using - to sepreate arguments\n\n" +
                 "create workspace: create workspace - <name of workspace>\n" +
                 "join workspace: join - <name of workspace>\n" +
                 "create channel: create channel - <workspace name> - <channel name>\n"+
                 "create user: create user - <name> - <password>\n" +
-                "veiw users: veiw users\n" +
+                "view users: view users\n" +
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> - <message>\n" +
                 "pin message: pin message - <message>\n");
