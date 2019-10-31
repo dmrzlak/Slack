@@ -20,7 +20,7 @@ public class Message {
     @Nullable
     private Integer wId;
 
-    private Integer cID;
+    private Integer cId;
 
     private Integer recipientID;
 
@@ -53,11 +53,11 @@ public class Message {
     }
 
     public Integer getcID() {
-        return cID;
+        return cId;
     }
 
     public void setcID(Integer cID) {
-        this.cID = cID;
+        this.cId = cID;
     }
 
     public Integer getRecipientID() {

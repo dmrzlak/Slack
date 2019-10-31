@@ -224,7 +224,7 @@ public class DBSupport {
         }
 
         public static String addNewChannel(String workspaceName, String name) {
-            return BASE_URL+"channel/add/?name="+workspaceName+"&name="+name;
+            return BASE_URL+"channel/add?name="+workspaceName+"&name="+name;
         }
     }
 }
