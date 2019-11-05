@@ -81,7 +81,8 @@ public class InputController {
                   DBSupport.HTTPResponse uResponse = User.createUser(userArgs[0], userArgs[1]);
                   if (uResponse.code > 300) {
                       System.out.println(uResponse.response);
-                  } else {
+                  } 
+				  else {
                       System.out.println("Saved User");
                       User u = gson.fromJson(uResponse.response, User.class);
                       thisUser = u;
@@ -95,7 +96,8 @@ public class InputController {
                   DBSupport.HTTPResponse wResponse = Workspace.createWorkspace(userArgs[0]);
                   if (wResponse.code > 300) {
                       System.out.println(wResponse.response);
-                  } else {
+                  } 
+				  else {
                      System.out.println("Saved Workspace");
                      Workspace w = gson.fromJson(wResponse.response, Workspace.class);
 		            cur = w;
@@ -113,7 +115,8 @@ public class InputController {
                   DBSupport.HTTPResponse joinWorkspace = Workspace.joinWorkspace(userArgs[0], thisUser.getName());
                   if (joinWorkspace.code > 300) {
                       System.out.println(joinWorkspace.response);
-                  } else {
+                  } 
+				  else {
                       System.out.println("Joining Workspace");
                       Workspace w = gson.fromJson(joinWorkspace.response, Workspace.class);
                       cur = w;
@@ -126,11 +129,13 @@ public class InputController {
                   }
                   if (userArgs.length != 2) {
                       System.out.println("Wrong Number of arguments. Try: create channel - <workspace> <name> ");
+			  			break;
                   }
                   DBSupport.HTTPResponse cResponse = Channel.createChannel(userArgs[0], userArgs[1]);
                   if (cResponse.code > 300) {
                       System.out.println(cResponse.response);
-                  } else {
+                  } 
+				  else {
                       System.out.println("Saved Channel");
                       Channel c = gson.fromJson(cResponse.response, Channel.class);
                       curChannel = c;
@@ -144,6 +149,7 @@ public class InputController {
                   DBSupport.HTTPResponse viewUsers = Workspace.getUsersInWorkspace(cur.getName());
                   if(viewUsers.code > 300) {
                       System.out.println("There are no users in this workspace");
+			  			break;
                   }
                   String[] userList = gson.fromJson(viewUsers.response, String[].class);
                   System.out.println("\nUsers in workspace: " + cur.getName());
@@ -173,6 +179,7 @@ public class InputController {
               case SEND_DM:
                   if(userArgs.length < 2){
                       System.out.println("Invalid number of arguments");
+			  			break;
                   }
                   String directMessage = "";
                   for(int i = 1; i < userArgs.length; i++){
@@ -181,7 +188,8 @@ public class InputController {
                   DBSupport.HTTPResponse dm = Message.sendDirectMessage(thisUser.getName(), userArgs[0], directMessage);
                   if (dm.code > 300) {
                       System.out.println(dm.response);
-                  } else {
+                  } 
+				  else {
                       System.out.println("Joining Workspace");
                       Message m = gson.fromJson(dm.response, Message.class);
                       System.out.println("Message Sent: \n\t" + m.getContent());
@@ -202,6 +210,7 @@ public class InputController {
                   }
                   if(userArgs.length < 1){
                       System.out.println("Invalid number of arguments");
+						break;
                   }
                   String message = "";
                   for(int i = 0; i < userArgs.length; i++){
@@ -210,7 +219,8 @@ public class InputController {
                   DBSupport.HTTPResponse sendMessage = Message.sendMessage(thisUser.getName(), cur.getName(), curChannel.getName(), message);
                   if (sendMessage.code > 300) {
                       System.out.println(sendMessage.response);
-                  } else {
+                  } 
+				  else {
                       System.out.println("Joining Workspace");
                       Message m = gson.fromJson(sendMessage.response, Message.class);
                       System.out.println("Message Sent: \n\t" + m.getContent());
