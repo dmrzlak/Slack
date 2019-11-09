@@ -302,7 +302,7 @@ public class DBSupport {
         }
 
         public static String getUserNameById(Integer senderId) {
-            return BASE_URL+"user/getUsername?id="+senderId;
+            return BASE_URL+"user/getUsername?senderId="+senderId;
         }
 
         public static String signin(String username, String password) {

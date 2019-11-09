@@ -131,7 +131,8 @@ public class InputController {
             Message[] mentions = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your mentions:");
             for (Message mention : mentions) {
-                String printMention = "\t" + mention.getContent() + "\n";
+                String printMention = "\t" + mention.getContent();
+                System.out.println(printMention);
             }
         }
 
@@ -164,103 +165,17 @@ public class InputController {
             System.out.println("Retrieval for: " + curWorkspace.getName() + " successful");
             Message[] messages = gson.fromJson(response.response, Message[].class);
             String workspaceName = curWorkspace.getName();
-            //There is a real possibility that this could take a long time (and it's , so I'm going to run it asynchronously
-            new Thread(new Runnable() {
-                public void run() {
-
-                    //For the log file, as of now, we'll put it into the out folder under a folder logs
-                    //and with the name:
-                    //      "LOG_<WORKSPACENAME>_<DATE>
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm");
-                    Date date = new Date();
-                    String filePath = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
-                    System.out.println("Formatting");
-                    String[] linesToWrite = LogMessagesFormat(messages);
-                    System.out.println("Formatting");
-                    WriteFile(linesToWrite, filePath);
-
-                }
-
-                private void WriteFile(String[] linesToWrite, String filePath) {
-                   //Below is how we'll write to a file
-                    try {
-                        //We want to put it in the source directory of the entire project so for Dylan (the author):
-                        //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
-                        // Get that relative directory and if it doesn't exist. Make it
-                        File dir = new File("..\\..\\logs\\");
-                        if(!dir.exists()){
-                            dir.mkdir();
-                        }
-                        //Get the file for to write to.
-                        // It shouldn't really exist unless a user logs twice within a minute
-                        //If it does exist, delete it, and make a new one
-                        File toWrite = new File(dir + filePath);
-                        FileWriter fw;
-                        if(toWrite.exists())
-                            toWrite.delete();
-                        toWrite.createNewFile();
-                        //Set it to be writable
-                        toWrite.setWritable(true);
-                        //Prepare to start writing the file. Making a file Writer, and then iteration through the data
-                        //and writing those lines into the file.
-                        fw = new FileWriter(toWrite);
-                        for(String line: linesToWrite){
-                            fw.write(line);
-                        }
-                        //Close the writer to prevent memory leaks
-                        fw.close();
-                        //set the file to read only. Gotta keep our logs pure and clean
-                        toWrite.setReadOnly();
-                        System.out.println("File " + filePath + "Written to: \n" +
-                                "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
-                                "Relative Path: " + toWrite.getPath() + "\n");
-                    }
-                    catch (IOException e) {
-                        //Lots of methods have the chance to throw an error (although they shouldn't now)
-                        //So we want to print that error.
-                        e.printStackTrace();
-                    }
-                }
-
-                private String[] LogMessagesFormat(Message[] messages) {
-                    String[] file = new String[messages.length];
-                    //We want to show the Workspace and Channel along with sender for each
-                    //As channel will change (and workspace will not) we want to keep track of the channel and get its name
-                    // when it changes. So we'll keep track of a messages cId.
-                    //We also want to have the Sender's name for each message, and that's not grouped,
-                    // so we'll need to pull that each message :(
-                    int cId = -1;
-                    String channelName = "";
-                    for (int i = 0; i < messages.length; i++) {
-                        String messageString = "";
-                        Message message = messages[i];
-                        if (message.getcID() != cId) {
-                            cId = message.getcID();
-                            DBSupport.HTTPResponse cRepsonse = Channel.getChannelName(cId);
-                            if (cRepsonse.code >= 300) {
-                                // as we want all messages that are public, should an issue from the backend happen,
-                                // we want to still display the message. What we'll do is make just use a tab for that
-                                channelName = "\t";
-                            } else {
-                                channelName = cRepsonse.response;
-                            }
-                        }
-                        String senderName;
-                        DBSupport.HTTPResponse uRepsonse = User.getUserNameByID(message.getSenderId());
-                        if (uRepsonse.code >= 300) {
-                            // as we want all messages that are public, should an issue from the backend happen,
-                            // we want to still display the message. What we'll do is make just use a tab for that
-                            senderName = "\t";
-                        } else {
-                            senderName = uRepsonse.response;
-                        }
-                        messageString = "[" + workspaceName + "].[" + channelName + "]\t" + "FROM: " + senderName +
-                                "\n\tMESSAGE: " + message.getContent() + "\n";
-                        file[i] = messageString;
-                    }
-                    return file;
-                }
-            }).start();
+            //There is a real possibility that this could take a long time (and it's , so I'm going to run it asynchronously maybe later)
+            //For the log file, as of now, we'll put it into the out folder under a folder logs
+            //and with the name:
+            //      "LOG_<WORKSPACENAME>_<DATE>
+            DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm");
+            Date date = new Date();
+            String filePath = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
+            System.out.println("Formatting");
+            String[] linesToWrite = LogMessagesFormat(messages);
+            System.out.println("Writing");
+            WriteFile(linesToWrite, filePath);
         }
     }
 
@@ -463,4 +378,87 @@ public class InputController {
                 "view mentions: view mentions\n");
     }
 
+
+
+
+
+    private static void WriteFile(String[] linesToWrite, String filePath) {
+        //Below is how we'll write to a file
+        try {
+            //We want to put it in the source directory of the entire project so for Dylan (the author):
+            //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
+            // Get that relative directory and if it doesn't exist. Make it
+            File dir = new File("..\\..\\logs\\");
+            if(!dir.exists()){
+                dir.mkdir();
+            }
+            //Get the file for to write to.
+            // It shouldn't really exist unless a user logs twice within a minute
+            //If it does exist, delete it, and make a new one
+            File toWrite = new File(dir + filePath + ".txt");
+            FileWriter fw;
+            if(toWrite.exists())
+                toWrite.delete();
+            toWrite.createNewFile();
+            //Set it to be writable
+            toWrite.setWritable(true);
+            //Prepare to start writing the file. Making a file Writer, and then iteration through the data
+            //and writing those lines into the file.
+            fw = new FileWriter(toWrite);
+            for(String line: linesToWrite){
+                fw.write(line);
+            }
+            //Close the writer to prevent memory leaks
+            fw.close();
+            //set the file to read only. Gotta keep our logs pure and clean
+            toWrite.setReadOnly();
+            System.out.println("File " + filePath + "Written to: \n" +
+                    "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
+                    "Relative Path: " + toWrite.getPath() + "\n");
+        }
+        catch (IOException e) {
+            //Lots of methods have the chance to throw an error (although they shouldn't now)
+            //So we want to print that error.
+            e.printStackTrace();
+        }
+    }
+
+    private static String[] LogMessagesFormat(Message[] messages) {
+        String[] file = new String[messages.length];
+        //We want to show the Workspace and Channel along with sender for each
+        //As channel will change (and workspace will not) we want to keep track of the channel and get its name
+        // when it changes. So we'll keep track of a messages cId.
+        //We also want to have the Sender's name for each message, and that's not grouped,
+        // so we'll need to pull that each message :(
+        int cId = -1;
+        String channelName = "";
+        for (int i = 0; i < messages.length; i++) {
+            String messageString = "";
+            Message message = messages[i];
+            if (message.getcID() != cId) {
+                cId = message.getcID();
+                DBSupport.HTTPResponse cRepsonse = Channel.getChannelName(cId);
+                if (cRepsonse.code >= 300) {
+                    // as we want all messages that are public, should an issue from the backend happen,
+                    // we want to still display the message. What we'll do is make just use a tab for that
+                    channelName = "\t";
+                } else {
+                    channelName = cRepsonse.response;
+                }
+            }
+            String senderName;
+            DBSupport.HTTPResponse uRepsonse = User.getUserNameByID(message.getSenderId());
+            if (uRepsonse.code >= 300) {
+                // as we want all messages that are public, should an issue from the backend happen,
+                // we want to still display the message. What we'll do is make just use a tab for that
+                senderName = "\t";
+            } else {
+                senderName = uRepsonse.response;
+            }
+            messageString = "[" + curWorkspace.getName() + "].[" + channelName + "]\t" + "FROM: " + senderName +
+                    "\n\tMESSAGE: " + message.getContent() + "\n";
+            file[i] = messageString;
+        }
+        return file;
+    }
 }

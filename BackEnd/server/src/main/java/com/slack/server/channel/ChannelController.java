@@ -86,7 +86,8 @@ public class ChannelController {
         if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         Channel c = channelRepository.find(w.getId(), channelName);
         if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
-        Iterable<Message> list = mRepo.getAllMessageContainsUName(username, w.getId(), c.getId());
+        String query = "%" + username + "%";
+        Iterable<Message> list = mRepo.getAllMessageContainsUName(query, w.getId(), c.getId());
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
