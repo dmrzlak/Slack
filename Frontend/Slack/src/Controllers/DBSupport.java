@@ -197,7 +197,7 @@ public class DBSupport {
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
         public static String sendDirectMessage(String sender, String reciever, String message){
-            return BASE_URL+"/message/directMessage?senderName"+sender+"&recieverName="+reciever+"&message="+message;
+            return BASE_URL+"/message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
         }
         public static String sendMessage(String sender, String workspace, String channelName, String message){
             return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
@@ -224,7 +224,7 @@ public class DBSupport {
         }
 
         public static String addNewChannel(String workspaceName, String name) {
-            return BASE_URL+"channel/add?name="+workspaceName+"&name="+name;
+            return BASE_URL+"channel/add?workspaceName="+workspaceName+"&name="+name;
         }
     }
 }
