@@ -14,6 +14,11 @@ public class Channel {
         return res;
     }
 
+    public static DBSupport.HTTPResponse viewMentions(String userName, String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.viewMentions(userName, workspaceName, channelName);
+        return res;
+    }
+
     public Integer getId() {
         return id;
     }

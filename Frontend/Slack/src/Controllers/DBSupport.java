@@ -22,7 +22,8 @@ public class DBSupport {
 
     /**
      * Connect to the backend via HTTPRequest. The controllers on the backend have specific URL mappings,
-     *      so we can use those to proc the backend to do its work
+     * so we can use those to proc the backend to do its work
+     *
      * @param url
      * @return
      * @throws URISyntaxException
@@ -80,92 +81,116 @@ public class DBSupport {
     }
 
     //Prints an error for stating the a request couldn't finish for whatever reason. Helps keep the app from being pissy
-    public static String handleErr(){
+    public static String handleErr() {
         System.out.println("Unable to handle the request, please check your connection, try again");
         return null;
     }
 
     /**
      * Creates a request to the backend to make a Workspace
+     *
      * @param name
      * @return
      * @Author Dylan Mrzlak
      */
-    public static HTTPResponse putWorkspace(String name){
-      try{
-          HTTPResponse response = serverRequest(ParamBuilder.createWorkspace(name));
-          return response;
-      }  catch(Exception e){
-          return new HTTPResponse(406, handleErr());
-      }
+    public static HTTPResponse putWorkspace(String name) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.createWorkspace(name));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
     }
 
     public static HTTPResponse joinWorkspace(String workspaceName, String name) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.joinWorkspace(workspaceName, name));
             return response;
-        }  catch(Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
 
     public static HTTPResponse createUser(String name, String password) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.createUser(name, password));
             return response;
-        }  catch(Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
+
     /**
      * Sets a message as pinned
+     *
      * @param id
      * @return
      * @Author Joseph Hudson
      */
     public static HTTPResponse pinMessage(Integer id) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.pinMessage(id));
             return response;
-        }  catch(Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
 
     public static HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.sendMessage(senderName, workspaceName, channelName, message));
             return response;
-        }  catch(Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
 
     public static HTTPResponse createChannel(String workspaceName, String name) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.addNewChannel(workspaceName, name));
             return response;
-        }   catch (Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
 
     public static HTTPResponse sendDirectMessage(String senderName, String receiver, String message) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.sendDirectMessage(senderName, receiver, message));
             return response;
-        }  catch(Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
 
     public static HTTPResponse viewUsers(String workspaceName) {
-        try{
+        try {
             HTTPResponse response = serverRequest(ParamBuilder.getUsersInWorkspace(workspaceName));
             return response;
-        }   catch (Exception e){
+        } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
+    }
+
+    public static HTTPResponse viewMentions(String username, String workspaceName, String channelName) {
+        return new HTTPResponse(200, "");
+    }
+
+    public static HTTPResponse getAllMessages(String workspaceName) {
+        return new HTTPResponse(200, "");
+
+    }
+
+    public static HTTPResponse getChannelName(int cId) {
+        return new HTTPResponse(200, "");
+    }
+
+    public static HTTPResponse getUserNameByID(Integer senderId){
+        return new HTTPResponse(200,"");
+    }
+
+    public static HTTPResponse signin(String username, String password) {
+        return new HTTPResponse(200,"");
     }
 
     /**

@@ -18,6 +18,11 @@ public class User {
         userId = uId;
     }
 
+    public static DBSupport.HTTPResponse signIn(String username, String password) {
+        DBSupport.HTTPResponse res = DBSupport.signin(username, password);
+        return res;
+    }
+
     public Integer getUserId() {
         return userId;
     }

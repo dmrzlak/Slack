@@ -31,14 +31,16 @@ public class Message {
         this.content = content;
         this.pinned = pinned;
     }
-    //public message
+
+    //dm
     public Message(Integer id, Integer senderId, Integer recipientID, String content) {
         this.id = id;
         this.senderId = senderId;
         this.recipientID = recipientID;
         this.content = content;
     }
-    //dm
+
+    //public message
     public Message(Integer id, Integer senderId, Integer wId, Integer cID, String content, Boolean pinned) {
         this.id = id;
         this.senderId = senderId;
@@ -46,6 +48,11 @@ public class Message {
         this.cID = cID;
         this.content = content;
         this.pinned = pinned;
+    }
+
+    public static DBSupport.HTTPResponse getAllMessages(String name) {
+        DBSupport.HTTPResponse res = DBSupport.getAllMessages(name);
+        return res;
     }
 
     public Integer getId() {
