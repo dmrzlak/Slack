@@ -105,4 +105,16 @@ public class UserController {
         //Return OK status (200) and workspace
         return new ResponseEntity(w, HttpStatus.OK);
     }
+
+    @GetMapping(path = "/getUsername")
+    public @ResponseBody ResponseEntity getUserNameById(Integer senderId) {
+        if(uRepo.existsById(senderId)) {
+            User user = uRepo.findByID(senderId);
+            return new ResponseEntity(user.getName(), HttpStatus.OK);
+        }
+        return new ResponseEntity("User Does Not Exist", HttpStatus.NOT_FOUND);
+
+    }
+
+
 }

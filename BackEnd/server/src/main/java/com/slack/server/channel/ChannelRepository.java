@@ -13,6 +13,11 @@ public interface ChannelRepository extends CrudRepository<Channel, Integer>{
 
     @Query("SELECT c FROM Channel c WHERE c.wId = :wId AND c.name = :name")
     Channel find(@Param("wId") int wId, @Param("name") String name);
+
+
+    @Query("SELECT c FROM Channel c WHERE c.id = :cId")
+    Channel findByID( @Param("cId") int cId);
+
 }
 
 

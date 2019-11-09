@@ -23,6 +23,11 @@ public class User {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getUserNameByID(Integer senderId) {
+        DBSupport.HTTPResponse res = DBSupport.getUserNameByID(senderId);
+        return res;
+    }
+
     public Integer getUserId() {
         return userId;
     }

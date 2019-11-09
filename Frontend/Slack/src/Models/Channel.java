@@ -19,6 +19,11 @@ public class Channel {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getChannelName(int cId) {
+        DBSupport.HTTPResponse res = DBSupport.getChannelName(cId);
+        return res;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -211,6 +211,9 @@ public class InputController {
                         fw.close();
                         //set the file to read only. Gotta keep our logs pure and clean
                         toWrite.setReadOnly();
+                        System.out.println("File " + filePath + "Written to: \n" +
+                                "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
+                                "Relative Path: " + toWrite.getPath() + "\n");
                     }
                     catch (IOException e) {
                         //Lots of methods have the chance to throw an error (although they shouldn't now)
@@ -233,7 +236,7 @@ public class InputController {
                         Message message = messages[i];
                         if (message.getcID() != cId) {
                             cId = message.getcID();
-                            DBSupport.HTTPResponse cRepsonse = DBSupport.getChannelName(cId);
+                            DBSupport.HTTPResponse cRepsonse = Channel.getChannelName(cId);
                             if (cRepsonse.code >= 300) {
                                 // as we want all messages that are public, should an issue from the backend happen,
                                 // we want to still display the message. What we'll do is make just use a tab for that
@@ -243,7 +246,7 @@ public class InputController {
                             }
                         }
                         String senderName;
-                        DBSupport.HTTPResponse uRepsonse = DBSupport.getUserNameByID(message.getSenderId());
+                        DBSupport.HTTPResponse uRepsonse = User.getUserNameByID(message.getSenderId());
                         if (uRepsonse.code >= 300) {
                             // as we want all messages that are public, should an issue from the backend happen,
                             // we want to still display the message. What we'll do is make just use a tab for that

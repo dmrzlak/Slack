@@ -18,4 +18,12 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
     @Query("Select m From Message m where m.recipientID = :rId")
     Iterable<Message> getUsersMessages(@Param("rId") int rId);
 
+
+    @Query("Select m From Message m where m.wId = :wId ORDER BY m.cID ASC, m.id ASC")
+    Iterable<Message> getAllMessagesByWorkspace(@Param("wId") int wId);
+
+    @Query("Select m from Message m where m.wId = wId AND m.cID = cId AND m.content LIKE concat('%', username, '%')")
+    Iterable<Message> getAllMessageContainsUName(@Param("username") String username,
+                                                 @Param("wId") int wId,
+                                                 @Param("cId") int cId);
 }

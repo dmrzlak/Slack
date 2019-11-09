@@ -1,5 +1,7 @@
 package com.slack.server.channel;
 
+import com.slack.server.messages.Message;
+import com.slack.server.messages.MessageRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 //import javafx.util.Pair;
@@ -22,6 +24,9 @@ public class ChannelController {
 
     @Autowired
     private ChannelRepository channelRepository;
+
+    @Autowired
+    private MessageRepository mRepo;
 
     /**
      * Create a channel for the DB and put them into the table
@@ -73,6 +78,23 @@ public class ChannelController {
             return new ResponseEntity(c, HttpStatus.OK);
         }
         return new ResponseEntity("Channel Does Not Exist", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path="/viewMentions")
+    public @ResponseBody ResponseEntity viewMentions(String username, String workspaceName, String channelName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        Iterable<Message> list = mRepo.getAllMessageContainsUName(username, w.getId(), c.getId());
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
+
+    @GetMapping(path="/getName")
+    public @ResponseBody ResponseEntity getChannelName(int cId) {
+        Channel c = channelRepository.findByID(cId);
+        if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(c.getName(), HttpStatus.OK);
 
     }
 }

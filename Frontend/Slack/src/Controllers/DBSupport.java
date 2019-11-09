@@ -172,26 +172,61 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Get all the mentions within a channel for a given user
+     * @param username
+     * @param workspaceName
+     * @param channelName
+     * @return Status code of the HTTP call and a response string (either a JSON or a string)
+     */
     public static HTTPResponse viewMentions(String username, String workspaceName, String channelName) {
-        return new HTTPResponse(200, "");
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.viewMentions(username, workspaceName, channelName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
     }
 
+    /**
+     * Get all the messages within a workspace
+     * @param workspaceName
+     * @return Status code of the HTTP call and a response string (either a JSON or a string)
+     *          The Json is a list of messages all grouped by channel
+     */
     public static HTTPResponse getAllMessages(String workspaceName) {
-        return new HTTPResponse(200, "");
-
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getAllMessages(workspaceName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
     }
 
     public static HTTPResponse getChannelName(int cId) {
-        return new HTTPResponse(200, "");
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getChannelName(cId));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
     }
 
     public static HTTPResponse getUserNameByID(Integer senderId){
-        return new HTTPResponse(200,"");
-    }
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getUserNameById(senderId));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }    }
 
     public static HTTPResponse signin(String username, String password) {
-        return new HTTPResponse(200,"");
-    }
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.signin(username, password));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }    }
 
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
@@ -250,6 +285,29 @@ public class DBSupport {
 
         public static String addNewChannel(String workspaceName, String name) {
             return BASE_URL+"channel/add?workspaceName="+workspaceName+"&name="+name;
+        }
+
+        public static String viewMentions(String username, String workspaceName, String channelName) {
+            return BASE_URL+"channel/viewMentions?username=" + username +
+                    "&workspaceName=" + workspaceName +
+                    "&channelName=" + channelName;
+        }
+
+        public static String getAllMessages(String workspaceName) {
+            return BASE_URL+"workspace/getAllMessages/?workspaceName="+workspaceName;
+        }
+
+        public static String getChannelName(int cId) {
+            return BASE_URL+"channel/getName?cId="+cId;
+        }
+
+        public static String getUserNameById(Integer senderId) {
+            return BASE_URL+"user/getUsername?id="+senderId;
+        }
+
+        public static String signin(String username, String password) {
+            return BASE_URL+"user/login?username="+username+"&password="+password;
+
         }
     }
 }

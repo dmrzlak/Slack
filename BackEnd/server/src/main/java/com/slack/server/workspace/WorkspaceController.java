@@ -1,5 +1,7 @@
 package com.slack.server.workspace;
 
+import com.slack.server.messages.Message;
+import com.slack.server.messages.MessageRepository;
 import com.slack.server.user.User;
 import com.slack.server.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,9 @@ public class WorkspaceController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MessageRepository mRepo;
 
     /**
      * Create and put a Workspaceinto the table
@@ -71,5 +76,12 @@ public class WorkspaceController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
+
+    @GetMapping(path="/getAllMessages")
+    public @ResponseBody ResponseEntity getAllMessages(String workspaceName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        Iterable<Message> list = mRepo.getAllMessagesByWorkspace(w.getId());
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
 
 }

@@ -16,6 +16,9 @@ public interface UserRepository extends CrudRepository<User, Integer>{
     @Query("SELECT u FROM User u WHERE u.name = :name")
     User findByName(@Param("name") String name);
 
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    User findByID(@Param("id") int id);
+
     @Query("Select u.name "+
             "From User u Left Join WorkspaceXRef x on u.id = x.uId "+
             "where x.wId = (select id from Workspace w where w.name = :wName)")
