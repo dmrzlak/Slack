@@ -131,7 +131,7 @@ public class InputController {
             Message[] mentions = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your mentions:");
             for (Message mention : mentions) {
-                String printMention = "\t" + mention.getContent();
+                String printMention = "\t" + mention.getContent().replaceAll("_SS_", " ");
                 System.out.println(printMention);
             }
         }
@@ -301,7 +301,8 @@ public class InputController {
         } else {
             System.out.println("Pinned message");
             Message m = gson.fromJson(pinMessage.response, Message.class);
-            System.out.println("Message Pinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]" + m.getContent());
+            System.out.println("Message Pinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                    + m.getContent().replaceAll("_SS_", " "));
         }
     }
 
@@ -324,15 +325,17 @@ public class InputController {
         }
         String message = "";
         for (int i = 0; i < userArgs.length; i++) {
-            message += userArgs[i];
+            message += userArgs[i] + "_SS_";
         }
+        message = message.trim();
         DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
         if (sendMessage.code > 300) {
             System.out.println(sendMessage.response);
         } else {
             System.out.println("Joining Workspace");
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent());
+
+            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
         }
     }
 
@@ -343,15 +346,17 @@ public class InputController {
         }
         String directMessage = "";
         for (int i = 1; i < userArgs.length; i++) {
-            directMessage += userArgs[i];
+            directMessage += userArgs[i] + "_SS_";
         }
+        directMessage = directMessage.trim();
         DBSupport.HTTPResponse dm = Message.sendDirectMessage(curUser.getName(), userArgs[0], directMessage);
         if (dm.code > 300) {
             System.out.println(dm.response);
         } else {
             System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent());
+
+            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
         }
     }
 
@@ -456,7 +461,7 @@ public class InputController {
                 senderName = uRepsonse.response;
             }
             messageString = "[" + curWorkspace.getName() + "].[" + channelName + "]\t" + "FROM: " + senderName +
-                    "\n\tMESSAGE: " + message.getContent() + "\n";
+                    "\n\tMESSAGE: " + message.getContent().replaceAll("_SS_", " ") + "\n";
             file[i] = messageString;
         }
         return file;
