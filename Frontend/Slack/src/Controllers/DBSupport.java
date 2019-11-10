@@ -15,6 +15,8 @@ import java.net.URISyntaxException;
  * This is our Data Provider for the frontend app. THis will cal to the backend controllers via HTTPRequests.
  * The idea goes:
  *      User --> InputController --> Model --> DBSupport --> HTTPRequest --> ModelController --> DB
+ *      User <-- InputController <-- Model <-- DBSupport <-- HTTPRequest <-- ModelController <--
+ *   (Interface)
  * @Author Dylan Mrzlak
  */
 public class DBSupport {
@@ -80,7 +82,8 @@ public class DBSupport {
         return new HTTPResponse(status, content.toString());
     }
 
-    //Prints an error for stating the a request couldn't finish for whatever reason. Helps keep the app from being pissy
+    //Prints an error for stating the a request couldn't finish for whatever reason.
+    // Helps keep the app from breaking completely
     public static String handleErr() {
         System.out.println("Unable to handle the request, please check your connection, try again");
         return null;
@@ -88,7 +91,6 @@ public class DBSupport {
 
     /**
      * Creates a request to the backend to make a Workspace
-     *
      * @param name
      * @return
      * @Author Dylan Mrzlak
@@ -102,6 +104,13 @@ public class DBSupport {
         }
     }
 
+
+    /**
+     * Builds the request to join a workspace
+     * @param workspaceName
+     * @param name
+     * @return
+     */
     public static HTTPResponse joinWorkspace(String workspaceName, String name) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.joinWorkspace(workspaceName, name));
@@ -111,6 +120,13 @@ public class DBSupport {
         }
     }
 
+
+    /**
+     * Builds a request to create a user
+     * @param name
+     * @param password
+     * @return
+     */
     public static HTTPResponse createUser(String name, String password) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.createUser(name, password));
@@ -122,7 +138,6 @@ public class DBSupport {
 
     /**
      * Sets a message as pinned
-     *
      * @param id
      * @return
      * @Author Joseph Hudson
@@ -136,6 +151,14 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to send a message
+     * @param senderName
+     * @param workspaceName
+     * @param channelName
+     * @param message
+     * @return
+     */
     public static HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.sendMessage(senderName, workspaceName, channelName, message));
@@ -145,6 +168,12 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to create a channel
+     * @param workspaceName
+     * @param name
+     * @return
+     */
     public static HTTPResponse createChannel(String workspaceName, String name) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.addNewChannel(workspaceName, name));
@@ -154,6 +183,13 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to send a DM
+     * @param senderName
+     * @param receiver
+     * @param message
+     * @return
+     */
     public static HTTPResponse sendDirectMessage(String senderName, String receiver, String message) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.sendDirectMessage(senderName, receiver, message));
@@ -163,6 +199,11 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to view users in a workspace
+     * @param workspaceName
+     * @return
+     */
     public static HTTPResponse viewUsers(String workspaceName) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUsersInWorkspace(workspaceName));
@@ -203,6 +244,11 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to get a channel name
+     * @param cId
+     * @return
+     */
     public static HTTPResponse getChannelName(int cId) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getChannelName(cId));
@@ -212,14 +258,26 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to get a user by id
+     * @param senderId
+     * @return
+     */
     public static HTTPResponse getUserNameByID(Integer senderId){
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUserNameById(senderId));
             return response;
         } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
-        }    }
+        }
+    }
 
+    /**
+     * Builds a request to sign in a user
+     * @param username
+     * @param password
+     * @return
+     */
     public static HTTPResponse signin(String username, String password) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.signin(username, password));
