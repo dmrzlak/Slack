@@ -31,14 +31,16 @@ public class Message {
         this.content = content;
         this.pinned = pinned;
     }
-    //public message
+
+    //dm
     public Message(Integer id, Integer senderId, Integer recipientID, String content) {
         this.id = id;
         this.senderId = senderId;
         this.recipientID = recipientID;
         this.content = content;
     }
-    //dm
+
+    //public message
     public Message(Integer id, Integer senderId, Integer wId, Integer cID, String content, Boolean pinned) {
         this.id = id;
         this.senderId = senderId;
@@ -46,6 +48,11 @@ public class Message {
         this.cID = cID;
         this.content = content;
         this.pinned = pinned;
+    }
+
+    public static DBSupport.HTTPResponse getAllMessages(String name) {
+        DBSupport.HTTPResponse res = DBSupport.getAllMessages(name);
+        return res;
     }
 
     public Integer getId() {
@@ -104,11 +111,27 @@ public class Message {
         this.pinned = pinned;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param senderName
+     * @param workspaceName
+     * @param channelName
+     * @param message
+     * @return
+     */
     public static DBSupport.HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message){
             DBSupport.HTTPResponse res = DBSupport.sendMessage(senderName, workspaceName, channelName, message);
             return res;
 
     }
+
+    /**
+     * Calls DBSupport and returns the response
+     * @param senderName
+     * @param receiver
+     * @param message
+     * @return
+     */
     public static DBSupport.HTTPResponse sendDirectMessage(String senderName, String receiver, String message){
         DBSupport.HTTPResponse res = DBSupport.sendDirectMessage(senderName, receiver, message);
         return res;

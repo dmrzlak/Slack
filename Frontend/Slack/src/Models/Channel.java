@@ -2,6 +2,9 @@ package Models;
 
 import Controllers.DBSupport;
 
+/**
+ * Model for the channel, holds the same data that the server would and contains the static calls to the dbsupport
+ */
 public class Channel {
     private Integer id;
 
@@ -9,8 +12,36 @@ public class Channel {
 
     private String name;
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param workspaceName
+     * @param name
+     * @return
+     */
     public static DBSupport.HTTPResponse createChannel(String workspaceName, String name) {
         DBSupport.HTTPResponse res = DBSupport.createChannel(workspaceName, name);
+        return res;
+    }
+
+    /**
+     * Calls DBSupport and returns the response
+     * @param userName
+     * @param workspaceName
+     * @param channelName
+     * @return
+     */
+    public static DBSupport.HTTPResponse viewMentions(String userName, String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.viewMentions(userName, workspaceName, channelName);
+        return res;
+    }
+
+    /**
+     * Calls DBSupport and returns the response
+     * @param cId
+     * @return
+     */
+    public static DBSupport.HTTPResponse getChannelName(int cId) {
+        DBSupport.HTTPResponse res = DBSupport.getChannelName(cId);
         return res;
     }
 

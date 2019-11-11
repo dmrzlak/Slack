@@ -1,5 +1,7 @@
 package com.slack.server.channel;
 
+import com.slack.server.messages.Message;
+import com.slack.server.messages.MessageRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 //import javafx.util.Pair;
@@ -13,15 +15,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * Controller for the Messages in the server
+ * We set a Mapping to a specified value, and all http requests that use that
+ *      (BASE_URL + /mapping)
+ * Come here. This class handles all login for the given section
+ */
 @Controller    // This means that this class is a Controller
 @RequestMapping(path="/channel") // This means URL's start with /demo (after Application path)
 public class ChannelController {
 
+    /**
+     * Repo section
+     * Autowired gives the controller access to the specified repositories (tables)
+     */
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
     private ChannelRepository channelRepository;
+
+    @Autowired
+    private MessageRepository mRepo;
 
     /**
      * Create a channel for the DB and put them into the table
@@ -73,6 +88,40 @@ public class ChannelController {
             return new ResponseEntity(c, HttpStatus.OK);
         }
         return new ResponseEntity("Channel Does Not Exist", HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Get all the mentions for a user in a channel
+     * @param username
+     * @param workspaceName
+     * @param channelName
+     * @return
+     */
+    @GetMapping(path="/viewMentions")
+    public @ResponseBody ResponseEntity viewMentions(String username, String workspaceName, String channelName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        //Using SQL checking if a field is similar tp something using the keyword like
+        //If we pass in a string and put the % wildcards around it, then we can check if the field contains the string
+        //By doing that, we can search for only messages containing the username that we receive
+        String query = "%" + username + "%";
+        Iterable<Message> list = mRepo.getAllMessageContainsUName(query, w.getId(), c.getId());
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
+
+
+    /**
+     * Return a channel's name after finding it by ID
+     * @param cId
+     * @return
+     */
+    @GetMapping(path="/getName")
+    public @ResponseBody ResponseEntity getChannelName(int cId) {
+        Channel c = channelRepository.findByID(cId);
+        if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(c.getName(), HttpStatus.OK);
 
     }
 }

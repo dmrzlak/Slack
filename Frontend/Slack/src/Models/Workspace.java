@@ -25,6 +25,8 @@ public class Workspace {
         this.id = id;
     }
 
+
+
     public String getName(){
         return name;
     }
@@ -54,16 +56,32 @@ public class Workspace {
         return res;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param name
+     * @param username
+     * @return
+     */
     public static DBSupport.HTTPResponse joinWorkspace(String name, String username){
         DBSupport.HTTPResponse res = DBSupport.joinWorkspace(name, username);
         return res;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param mId
+     * @return
+     */
     public static DBSupport.HTTPResponse pinMessage(String mId) {
         DBSupport.HTTPResponse res = DBSupport.pinMessage(Integer.parseInt(mId));
         return res;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param workspaceName
+     * @return
+     */
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;
