@@ -172,6 +172,43 @@ public class InputController {
 
     }
 
+    private static void downloadTextfile(){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        String filename = userArgs[0];
+
+        DBSupport.HTTPResponse response = DBSupport.HTTPResponse Textfile.getText(filename);
+
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        } else {
+            Textfile t = gson.fromJson(response, t.class);
+
+
+            String temp = t.getContent();
+
+            temp = scan.nextLine();
+            temp.replace("_SS_", ' ');
+            temp.replace("_TT_", '\t');
+            temp.replace("_AA_", '&');
+            temp.replace("_QQ_", '?');
+
+            String[] file = temp.split("_NN_");
+            WriteFile(file,"..\\..\\files\\", t.getName());
+        }
+
+    }
+
 
     /**
      * Takes "no" arguments and will print the mentions for the current user in a channel.
@@ -250,13 +287,13 @@ public class InputController {
             //      "LOG_<WORKSPACENAME>_<DATE>
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm");
             Date date = new Date();
-            String filePath = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
+            String fileName = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
             System.out.println("Formatting");
             //We want to format the data as we want, and then take the new list and write the file with it
             String[] linesToWrite = LogMessagesFormat(messages);
             System.out.println("Writing");
             //write said file
-            WriteFile(linesToWrite, filePath);
+            WriteFile(linesToWrite, "..\\..\\logs\\", fileName);
         }
     }
 
@@ -632,20 +669,20 @@ public class InputController {
 
 
 
-    private static void WriteFile(String[] linesToWrite, String filePath) {
+    private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
         //Below is how we'll write to a file
         try {
             //We want to put it in the source directory of the entire project so for Dylan (the author):
             //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
             // Get that relative directory and if it doesn't exist. Make it
-            File dir = new File("..\\..\\logs\\");
+            File dir = new File(filepath);
             if(!dir.exists()){
                 dir.mkdir();
             }
             //Get the file for to write to.
             // It shouldn't really exist unless a user logs twice within a minute
             //If it does exist, delete it, and make a new one
-            File toWrite = new File(dir + filePath + ".txt");
+            File toWrite = new File(dir + fileName + ".txt");
             FileWriter fw;
             if(toWrite.exists())
                 toWrite.delete();

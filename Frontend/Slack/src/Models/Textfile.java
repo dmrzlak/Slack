@@ -29,11 +29,11 @@ public class Textfile {
         this.id = id;
     }
     public String getName() {
-        return content;
+        return name;
     }
 
     public void setName(String content) {
-        this.content = content;
+        this.name = name;
     }
 
     public String getContent() {
@@ -51,6 +51,12 @@ public class Textfile {
      */
     public static DBSupport.HTTPResponse sendText(String name, String message){
         DBSupport.HTTPResponse res = DBSupport.sendMessage(name, message);
+        return res;
+
+    }
+
+    public static DBSupport.HTTPResponse getText(String name){
+        DBSupport.HTTPResponse res = DBSupport.sendMessage(name);
         return res;
 
     }
