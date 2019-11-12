@@ -35,6 +35,7 @@ public class InputController {
     private static final String PIN_MESSAGE = "pin message";
     private static final String LOG_MESSAGES = "log messages";
     private static final String VIEW_MENTIONS = "view mentions";
+    private static final String GET_PINNED = "get pinned";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
     private static Gson gson = new Gson();
@@ -100,6 +101,8 @@ public class InputController {
                 case VIEW_MENTIONS:
                     ViewMentions(userArgs);
                     break;
+                case GET_PINNED:
+                    GetPinned(userArgs);
                 default:
                     System.out.println("Invalid Input please try again :(");
                     break;
@@ -211,7 +214,7 @@ public class InputController {
 
     private static void CreateWorkspace(String[] userArgs) {
         if (userArgs.length != 1) {
-            System.out.println("Invalid Number or Arguments");
+            System.out.println("Invalid Number of Arguments");
             return;
         }
         System.out.println("Creating Workspace...");
@@ -284,6 +287,41 @@ public class InputController {
             }
             System.out.println("\n");
         }
+    }
+
+    private static void GetPinned(String[] userArgs) {//TODO
+        if (userArgs.length != 0) {
+            System.out.println("Invalid number of arguments\n");
+            return;
+        }
+        if(curChannel == null || curWorkspace == null){
+            if (curWorkspace == null) {
+                System.out.println("You are not in a workspace\n");
+            }
+            if (curChannel == null) {
+                System.out.println("You are not in a channel\n");
+            }
+            return;
+        }
+        else{
+            //get messages, then return them
+            System.out.println("Getting the pinned messages for: " + curChannel.getName());
+            DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName() ,curChannel.getName());
+            if (response.code >= 300) {
+                System.out.println(response.response);
+            }
+            else {
+                System.out.println("Retrieval for: " + curChannel.getName() + " successful");
+                Message[] messages = gson.fromJson(response.response, Message[].class);
+                int i = 0;
+                while(i < messages.length){
+                    System.out.println("Message ID: " + messages[i].getID());
+                    System.out.println("Sender ID: " + messages[i].getSenderID());
+                    System.out.println("Message: " + messages[i].getContent());
+                    i++;
+                }
+
+            }
     }
 
     private static void PinMessage(String[] userArgs) {

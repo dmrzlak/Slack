@@ -55,6 +55,11 @@ public class Message {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.getPinnedMessages(workspaceName, channelName);
+        return res;
+    }
+
     public Integer getId() {
         return id;
     }

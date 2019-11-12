@@ -89,9 +89,7 @@ public class MessageController {
         Message m = messageRepository.findByID(messageID);
         m.setPinned(true);
         messageRepository.save(m);
-
         return new ResponseEntity(m, HttpStatus.OK);
-
     }
 
 }

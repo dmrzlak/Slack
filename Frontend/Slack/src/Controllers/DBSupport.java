@@ -203,6 +203,22 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Get all the pinned messages within a channel
+     * @param workspaceName
+     * @param channelName
+     * @return Status code of the HTTP call and a response string (either a JSON or a string)
+     *          The Json is a list of messages all grouped by channel
+     */
+    public static HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getPinnedMessages(workspaceName, channelName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     public static HTTPResponse getChannelName(int cId) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getChannelName(cId));

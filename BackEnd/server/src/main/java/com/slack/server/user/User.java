@@ -15,6 +15,8 @@ public class User {
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
     private Integer id;
 
+    //Role id; 1 mute, 2 user, 3 mod, 4 admin
+
     private String name;
 
     private String password;

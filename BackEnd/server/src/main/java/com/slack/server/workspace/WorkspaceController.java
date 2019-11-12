@@ -83,5 +83,4 @@ public class WorkspaceController {
         Iterable<Message> list = mRepo.getAllMessagesByWorkspace(w.getId());
         return new ResponseEntity(list, HttpStatus.OK);
     }
-
 }
