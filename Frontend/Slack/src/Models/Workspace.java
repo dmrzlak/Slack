@@ -66,6 +66,11 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse unpinMessage(String mId) {
+        DBSupport.HTTPResponse res = DBSupport.unpinMessage(Integer.parseInt(mId));
+        return res;
+    }
+
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;

@@ -295,6 +295,10 @@ public class DBSupport {
             return BASE_URL+"message/pinMessage?messageID=" + mId;
         }
 
+        public static String unpinMessage(int mId){
+            return BASE_URL+"message/unpinMessage?messageID=" + mId;
+        }
+
         public static String getUsersInWorkspace(String workspaceName) {
             return BASE_URL+"workspace/getUsers/?name="+workspaceName;
         }

@@ -344,7 +344,27 @@ public class InputController {
         }
     }
 
-    private static void SendMessage(String[] userArgs) {
+        private static void UnpinMessage(String[] userArgs) {
+            if (curUser == null) {
+                System.out.println("You need to create a user or sign in to continue");
+                return;
+            }
+            if (userArgs.length != 1) {
+                System.out.println("Invalid Number or Arguments");
+                return;
+            }
+            DBSupport.HTTPResponse pinMessage = Workspace.unpinMessage(userArgs[0]);
+            if (unpinMessage.code > 300) {
+                System.out.println(unpinMessage.response);
+            } else {
+                System.out.println("Pinned message");
+                Message m = gson.fromJson(unpinMessage.response, Message.class);
+                System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                        + m.getContent().replaceAll("_SS_", " "));
+            }
+        }
+
+        private static void SendMessage(String[] userArgs) {
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
