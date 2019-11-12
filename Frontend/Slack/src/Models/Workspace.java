@@ -56,6 +56,10 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse searchWorkspace(String name){
+        DBSupport.HTTPResponse res = DBSupport.searchWorkspace(name);
+        return res;
+    }
     /**
      * Calls DBSupport and returns the response
      * @param name

@@ -79,6 +79,18 @@ public class WorkspaceController {
         return new ResponseEntity("Workspace does not exist", HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping(path="/search")
+    public @ResponseBody ResponseEntity searchWorkspace(@RequestParam String name){
+        Iterable<Workspace> list;
+        if(name == "-1"){
+            list = workspaceRepository.findAll();
+        }else {
+            name = "%" + name + "%";
+            list =  workspaceRepository.searchWorkspace(name);
+        }
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
+
     /**
      * Get all the users in a given workspace
      * @param name

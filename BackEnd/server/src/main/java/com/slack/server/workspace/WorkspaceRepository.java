@@ -26,6 +26,8 @@ public interface WorkspaceRepository extends CrudRepository<Workspace, Integer>{
     @Query("SELECT w FROM Workspace w WHERE w.name = :name")
     Workspace findbyName(@Param("name") String name);
 
+    @Query("SELECT w FROM Workspace w WHERE w.name LIKE :name")
+    Iterable<Workspace> searchWorkspace(@Param("name") String name);
 }
 
 

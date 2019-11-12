@@ -69,6 +69,17 @@ public class UserController {
         return new ResponseEntity("Incorrect Password", HttpStatus.NOT_ACCEPTABLE);
     }
 
+    @GetMapping(path="/search")
+    public @ResponseBody ResponseEntity searchUser(@RequestParam String name){
+        Iterable<User> list;
+        if(name == "-1"){
+            list = uRepo.findAll();
+        }else {
+            name = "%" + name + "%";
+            list =  uRepo.searchUser(name);
+        }
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
 
     /**
      * Gets all the users in the DB

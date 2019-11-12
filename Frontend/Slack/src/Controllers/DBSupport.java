@@ -245,6 +245,32 @@ public class DBSupport {
     }
 
     /**
+     * searcher workspace
+     * @param workspaceName
+     * @return Status code of the HTTP call and a json list of the workspaces
+     */
+    public static HTTPResponse searchWorkspace(String workspaceName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.searchWorkspace(workspaceName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    /**
+     * searcher workspace
+     * @param workspaceName
+     * @return Status code of the HTTP call and a json list of the workspaces
+     */
+    public static HTTPResponse searchUser(String userName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.searchUser(userName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    /**
      * Builds a request to get a channel name
      * @param cId
      * @return
@@ -321,6 +347,14 @@ public class DBSupport {
             return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
         }
 
+        public static String sendText(String name, String content){
+            return BASE_URL+"/textfile/send?name="+name+"&content="+content;
+        }
+
+        public static String getText(String name){
+            return BASE_URL+"/textfile/download?name"+name;
+        }
+
         public static String createWorkspace(String name){
             return BASE_URL+"workspace/add?name="+name;
         }
@@ -340,7 +374,12 @@ public class DBSupport {
         public static String getUsersInWorkspace(String workspaceName) {
             return BASE_URL+"workspace/getUsers/?name="+workspaceName;
         }
-
+        public static String searchWorkspace(String workspaceName) {
+            return BASE_URL+"workspace/search?name="+workspaceName;
+        }
+        public static String searchUser(String userName) {
+            return BASE_URL+"user/search?name="+userName;
+        }
         public static String addNewChannel(String workspaceName, String name) {
             return BASE_URL+"channel/add?workspaceName="+workspaceName+"&name="+name;
         }
