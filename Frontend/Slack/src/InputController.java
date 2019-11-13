@@ -33,9 +33,11 @@ public class InputController {
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
     private static final String PIN_MESSAGE = "pin message";
+    private static final String UNPIN_MESSAGE = "unpin message";
     private static final String LOG_MESSAGES = "log messages";
     private static final String VIEW_MENTIONS = "view mentions";
     private static final String GET_PINNED = "get pinned";
+    private static final String CHANGE_ROLE = "change role";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
     private static Gson gson = new Gson();
@@ -103,6 +105,13 @@ public class InputController {
                     break;
                 case GET_PINNED:
                     GetPinned(userArgs);
+                    break;
+                case UNPIN_MESSAGE:
+                    UnpinMessage(userArgs);
+                    break;
+                case CHANGE_ROLE:
+                    ChangeRole(userArgs);
+                    break;
                 default:
                     System.out.println("Invalid Input please try again :(");
                     break;
@@ -306,7 +315,7 @@ public class InputController {
         else{
             //get messages, then return them
             System.out.println("Getting the pinned messages for: " + curChannel.getName());
-            DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName() ,curChannel.getName());
+            DBSupport.HTTPResponse response = User.getPinnedMessages(curWorkspace.getName() ,curChannel.getName());
             if (response.code >= 300) {
                 System.out.println(response.response);
             }
@@ -315,9 +324,8 @@ public class InputController {
                 Message[] messages = gson.fromJson(response.response, Message[].class);
                 int i = 0;
                 while(i < messages.length){
-                    System.out.println("Message ID: " + messages[i].getID());
-                    System.out.println("Sender ID: " + messages[i].getSenderID());
-                    System.out.println("Message: " + messages[i].getContent());
+                    System.out.println("[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                            + m.getContent().replaceAll("_SS_", " "));
                     i++;
                 }
 
@@ -357,10 +365,46 @@ public class InputController {
             if (unpinMessage.code > 300) {
                 System.out.println(unpinMessage.response);
             } else {
-                System.out.println("Pinned message");
+                System.out.println("Unpinned message");
                 Message m = gson.fromJson(unpinMessage.response, Message.class);
                 System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
                         + m.getContent().replaceAll("_SS_", " "));
+            }
+        }
+
+        private static void ChangeRole(String[] userArgs) {
+            if (userArgs.length != 2) {
+                System.out.println("Invalid Number or Arguments");
+                return;
+            }//1 mute, 2 user, 3 moderator, 4 admin
+            int role;
+            String strRole;
+            String toComp = userArgs[0].toLowerCase();
+            if (toComp.equals("mute")){
+                role = 1;
+                strRole = "Mute";
+            }
+            else if (toComp.equals("user")) {
+                role = 2;
+                strRole = "User";
+            }
+            else if(toComp.equals("mod")){
+                role = 3;
+                strRole = "Moderator";
+            }
+            else if(toComp.equals("admin")){
+                role = 4;
+                strRole = "Admin";
+            }
+            else{
+                System.out.println("Invalid Role name input");
+                return;
+            }
+            DBSupport.HTTPResponse changeRole = Workspace.changeRole(rId, userArgs[1]);
+            if (changeRole.code > 300) {
+                System.out.println(changeRole.response);
+            } else {
+                System.out.println("Changed role of " + userArgs[1] + " to " + strRole);
             }
         }
 

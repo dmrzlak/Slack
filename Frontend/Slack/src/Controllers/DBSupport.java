@@ -325,6 +325,10 @@ public class DBSupport {
             return BASE_URL+"user/getUsername?senderId="+senderId;
         }
 
+        public static String changeRole(int rId, int uId){
+            return BASE_URL+"workspace/changeRole?rId="+rId+"&uId"+uId;
+        }
+
         public static String signin(String username, String password) {
             return BASE_URL+"user/login?username="+username+"&password="+password;
 

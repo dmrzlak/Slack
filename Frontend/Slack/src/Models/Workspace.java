@@ -71,6 +71,11 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse changeRole(int newRole, String uId) {
+        DBSupport.HTTPResponse res = DBSupport.changeRole(newRole, Integer.parseInt(uId));
+        return res;
+    }
+
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;
