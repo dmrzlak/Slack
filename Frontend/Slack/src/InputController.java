@@ -108,6 +108,7 @@ public class InputController {
                     break;
                 case GET_PINNED:
                     GetPinned(userArgs);
+                    break;
                 default:
                     System.out.println("Invalid Input please try again :(");
                     break;
@@ -347,32 +348,30 @@ public class InputController {
     }
 
     private static void GetPinned(String[] userArgs) {
-        if (curChannel == null || curWorkspace == null) {
-            if (curWorkspace == null) {
-                System.out.println("You are not in a workspace\n");
-            }
-            if (curChannel == null) {
-                System.out.println("You are not in a channel\n");
-            }
+        if (curWorkspace == null) {
+            System.out.println("You are not in a workspace\n");
             return;
+        }
+        if (curChannel == null) {
+            System.out.println("You are not in a channel\n");
+            return;
+        }
+        //get messages, then return them
+        System.out.println("Getting the pinned messages for: " + curChannel.getName());
+        DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
+        if (response.code >= 300) {
+            System.out.println(response.response);
         } else {
-            //get messages, then return them
-            System.out.println("Getting the pinned messages for: " + curChannel.getName());
-            DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
-            if (response.code >= 300) {
-                System.out.println(response.response);
-            } else {
-                System.out.println("Retrieval for: " + curChannel.getName() + " successful");
-                Message[] messages = gson.fromJson(response.response, Message[].class);
-                int i = 0;
-                while (i < messages.length) {
-                    System.out.println("Message ID: " + messages[i].getId());
-                    System.out.println("Sender ID: " + messages[i].getSenderId());
-                    System.out.println("Message: " + messages[i].getContent());
-                    i++;
-                }
-
+            System.out.println("Retrieval for: " + curChannel.getName() + " successful");
+            Message[] messages = gson.fromJson(response.response, Message[].class);
+            int i = 0;
+            while (i < messages.length) {
+                System.out.print("Message ID: " + messages[i].getId());
+                System.out.print(", Sender ID: " + messages[i].getSenderId());
+                System.out.print(", Message: " + messages[i].getContent().replaceAll("_SS_", " ");
+                i++;
             }
+
         }
     }
 
