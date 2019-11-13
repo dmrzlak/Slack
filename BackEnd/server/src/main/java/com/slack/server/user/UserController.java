@@ -72,7 +72,7 @@ public class UserController {
     @GetMapping(path="/search")
     public @ResponseBody ResponseEntity searchUser(@RequestParam String name){
         Iterable<User> list;
-        if(name == "-1"){
+        if(name.equals("-1")){
             list = uRepo.findAll();
         }else {
             name = "%" + name + "%";

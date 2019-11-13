@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.HashMap;
 /**
  * Interface for the given db table. Springboot will make all of the CRUD functions for us
  * Anything past that that would require some kinda query, we need to put that SQL query here tied to a function

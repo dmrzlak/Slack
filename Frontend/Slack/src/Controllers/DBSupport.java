@@ -173,6 +173,40 @@ public class DBSupport {
     }
 
     /**
+     *
+     * @param name
+     * @return
+     */
+    public static HTTPResponse getText(String name) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getText(name));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    /**
+     *
+     * @param fileName
+     * @param content
+     * @return
+     */
+    public static HTTPResponse sendText(String fileName, String content) {
+        try {
+            String url = ParamBuilder.sendText(fileName, content);
+            if (url.length() > 2048) {
+                url = url.substring(0, 2048);
+                System.out.print("File too long. Truncating Message");
+            }
+            HTTPResponse response = serverRequest(url);
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    /**
      * Builds a request to create a channel
      *
      * @param workspaceName

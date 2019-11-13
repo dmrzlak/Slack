@@ -15,7 +15,7 @@ public class Textfile {
     private String content;
 
 
-    public Message(Integer id,String name String content) {
+    Textfile(Integer id, String name, String content) {
         this.id = id;
         this.name = name;
         this.content = content;
@@ -50,13 +50,13 @@ public class Textfile {
      * @return
      */
     public static DBSupport.HTTPResponse sendText(String name, String message){
-        DBSupport.HTTPResponse res = DBSupport.sendMessage(name, message);
+        DBSupport.HTTPResponse res = DBSupport.sendText(name, message);
         return res;
 
     }
 
     public static DBSupport.HTTPResponse getText(String name){
-        DBSupport.HTTPResponse res = DBSupport.sendMessage(name);
+        DBSupport.HTTPResponse res = DBSupport.getText(name);
         return res;
 
     }

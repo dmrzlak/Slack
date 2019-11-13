@@ -1,14 +1,12 @@
 package com.slack.server.textfile;
 
-import org.springframework.data.annotation.Id;
+import javax.persistence.*;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-
+@Entity
 public class Textfile {
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
 
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String name;

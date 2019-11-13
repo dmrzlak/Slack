@@ -120,6 +120,7 @@ public class InputController {
                     break;
                 case SEND_TEXTFILE:
                     sendTextfile(userArgs);
+                    break;
                 case GET_PINNED:
                     GetPinned(userArgs);
                     break;
@@ -146,7 +147,12 @@ public class InputController {
             return;
         }
         String filename = userArgs[0];
-        filename = filename.substring( filename.lastIndexOf('/'));
+        if(filename.contains("/")){
+            filename = filename.substring( filename.lastIndexOf('/') + 1);
+        }
+        else{
+            filename = filename.substring( filename.lastIndexOf('\\') + 1);
+        }
 
         String content = "";
         File toRead = new File(userArgs[0]);
@@ -157,13 +163,11 @@ public class InputController {
                 String temp;
                 while (scan.hasNextLine()) {
                     temp = scan.nextLine();
-                    content += temp;
+                    content += temp + "\n";
                 }
+                content = ReplaceSpecChars(content);
                 DBSupport.HTTPResponse response = Textfile.sendText(filename, content);
-    //            if (content.length > 2048) {
-    //                content = content.subString(0, 2048);
-    //                System.out.print("File too long shortened to send");
-    //            }
+
                 if (response.code >= 300) {
                     System.out.println(response.response);
                 } else {
@@ -678,6 +682,13 @@ public class InputController {
         }
     }
 
+
+
+    //////////////////////
+    //                  //
+    //      Helpers     //
+    //                  //
+    //////////////////////
     /**
      * Print the base instructions for the app, just a welcome to the app and a short description on how to operate it
       */
@@ -798,7 +809,7 @@ public class InputController {
         content = content.replaceAll("\\\\", " BCKSLSH ");
         content = content.replaceAll(" ", "%20");
         content = content.replaceAll("\t", "%09");
-        content = content.replaceAll("\n", "%0D");
+        content = content.replaceAll("\n", "%0A");
         return content;
     }
 

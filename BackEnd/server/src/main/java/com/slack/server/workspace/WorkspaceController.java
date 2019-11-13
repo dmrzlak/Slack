@@ -1,8 +1,7 @@
 package com.slack.server.workspace;
 
-import com.slack.server.messages.Message;
 import com.slack.server.messages.MessageRepository;
-import com.slack.server.user.User;
+import com.slack.server.messages.Message;
 import com.slack.server.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -82,7 +81,7 @@ public class WorkspaceController {
     @GetMapping(path="/search")
     public @ResponseBody ResponseEntity searchWorkspace(@RequestParam String name){
         Iterable<Workspace> list;
-        if(name == "-1"){
+        if(name.equals("-1")){
             list = workspaceRepository.findAll();
         }else {
             name = "%" + name + "%";

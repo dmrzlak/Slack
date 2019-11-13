@@ -20,8 +20,11 @@ public class Message {
     @Nullable
     private Integer wId;
 
+    @Nullable
+
     private Integer cId;
 
+    @Nullable
     private Integer recipientID;
 
     private String content;
