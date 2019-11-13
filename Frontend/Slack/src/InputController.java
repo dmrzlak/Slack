@@ -38,6 +38,7 @@ public class InputController {
     private static final String GET_PINNED = "get pinned";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
+    
     private static Gson gson = new Gson();
     private static User curUser = null;
     private static Workspace curWorkspace = null;
@@ -148,7 +149,7 @@ public class InputController {
             Message[] mentions = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your mentions:");
             for (Message mention : mentions) {
-                String printMention = "\t" + mention.getContent().replaceAll("_SS_", " ");
+                String printMention = "\t" + mention.getContent();
                 System.out.println(printMention);
             }
         }
@@ -368,7 +369,7 @@ public class InputController {
             while (i < messages.length) {
                 System.out.print("Message ID: " + messages[i].getId());
                 System.out.print(", Sender ID: " + messages[i].getSenderId());
-                System.out.print(", Message: " + messages[i].getContent().replaceAll("_SS_", " ");
+                System.out.print(", Message: " + messages[i].getContent());
                 i++;
             }
 
@@ -397,7 +398,7 @@ public class InputController {
             System.out.println("Pinned message");
             Message m = gson.fromJson(pinMessage.response, Message.class);
             System.out.println("Message Pinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                    + m.getContent().replaceAll("_SS_", " "));
+                    + m.getContent());
         }
     }
 
@@ -417,7 +418,7 @@ public class InputController {
             System.out.println("Pinned message");
             Message m = gson.fromJson(unpinMessage.response, Message.class);
             System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                    + m.getContent().replaceAll("_SS_", " "));
+                    + m.getContent());
         }
     }
 
@@ -445,23 +446,23 @@ public class InputController {
             return;
         }
         //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
+        //using %20 to replace 'spaces' in the message
         //We don't use http bodies, so the url is not a fan of spaces
         String message = "";
         for (int i = 0; i < userArgs.length; i++) {
-            message += userArgs[i] + "_SS_";
+            message += userArgs[i] + " ";
         }
         message = message.trim();
+        message = ReplaceSpecChars(message);
         //Send the message to the server, and acknowledge the search
         DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
         if (sendMessage.code > 300) {
             System.out.println(sendMessage.response);
         } else {
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
-
 
     /**
      * Send a message to a user. Takes the content and will put it into the server.
@@ -475,13 +476,14 @@ public class InputController {
             return;
         }
         //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
+        //using %20 to replace 'spaces' in the message
         //We don't use http bodies, so the url is not a fan of spaces
         String directMessage = "";
         for (int i = 1; i < userArgs.length; i++) {
-            directMessage += userArgs[i] + "_SS_";
+            directMessage += userArgs[i] + " ";
         }
         directMessage = directMessage.trim();
+        directMessage = ReplaceSpecChars(directMessage);
         DBSupport.HTTPResponse dm = Message.sendDirectMessage(curUser.getName(), userArgs[0], directMessage);
         if (dm.code > 300) {
             System.out.println(dm.response);
@@ -489,7 +491,7 @@ public class InputController {
             System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
 
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
@@ -597,9 +599,23 @@ public class InputController {
                 senderName = uRepsonse.response;
             }
             messageString = "[" + curWorkspace.getName() + "].[" + channelName + "]\t" + "FROM: " + senderName +
-                    "\n\tMESSAGE: " + message.getContent().replaceAll("_SS_", " ") + "\n";
+                    "\n\tMESSAGE: " + message.getContent() + "\n";
             file[i] = messageString;
         }
         return file;
     }
+
+    private static String ReplaceSpecChars(String input) {
+        //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
+        // it to something that url's can handle
+        String content = input;
+        content = content.replaceAll("&", " AND ");
+        content = content.replaceAll("\\?", " QM ");
+        content = content.replaceAll("\\\\", " BCKSLSH ");
+        content = content.replaceAll(" ", "%20");
+        content = content.replaceAll("\t", "%09");
+        content = content.replaceAll("\n", "%0D");
+        return content;
+    }
+
 }
