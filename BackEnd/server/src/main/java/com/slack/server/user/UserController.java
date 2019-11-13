@@ -14,10 +14,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/**
+ * Controller for the Messages in the server
+ * We set a Mapping to a specified value, and all http requests that use that
+ *      (BASE_URL + /mapping)
+ * Come here. This class handles all login for the given section
+ */
 @Controller    // This means that this class is a Controller
 @RequestMapping(path="/user") // This means URL's start with /demo (after Application path)
 public class UserController {
 
+    /**
+     * Repo section
+     * Autowired gives the controller access to the specified repositories (tables)
+     */
     @Autowired
     private UserRepository uRepo;
 
@@ -45,6 +55,12 @@ public class UserController {
         return new ResponseEntity(u, HttpStatus.OK);
     }
 
+    /**
+     * Login for a user. Get the user by a name, check that the passwords are equal. If so, we're good
+     * @param username
+     * @param password
+     * @return
+     */
     @GetMapping(path="/login")
     public @ResponseBody ResponseEntity login(@RequestParam String username, @RequestParam String password){
         if(!uRepo.existsByName(username)) return new ResponseEntity("No User found", HttpStatus.NOT_FOUND);
@@ -66,6 +82,9 @@ public class UserController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
+
+    /** get a user via name
+     */
     @GetMapping(path="/get")
     public @ResponseBody ResponseEntity getUser(@RequestParam String name){
         if(uRepo.existsByName(name)){
@@ -106,6 +125,12 @@ public class UserController {
         return new ResponseEntity(w, HttpStatus.OK);
     }
 
+
+    /**
+     * Find a user by id, and return its username
+     * @param senderId
+     * @return
+     */
     @GetMapping(path = "/getUsername")
     public @ResponseBody ResponseEntity getUserNameById(Integer senderId) {
         if(uRepo.existsById(senderId)) {

@@ -56,11 +56,22 @@ public class Workspace {
         return res;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param name
+     * @param username
+     * @return
+     */
     public static DBSupport.HTTPResponse joinWorkspace(String name, String username){
         DBSupport.HTTPResponse res = DBSupport.joinWorkspace(name, username);
         return res;
     }
 
+    /**
+     * Calls DBSupport and returns the response
+     * @param mId
+     * @return
+     */
     public static DBSupport.HTTPResponse pinMessage(String mId) {
         DBSupport.HTTPResponse res = DBSupport.pinMessage(Integer.parseInt(mId));
         return res;
@@ -71,11 +82,19 @@ public class Workspace {
         return res;
     }
 
+<<<<<<< HEAD
     public static DBSupport.HTTPResponse changeRole(int newRole, String uId) {
         DBSupport.HTTPResponse res = DBSupport.changeRole(newRole, Integer.parseInt(uId));
         return res;
     }
 
+=======
+    /**
+     * Calls DBSupport and returns the response
+     * @param workspaceName
+     * @return
+     */
+>>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;

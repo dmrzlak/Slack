@@ -14,6 +14,10 @@ import javax.persistence.NamedStoredProcedureQuery;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureParameter;
 
+/**
+ * Interface for the given db table. Springboot will make all of the CRUD functions for us
+ * Anything past that that would require some kinda query, we need to put that SQL query here tied to a function
+ */
 public interface WorkspaceRepository extends CrudRepository<Workspace, Integer>{
 
     @Query("SELECT CASE WHEN COUNT(w) > 0 THEN true ELSE false END FROM Workspace w WHERE w.name = :name")

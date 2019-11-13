@@ -17,7 +17,6 @@ import com.google.gson.Gson;
 
 /**
  * This will be the main controller for the application.
- * <p>
  * It will take the initial input for User Input
  * and then pass it along to other classes to handle the actual functionality
  *
@@ -56,6 +55,7 @@ public class InputController {
             //By forcing commands to be in a format of COMMAND - ARGUMENT
             //We can easily manage the input and decide what is needed
             int substringBegin = userInput.indexOf('-');
+            //Now that we have commands without args, we need to be able to take commands without the delimitter set
             if (substringBegin == -1) substringBegin = userInput.length();
             String command = "";
             String[] userArgs = {};
@@ -65,7 +65,8 @@ public class InputController {
                 command = userInput.substring(0, substringBegin).trim();
                 userArgs = userInput.substring(substringBegin + 1).trim().split(" ");
             }
-
+            //Have updated the switch to be more readable and move into methods, rather than holding all the logic in here.
+            //We were simply expanding this too much that it was becoming hard to read. This is much more followable
             switch (command) {
                 case HELP:
                     printHelp();
@@ -91,6 +92,9 @@ public class InputController {
                 case PIN_MESSAGE:
                     PinMessage(userArgs);
                     break;
+                case UNPIN_MESSAGE:
+                    UnpinMessage(userArgs);
+                    break;
                 case SEND_DM:
                     SendDM(userArgs);
                     break;
@@ -106,12 +110,15 @@ public class InputController {
                 case GET_PINNED:
                     GetPinned(userArgs);
                     break;
+<<<<<<< HEAD
                 case UNPIN_MESSAGE:
                     UnpinMessage(userArgs);
                     break;
                 case CHANGE_ROLE:
                     ChangeRole(userArgs);
                     break;
+=======
+>>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
                 default:
                     System.out.println("Invalid Input please try again :(");
                     break;
@@ -120,6 +127,12 @@ public class InputController {
 
     }
 
+    /**
+     * Takes "no" arguments and will print the mentions for the current user in a channel.
+     * Our mentions right now just search for a username, but can simply be expanded to be "@/USERNAME/"
+     * @param userArgs
+     * @author Dylan Mrzlak
+     */
     private static void ViewMentions(String[] userArgs) {
         //View mentions does not need user args whatsoever, so we'll just ignore them. They are passed in for consistency
         //First we want to make sure that nothing is null (We want to be in a workspace and a channel, and then the user needs to be signed in
@@ -136,6 +149,8 @@ public class InputController {
             return;
         }
         //Now that those are out of the way, we need to get the actual mentions
+        // depending on what the server returns, we handle it accordingly. We either get a list and print it,
+        //  or an error and print that
         DBSupport.HTTPResponse response = Channel.viewMentions(curUser.getName(), curWorkspace.getName(), curChannel.getName());
         if (response.code >= 300) {
             System.out.println(response.response);
@@ -150,6 +165,11 @@ public class InputController {
 
     }
 
+    /**
+     * Take the messages from a workspace, grouped by channel and order based on time. The write it to a file
+     * @param userArgs
+     * @author Dylan Mrzlak
+     */
     private static void LogMessage(String[] userArgs) {
         //Logging does not need user args whatsoever, so we'll just ignore them. They are passed in for consistency
         //First we want to make sure that nothing is null (We want to be in a workspace and a channel, and then the user needs to be signed in
@@ -167,13 +187,13 @@ public class InputController {
         }
         //Now that those are out of the way, we need to get the actual messages.
         // They will be grouped by channel in the backend,
-        // but we do some lifting here as well to properly make the strings we need;
+        // but we do some lifting here as well to properly make the strings we need
+        //Note like with all of our methods, we can get an error or the data we want so we have to deal with it properly
         System.out.println("Getting the messages for: " + curWorkspace.getName());
         DBSupport.HTTPResponse response = Message.getAllMessages(curWorkspace.getName());
         if (response.code >= 300) {
             System.out.println(response.response);
-        }
-        else {
+        } else {
             System.out.println("Retrieval for: " + curWorkspace.getName() + " successful");
             Message[] messages = gson.fromJson(response.response, Message[].class);
             String workspaceName = curWorkspace.getName();
@@ -185,27 +205,41 @@ public class InputController {
             Date date = new Date();
             String filePath = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
             System.out.println("Formatting");
+            //We want to format the data as we want, and then take the new list and write the file with it
             String[] linesToWrite = LogMessagesFormat(messages);
             System.out.println("Writing");
+            //write said file
             WriteFile(linesToWrite, filePath);
         }
     }
 
+    /**
+     * Sign the user in (if the arguments are correct) and set them to the current user
+     * @param userArgs
+     * @author Logan Garrett
+     */
     private static void SignIn(String[] userArgs) {
         if (userArgs.length != 2) {
             System.out.println("Invalid Number or Arguments");
             return;
         }
+        //Either the user put in the right username and password, or they did not.
+        //If they did not, tell them with the error
+        //If they did, then the user is signed in and set the user to the user returned from the server
         DBSupport.HTTPResponse uResponse = User.signIn(userArgs[0], userArgs[1]);
         if (uResponse.code > 300) {
             System.out.println(uResponse.response);
         } else {
-            System.out.println("Saved User");
+            System.out.println("Login Successful");
             User u = gson.fromJson(uResponse.response, User.class);
             curUser = u;
         }
     }
 
+    /**
+     * Create user in the server, then set the user to that
+     * @param userArgs
+     */
     private static void AddUser(String[] userArgs) {
         if (userArgs.length != 2) {
             System.out.println("Invalid Number or Arguments");
@@ -221,6 +255,11 @@ public class InputController {
         }
     }
 
+    /**
+     * Create a new workspace (if possible) and then set the user's current workspace to that
+     * @param userArgs
+     * @author dylan mrzlak
+     */
     private static void CreateWorkspace(String[] userArgs) {
         if (userArgs.length != 1) {
             System.out.println("Invalid Number of Arguments");
@@ -235,12 +274,20 @@ public class InputController {
             Workspace w = gson.fromJson(wResponse.response, Workspace.class);
             curWorkspace = w;
             System.out.println("Joining Workspace");
+            //Whenever a new workspace is created, the creator should automatically join it
             JoinWorkspace(new String[]{w.getName()});
+            //We don't want to force a user to need to create a channel just to send messages, so now we automatically
+            //make one, We can change the name whenever, but every new workspace gets the same name for it's first channel
             System.out.println("Creating Default Channel");
             CreateChannel(new String[]{w.getName(), "Welcome"});
         }
     }
 
+    /**
+     * Join a workspace (put data into the server that the user is in the workspace) and then make the workspace the current
+     * @param userArgs
+     * @author Dylan Mrzlak
+     */
     private static void JoinWorkspace(String[] userArgs) {
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -261,6 +308,11 @@ public class InputController {
         }
     }
 
+    /**
+     * Create a new channel (if possible) and then set the user's current channel to that
+     * @param userArgs
+     * @author dylan mrzlak
+     */
     private static void CreateChannel(String[] userArgs) {
         if (curWorkspace == null) {
             System.out.println("User not in workspace");
@@ -280,11 +332,18 @@ public class InputController {
         }
     }
 
+    /**
+     * Get all of the users in a workspace, this is not a focused search at all.
+     * Simply a full list of users that are marked as having joined
+     * @param userArgs
+     * @author logan garrett
+     */
     private static void ViewUsers(String[] userArgs) {
         if (curWorkspace == null) {
             System.out.println("User not in workspace");
             return;
         }
+        //We either get an error and want to consume it, or we get a list to print
         DBSupport.HTTPResponse viewUsers = Workspace.getUsersInWorkspace(curWorkspace.getName());
         if (viewUsers.code > 300) {
             System.out.println("There are no users in this workspace");
@@ -294,24 +353,20 @@ public class InputController {
             for (int i = 0; i < userList.length; i++) {
                 System.out.println("\t" + userList[i]);
             }
-            System.out.println("\n");
+            System.out.println(userList.length + " Users in this workspace found. \n");
         }
     }
 
-    private static void GetPinned(String[] userArgs) {//TODO
-        if (userArgs.length != 0) {
-            System.out.println("Invalid number of arguments\n");
+    private static void GetPinned(String[] userArgs) {
+        if (curWorkspace == null) {
+            System.out.println("You are not in a workspace\n");
             return;
         }
-        if(curChannel == null || curWorkspace == null){
-            if (curWorkspace == null) {
-                System.out.println("You are not in a workspace\n");
-            }
-            if (curChannel == null) {
-                System.out.println("You are not in a channel\n");
-            }
+        if (curChannel == null) {
+            System.out.println("You are not in a channel\n");
             return;
         }
+<<<<<<< HEAD
         else{
             //get messages, then return them
             System.out.println("Getting the pinned messages for: " + curChannel.getName());
@@ -328,10 +383,33 @@ public class InputController {
                             + m.getContent().replaceAll("_SS_", " "));
                     i++;
                 }
-
+=======
+        //get messages, then return them
+        System.out.println("Getting the pinned messages for: " + curChannel.getName());
+        DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        } else {
+            System.out.println("Retrieval for: " + curChannel.getName() + " successful");
+            Message[] messages = gson.fromJson(response.response, Message[].class);
+            int i = 0;
+            while (i < messages.length) {
+                System.out.print("Message ID: " + messages[i].getId());
+                System.out.print(", Sender ID: " + messages[i].getSenderId());
+                System.out.print(", Message: " + messages[i].getContent().replaceAll("_SS_", " ");
+                i++;
             }
+>>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
+
+        }
     }
 
+    /**
+     * Mark a message as pinned (when marked as pinned a pin search will be able to get them)
+     * A pinned message is technically important to the channel (but we're not enforcing that and leaving that to the users)
+     * @param userArgs
+     * @author Joe Hudson
+     */
     private static void PinMessage(String[] userArgs) {
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -352,6 +430,7 @@ public class InputController {
         }
     }
 
+<<<<<<< HEAD
         private static void UnpinMessage(String[] userArgs) {
             if (curUser == null) {
                 System.out.println("You need to create a user or sign in to continue");
@@ -370,8 +449,29 @@ public class InputController {
                 System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
                         + m.getContent().replaceAll("_SS_", " "));
             }
+=======
+    private static void UnpinMessage(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
         }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse unpinMessage = Workspace.unpinMessage(userArgs[0]);
+        if (unpinMessage.code > 300) {
+            System.out.println(unpinMessage.response);
+        } else {
+            System.out.println("Pinned message");
+            Message m = gson.fromJson(unpinMessage.response, Message.class);
+            System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                    + m.getContent().replaceAll("_SS_", " "));
+>>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
+        }
+    }
 
+<<<<<<< HEAD
         private static void ChangeRole(String[] userArgs) {
             if (userArgs.length != 2) {
                 System.out.println("Invalid Number or Arguments");
@@ -409,6 +509,15 @@ public class InputController {
         }
 
         private static void SendMessage(String[] userArgs) {
+=======
+    /**
+     * Send a message to the channel. Takes the content and will put it into the server.
+     * @param userArgs
+     * @author thomas mcandrew
+     */
+    private static void SendMessage(String[] userArgs) {
+        //null checks for the stuff that's required to send a message
+>>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
@@ -425,27 +534,39 @@ public class InputController {
             System.out.println("Invalid number of arguments");
             return;
         }
+        //Format the message in a way that the data can be sent fully, uncorrupted
+        //using _SS_ to replace 'spaces' in the message
+        //We don't use http bodies, so the url is not a fan of spaces
         String message = "";
         for (int i = 0; i < userArgs.length; i++) {
             message += userArgs[i] + "_SS_";
         }
         message = message.trim();
+        //Send the message to the server, and acknowledge the search
         DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
         if (sendMessage.code > 300) {
             System.out.println(sendMessage.response);
         } else {
-            System.out.println("Joining Workspace");
             Message m = gson.fromJson(sendMessage.response, Message.class);
-
             System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
         }
     }
 
+
+    /**
+     * Send a message to a user. Takes the content and will put it into the server.
+     * DM's will be able to be seen by a user when a search for dm's is run
+     * @param userArgs
+     * @author thomas mcandrew
+     */
     private static void SendDM(String[] userArgs) {
         if (userArgs.length < 2) {
             System.out.println("Invalid number of arguments");
             return;
         }
+        //Format the message in a way that the data can be sent fully, uncorrupted
+        //using _SS_ to replace 'spaces' in the message
+        //We don't use http bodies, so the url is not a fan of spaces
         String directMessage = "";
         for (int i = 1; i < userArgs.length; i++) {
             directMessage += userArgs[i] + "_SS_";
@@ -462,6 +583,9 @@ public class InputController {
         }
     }
 
+    /**
+     * Print the base instructions for the app, just a welcome to the app and a short description on how to operate it
+      */
     private static void printInstructions() {
         System.out.println("Welcome to Slack# (patent pending), our cheeky, user un-friendly, clone of Slack\n" +
                 "\t\tTo run this god forsaken app, type in a command and its arguments.\n" +
@@ -469,6 +593,9 @@ public class InputController {
                 "\t\t(Or enter \"help\", I'm not your mommy lol)");
     }
 
+    /**
+     * Print the commands that have been implemented thus far
+     */
     private static void printHelp() {
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using ' ' to separate arguments\n\n" +
@@ -480,13 +607,11 @@ public class InputController {
                 "view users: view users\n" +
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> <message>\n" +
-                "pin message: pin message - <message>\n" +
+                "pin message: pin message - <messageId>\n" +
+                "unpin message: unpin message - <messageId>\n" +
                 "log messages: log messages\n" +
                 "view mentions: view mentions\n");
     }
-
-
-
 
 
     private static void WriteFile(String[] linesToWrite, String filePath) {
@@ -496,7 +621,7 @@ public class InputController {
             //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
             // Get that relative directory and if it doesn't exist. Make it
             File dir = new File("..\\..\\logs\\");
-            if(!dir.exists()){
+            if (!dir.exists()) {
                 dir.mkdir();
             }
             //Get the file for to write to.
@@ -504,7 +629,7 @@ public class InputController {
             //If it does exist, delete it, and make a new one
             File toWrite = new File(dir + filePath + ".txt");
             FileWriter fw;
-            if(toWrite.exists())
+            if (toWrite.exists())
                 toWrite.delete();
             toWrite.createNewFile();
             //Set it to be writable
@@ -512,7 +637,7 @@ public class InputController {
             //Prepare to start writing the file. Making a file Writer, and then iteration through the data
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
-            for(String line: linesToWrite){
+            for (String line : linesToWrite) {
                 fw.write(line);
             }
             //Close the writer to prevent memory leaks
@@ -522,8 +647,7 @@ public class InputController {
             System.out.println("File " + filePath + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //Lots of methods have the chance to throw an error (although they shouldn't now)
             //So we want to print that error.
             e.printStackTrace();
