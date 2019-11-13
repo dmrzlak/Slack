@@ -46,9 +46,8 @@ public class DBSupport {
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
-//        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Content-Type", "application/json");
 
-        con.setRequestProperty("Content-Type", "application/xml");
         String contentType = con.getHeaderField("Content-Type");
 
         //We want to know if we did good, or if Big Backend is mad at us
@@ -315,10 +314,10 @@ public class DBSupport {
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
         public static String sendDirectMessage(String sender, String reciever, String message){
-            return BASE_URL+"/message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
+            return BASE_URL+"message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
         }
         public static String sendMessage(String sender, String workspace, String channelName, String message){
-            return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
+            return BASE_URL+"message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
         }
 
         public static String createWorkspace(String name){
@@ -338,7 +337,7 @@ public class DBSupport {
         }
 
         public static String getUsersInWorkspace(String workspaceName) {
-            return BASE_URL+"workspace/getUsers/?name="+workspaceName;
+            return BASE_URL+"workspace/getUsers?name="+workspaceName;
         }
 
         public static String addNewChannel(String workspaceName, String name) {
@@ -352,7 +351,7 @@ public class DBSupport {
         }
 
         public static String getAllMessages(String workspaceName) {
-            return BASE_URL+"workspace/getAllMessages/?workspaceName="+workspaceName;
+            return BASE_URL+"workspace/getAllMessages?workspaceName="+workspaceName;
         }
 
         public static String getChannelName(int cId) {
