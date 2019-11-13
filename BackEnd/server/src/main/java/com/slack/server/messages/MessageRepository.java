@@ -22,6 +22,9 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
     Iterable<Message> getUsersMessages(@Param("rId") int rId);
 
 
+    @Query("Select m From Message m where m.pinned = 1 and m.wId = :wId AND m.cId = :cId")
+    Iterable<Message> getPinnedMessagesByChannel(@Param("wId") int wId, @Param("cId") int cId);
+
     @Query("Select m From Message m where m.wId = :wId ORDER BY m.cId ASC, m.id ASC")
     Iterable<Message> getAllMessagesByWorkspace(@Param("wId") int wId);
 

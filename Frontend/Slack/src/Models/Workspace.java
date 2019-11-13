@@ -81,6 +81,11 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse unpinMessage(String mId) {
+        DBSupport.HTTPResponse res = DBSupport.unpinMessage(Integer.parseInt(mId));
+        return res;
+    }
+
     /**
      * Calls DBSupport and returns the response
      * @param workspaceName

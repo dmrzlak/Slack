@@ -1,10 +1,8 @@
 import Controllers.DBSupport;
-import Models.Message;
-import Models.Channel;
-import Models.User;
-import Models.Workspace;
+import Models.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -32,15 +30,16 @@ public class InputController {
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
     private static final String PIN_MESSAGE = "pin message";
+    private static final String UNPIN_MESSAGE = "unpin message";
     private static final String LOG_MESSAGES = "log messages";
     private static final String VIEW_MENTIONS = "view mentions";
+    private static final String GET_PINNED = "get pinned";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
     private static final String SEARCH_WORKSPACE = "search workspace";
     private static final String SEARCH_USER = "search user";
     private static final String SEND_TEXTFILE = "send textfile";
     private static final String DOWNLOAD_TEXTFILE = "download textfile";
-
 
     private static Gson gson = new Gson();
     private static User curUser = null;
@@ -95,6 +94,9 @@ public class InputController {
                 case PIN_MESSAGE:
                     PinMessage(userArgs);
                     break;
+                case UNPIN_MESSAGE:
+                    UnpinMessage(userArgs);
+                    break;
                 case SEND_DM:
                     SendDM(userArgs);
                     break;
@@ -117,7 +119,9 @@ public class InputController {
                     downloadTextfile(userArgs);
                     break;
                 case SEND_TEXTFILE:
-                    sendTextfile(usedArgs);
+                    sendTextfile(userArgs);
+                case GET_PINNED:
+                    GetPinned(userArgs);
                     break;
                 default:
                     System.out.println("Invalid Input please try again :(");
@@ -128,7 +132,7 @@ public class InputController {
     }
 
 
-    private static void sendTextfile(){
+    private static void sendTextfile(String[] userArgs){
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
@@ -142,37 +146,40 @@ public class InputController {
             return;
         }
         String filename = userArgs[0];
-        filename = filename.subString(lastIndexOf('/',filname.length));
+        filename = filename.substring( filename.lastIndexOf('/'));
 
-        String Content = "";
-        Scanner scan = Scanner(new File(userArgs[0]));
-        String temp;
-        while (scan.hasNext()){
-            temp = scan.nextLine();
-            temp.replace(' ',"_SS_");
-            temp.replace('\t',"_TT_");
-            temp+="_NN_";
-            temp.replace('&', "_AA_");
-            temp.replace('?',"_QQ_");
-            //temp.replace('',"")
-            content += temp;
+        String content = "";
+        File toRead = new File(userArgs[0]);
+        if(toRead.exists()){
+            Scanner scan = null;
+            try {
+                scan = new Scanner(toRead);
+                String temp;
+                while (scan.hasNextLine()) {
+                    temp = scan.nextLine();
+                    content += temp;
+                }
+                DBSupport.HTTPResponse response = Textfile.sendText(filename, content);
+    //            if (content.length > 2048) {
+    //                content = content.subString(0, 2048);
+    //                System.out.print("File too long shortened to send");
+    //            }
+                if (response.code >= 300) {
+                    System.out.println(response.response);
+                } else {
+                    System.out.print("file sent!");
+                }
+            }
+            catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
         }
-        if(content.length > 2048) {
-            content = content.subString(0, 2048);
-            System.out.print("File too long shortened to send");
+        else {
+            System.out.println("File not found, please try again");
         }
-
-        DBSupport.HTTPResponse Textfile.sendText(filename,content);
-
-        if (response.code >= 300) {
-            System.out.println(response.response);
-        } else {
-            System.out.print("file sent!");
-        }
-
     }
 
-    private static void downloadTextfile(){
+    private static void downloadTextfile(String[] userArgs){
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
@@ -187,26 +194,15 @@ public class InputController {
         }
         String filename = userArgs[0];
 
-        DBSupport.HTTPResponse response = DBSupport.HTTPResponse Textfile.getText(filename);
+        DBSupport.HTTPResponse response = Textfile.getText(filename);
 
         if (response.code >= 300) {
             System.out.println(response.response);
         } else {
-            Textfile t = gson.fromJson(response, t.class);
-
-
-            String temp = t.getContent();
-
-            temp = scan.nextLine();
-            temp.replace("_SS_", ' ');
-            temp.replace("_TT_", '\t');
-            temp.replace("_AA_", '&');
-            temp.replace("_QQ_", '?');
-
-            String[] file = temp.split("_NN_");
+            Textfile t = gson.fromJson(response.response, Textfile.class);
+            String[] file = t.getContent().split("\n");
             WriteFile(file,"..\\..\\files\\", t.getName());
         }
-
     }
 
 
@@ -241,7 +237,7 @@ public class InputController {
             Message[] mentions = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your mentions:");
             for (Message mention : mentions) {
-                String printMention = "\t" + mention.getContent().replaceAll("_SS_", " ");
+                String printMention = "\t" + mention.getContent();
                 System.out.println(printMention);
             }
         }
@@ -276,8 +272,7 @@ public class InputController {
         DBSupport.HTTPResponse response = Message.getAllMessages(curWorkspace.getName());
         if (response.code >= 300) {
             System.out.println(response.response);
-        }
-        else {
+        } else {
             System.out.println("Retrieval for: " + curWorkspace.getName() + " successful");
             Message[] messages = gson.fromJson(response.response, Message[].class);
             String workspaceName = curWorkspace.getName();
@@ -319,7 +314,7 @@ public class InputController {
         }
         else {
             System.out.println("Workspaces like: " + Wname);
-            Workspace[] workspacesFound = gson.fromJson(response.response, workspacesFound[].class);
+            Workspace[] workspacesFound = gson.fromJson(response.response, Workspace[].class);
             for(int i = 0; i < workspacesFound.length;i++) {
                 System.out.println(workspacesFound[i].getName());
             }
@@ -342,10 +337,10 @@ public class InputController {
             System.out.println(response.response);
         }
         else {
-            System.out.println("User like: " + Wname);
-            User[] userFound = gson.fromJson(response.response, userFound[].class);
+            System.out.println("Users with name like: " + Uname);
+            User[] userFound = gson.fromJson(response.response, User[].class);
             for(int i = 0; i < userFound.length;i++) {
-                System.out.println(userFound[i].getName());
+                System.out.println("\t" + userFound[i].getName());
             }
         }
     }
@@ -399,7 +394,7 @@ public class InputController {
      */
     private static void CreateWorkspace(String[] userArgs) {
         if (userArgs.length != 1) {
-            System.out.println("Invalid Number or Arguments");
+            System.out.println("Invalid Number of Arguments");
             return;
         }
         System.out.println("Creating Workspace...");
@@ -494,6 +489,34 @@ public class InputController {
         }
     }
 
+    private static void GetPinned(String[] userArgs) {
+        if (curWorkspace == null) {
+            System.out.println("You are not in a workspace\n");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("You are not in a channel\n");
+            return;
+        }
+        //get messages, then return them
+        System.out.println("Getting the pinned messages for: " + curChannel.getName());
+        DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        } else {
+            System.out.println("Retrieval for: " + curChannel.getName() + " successful");
+            Message[] messages = gson.fromJson(response.response, Message[].class);
+            int i = 0;
+            while (i < messages.length) {
+                System.out.print("Message ID: " + messages[i].getId());
+                System.out.print(", Sender ID: " + messages[i].getSenderId());
+                System.out.print(", Message: " + messages[i].getContent());
+                i++;
+            }
+
+        }
+    }
+
     /**
      * Mark a message as pinned (when marked as pinned a pin search will be able to get them)
      * A pinned message is technically important to the channel (but we're not enforcing that and leaving that to the users)
@@ -516,7 +539,27 @@ public class InputController {
             System.out.println("Pinned message");
             Message m = gson.fromJson(pinMessage.response, Message.class);
             System.out.println("Message Pinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                    + m.getContent().replaceAll("_SS_", " "));
+                    + m.getContent());
+        }
+    }
+
+    private static void UnpinMessage(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse unpinMessage = Workspace.unpinMessage(userArgs[0]);
+        if (unpinMessage.code > 300) {
+            System.out.println(unpinMessage.response);
+        } else {
+            System.out.println("Pinned message");
+            Message m = gson.fromJson(unpinMessage.response, Message.class);
+            System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                    + m.getContent());
         }
     }
 
@@ -558,7 +601,7 @@ public class InputController {
             System.out.println(sendMessage.response);
         } else {
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
@@ -586,23 +629,23 @@ public class InputController {
             return;
         }
         //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
+        //using %20 to replace 'spaces' in the message
         //We don't use http bodies, so the url is not a fan of spaces
         String message = "";
         for (int i = 0; i < userArgs.length; i++) {
-            message += userArgs[i] + "_SS_";
+            message += userArgs[i] + " ";
         }
         message = message.trim();
+        message = ReplaceSpecChars(message);
         //Send the message to the server, and acknowledge the search
         DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
         if (sendMessage.code > 300) {
             System.out.println(sendMessage.response);
         } else {
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
-
 
     /**
      * Send a message to a user. Takes the content and will put it into the server.
@@ -616,13 +659,14 @@ public class InputController {
             return;
         }
         //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
+        //using %20 to replace 'spaces' in the message
         //We don't use http bodies, so the url is not a fan of spaces
         String directMessage = "";
         for (int i = 1; i < userArgs.length; i++) {
-            directMessage += userArgs[i] + "_SS_";
+            directMessage += userArgs[i] + " ";
         }
         directMessage = directMessage.trim();
+        directMessage = ReplaceSpecChars(directMessage);
         DBSupport.HTTPResponse dm = Message.sendDirectMessage(curUser.getName(), userArgs[0], directMessage);
         if (dm.code > 300) {
             System.out.println(dm.response);
@@ -630,7 +674,7 @@ public class InputController {
             System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
 
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
@@ -660,14 +704,11 @@ public class InputController {
                 "search user: search user - <name of user>\n"+
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> <message>\n" +
-                "pin message: pin message - <message>\n" +
+                "pin message: pin message - <messageId>\n" +
+                "unpin message: unpin message - <messageId>\n" +
                 "log messages: log messages\n" +
                 "view mentions: view mentions\n");
     }
-
-
-
-
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
         //Below is how we'll write to a file
@@ -675,7 +716,7 @@ public class InputController {
             //We want to put it in the source directory of the entire project so for Dylan (the author):
             //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
             // Get that relative directory and if it doesn't exist. Make it
-            File dir = new File(filepath);
+            File dir = new File(filePath);
             if(!dir.exists()){
                 dir.mkdir();
             }
@@ -684,7 +725,7 @@ public class InputController {
             //If it does exist, delete it, and make a new one
             File toWrite = new File(dir + fileName + ".txt");
             FileWriter fw;
-            if(toWrite.exists())
+            if (toWrite.exists())
                 toWrite.delete();
             toWrite.createNewFile();
             //Set it to be writable
@@ -692,7 +733,7 @@ public class InputController {
             //Prepare to start writing the file. Making a file Writer, and then iteration through the data
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
-            for(String line: linesToWrite){
+            for (String line : linesToWrite) {
                 fw.write(line);
             }
             //Close the writer to prevent memory leaks
@@ -702,8 +743,7 @@ public class InputController {
             System.out.println("File " + filePath + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //Lots of methods have the chance to throw an error (although they shouldn't now)
             //So we want to print that error.
             e.printStackTrace();
@@ -743,9 +783,23 @@ public class InputController {
                 senderName = uRepsonse.response;
             }
             messageString = "[" + curWorkspace.getName() + "].[" + channelName + "]\t" + "FROM: " + senderName +
-                    "\n\tMESSAGE: " + message.getContent().replaceAll("_SS_", " ") + "\n";
+                    "\n\tMESSAGE: " + message.getContent() + "\n";
             file[i] = messageString;
         }
         return file;
     }
+
+    private static String ReplaceSpecChars(String input) {
+        //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
+        // it to something that url's can handle
+        String content = input;
+        content = content.replaceAll("&", " AND ");
+        content = content.replaceAll("\\?", " QM ");
+        content = content.replaceAll("\\\\", " BCKSLSH ");
+        content = content.replaceAll(" ", "%20");
+        content = content.replaceAll("\t", "%09");
+        content = content.replaceAll("\n", "%0D");
+        return content;
+    }
+
 }

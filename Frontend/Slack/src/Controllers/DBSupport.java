@@ -46,9 +46,8 @@ public class DBSupport {
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
-//        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Content-Type", "application/json");
 
-        con.setRequestProperty("Content-Type", "application/xml");
         String contentType = con.getHeaderField("Content-Type");
 
         //We want to know if we did good, or if Big Backend is mad at us
@@ -91,6 +90,7 @@ public class DBSupport {
 
     /**
      * Creates a request to the backend to make a Workspace
+     *
      * @param name
      * @return
      * @Author Dylan Mrzlak
@@ -107,6 +107,7 @@ public class DBSupport {
 
     /**
      * Builds the request to join a workspace
+     *
      * @param workspaceName
      * @param name
      * @return
@@ -123,6 +124,7 @@ public class DBSupport {
 
     /**
      * Builds a request to create a user
+     *
      * @param name
      * @param password
      * @return
@@ -138,6 +140,7 @@ public class DBSupport {
 
     /**
      * Sets a message as pinned
+     *
      * @param id
      * @return
      * @Author Joseph Hudson
@@ -153,6 +156,7 @@ public class DBSupport {
 
     /**
      * Builds a request to send a message
+     *
      * @param senderName
      * @param workspaceName
      * @param channelName
@@ -170,6 +174,7 @@ public class DBSupport {
 
     /**
      * Builds a request to create a channel
+     *
      * @param workspaceName
      * @param name
      * @return
@@ -185,6 +190,7 @@ public class DBSupport {
 
     /**
      * Builds a request to send a DM
+     *
      * @param senderName
      * @param receiver
      * @param message
@@ -201,6 +207,7 @@ public class DBSupport {
 
     /**
      * Builds a request to view users in a workspace
+     *
      * @param workspaceName
      * @return
      */
@@ -215,6 +222,7 @@ public class DBSupport {
 
     /**
      * Get all the mentions within a channel for a given user
+     *
      * @param username
      * @param workspaceName
      * @param channelName
@@ -231,9 +239,10 @@ public class DBSupport {
 
     /**
      * Get all the messages within a workspace
+     *
      * @param workspaceName
      * @return Status code of the HTTP call and a response string (either a JSON or a string)
-     *          The Json is a list of messages all grouped by channel
+     * The Json is a list of messages all grouped by channel
      */
     public static HTTPResponse getAllMessages(String workspaceName) {
         try {
@@ -246,6 +255,7 @@ public class DBSupport {
 
     /**
      * searcher workspace
+     *
      * @param workspaceName
      * @return Status code of the HTTP call and a json list of the workspaces
      */
@@ -257,9 +267,28 @@ public class DBSupport {
             return new HTTPResponse(406, handleErr());
         }
     }
+
+    /**
+     * Get all the pinned messages within a channel
+     *
+     * @param workspaceName
+     * @param channelName
+     * @return Status code of the HTTP call and a response string (either a JSON or a string)
+     * The Json is a list of messages all grouped by channel
+     */
+    public static HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getPinnedMessages(workspaceName, channelName));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * searcher workspace
-     * @param workspaceName
+     *
+     * @param userName
      * @return Status code of the HTTP call and a json list of the workspaces
      */
     public static HTTPResponse searchUser(String userName) {
@@ -270,8 +299,10 @@ public class DBSupport {
             return new HTTPResponse(406, handleErr());
         }
     }
+
     /**
      * Builds a request to get a channel name
+     *
      * @param cId
      * @return
      */
@@ -286,10 +317,11 @@ public class DBSupport {
 
     /**
      * Builds a request to get a user by id
+     *
      * @param senderId
      * @return
      */
-    public static HTTPResponse getUserNameByID(Integer senderId){
+    public static HTTPResponse getUserNameByID(Integer senderId) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUserNameById(senderId));
             return response;
@@ -300,6 +332,7 @@ public class DBSupport {
 
     /**
      * Builds a request to sign in a user
+     *
      * @param username
      * @param password
      * @return
@@ -310,17 +343,28 @@ public class DBSupport {
             return response;
         } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
-        }    }
+        }
+    }
+
+    public static HTTPResponse unpinMessage(int id) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.unpinMessage(id));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
 
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
+     *
      * @author Dylan Mrzlak
      */
-    public static class HTTPResponse{
+    public static class HTTPResponse {
         public int code;
         public String response;
 
-        HTTPResponse(int status, String content){
+        HTTPResponse(int status, String content) {
             code = status;
             response = content;
         }
@@ -330,7 +374,7 @@ public class DBSupport {
      * Static class to build our URL's to Strings.
      * Makes it a lot better to send it out to here, rather than build them in other methods
      */
-    private static class ParamBuilder{
+    private static class ParamBuilder {
         //This is the base url for our server. When we get a dedicated server for the app, we will want this changed
         private static String BASE_URL = "http://localhost:8080/";
 
@@ -340,71 +384,82 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
-        public static String sendDirectMessage(String sender, String reciever, String message){
-            return BASE_URL+"/message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
-        }
-        public static String sendMessage(String sender, String workspace, String channelName, String message){
-            return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
+        public static String sendDirectMessage(String sender, String reciever, String message) {
+            return BASE_URL + "message/directMessage?senderName=" + sender + "&recieverName=" + reciever + "&message=" + message;
         }
 
-        public static String sendText(String name, String content){
-            return BASE_URL+"/textfile/send?name="+name+"&content="+content;
+        public static String sendMessage(String sender, String workspace, String channelName, String message) {
+            return BASE_URL + "message/channelMessage?senderName=" + sender + "&workSpaceName=" + workspace + "&channelName=" + channelName + "&message=" + message;
         }
 
-        public static String getText(String name){
-            return BASE_URL+"/textfile/download?name"+name;
+        public static String sendText(String name, String content) {
+            return BASE_URL + "/textfile/send?name=" + name + "&content=" + content;
         }
 
-        public static String createWorkspace(String name){
-            return BASE_URL+"workspace/add?name="+name;
+        public static String getText(String name) {
+            return BASE_URL + "/textfile/download?name" + name;
         }
 
-        public static String joinWorkspace(String workspaceName, String username){
-            return BASE_URL+"user/join?workspaceName="+workspaceName+"&name="+username;
+        public static String createWorkspace(String name) {
+            return BASE_URL + "workspace/add?name=" + name;
         }
 
-        public static String createUser(String name, String password){
-            return BASE_URL+"user/add?username="+name+"&password="+password;
+        public static String joinWorkspace(String workspaceName, String username) {
+            return BASE_URL + "user/join?workspaceName=" + workspaceName + "&name=" + username;
         }
 
-        public static String pinMessage(int mId){
-            return BASE_URL+"message/pinMessage?messageID=" + mId;
+        public static String createUser(String name, String password) {
+            return BASE_URL + "user/add?username=" + name + "&password=" + password;
+        }
+
+        public static String pinMessage(int mId) {
+            return BASE_URL + "message/pinMessage?messageID=" + mId;
+        }
+
+        public static String unpinMessage(int mId) {
+            return BASE_URL + "message/unpinMessage?messageID=" + mId;
         }
 
         public static String getUsersInWorkspace(String workspaceName) {
-            return BASE_URL+"workspace/getUsers/?name="+workspaceName;
+            return BASE_URL + "workspace/getUsers?name=" + workspaceName;
         }
+
         public static String searchWorkspace(String workspaceName) {
-            return BASE_URL+"workspace/search?name="+workspaceName;
+            return BASE_URL + "workspace/search?name=" + workspaceName;
         }
+
         public static String searchUser(String userName) {
-            return BASE_URL+"user/search?name="+userName;
+            return BASE_URL + "user/search?name=" + userName;
         }
+
         public static String addNewChannel(String workspaceName, String name) {
-            return BASE_URL+"channel/add?workspaceName="+workspaceName+"&name="+name;
+            return BASE_URL + "channel/add?workspaceName=" + workspaceName + "&name=" + name;
         }
 
         public static String viewMentions(String username, String workspaceName, String channelName) {
-            return BASE_URL+"channel/viewMentions?username=" + username +
+            return BASE_URL + "channel/viewMentions?username=" + username +
                     "&workspaceName=" + workspaceName +
                     "&channelName=" + channelName;
         }
 
         public static String getAllMessages(String workspaceName) {
-            return BASE_URL+"workspace/getAllMessages/?workspaceName="+workspaceName;
+            return BASE_URL + "workspace/getAllMessages?workspaceName=" + workspaceName;
         }
 
         public static String getChannelName(int cId) {
-            return BASE_URL+"channel/getName?cId="+cId;
+            return BASE_URL + "channel/getName?cId=" + cId;
         }
 
         public static String getUserNameById(Integer senderId) {
-            return BASE_URL+"user/getUsername?senderId="+senderId;
+            return BASE_URL + "user/getUsername?senderId=" + senderId;
         }
 
         public static String signin(String username, String password) {
-            return BASE_URL+"user/login?username="+username+"&password="+password;
+            return BASE_URL + "user/login?username=" + username + "&password=" + password;
+        }
 
+        public static String getPinnedMessages(String workspaceName, String channelName) {
+            return BASE_URL + "channel/getPinnedMessages?workspaceName=" + workspaceName + "&channelName=" + channelName;
         }
     }
 }

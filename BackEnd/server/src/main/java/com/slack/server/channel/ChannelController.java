@@ -124,4 +124,18 @@ public class ChannelController {
         return new ResponseEntity(c.getName(), HttpStatus.OK);
 
     }
+
+    /**
+     * @param workspaceName
+     * @param channelName
+     * @return
+     * @Author Joseph Hudson
+     */
+    @GetMapping(path="/getPinnedMessages")
+    public @ResponseBody ResponseEntity getPinnedMessages(String workspaceName, String channelName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        Iterable<Message> list = mRepo.getPinnedMessagesByChannel(w.getId(), c.getId());
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
 }
