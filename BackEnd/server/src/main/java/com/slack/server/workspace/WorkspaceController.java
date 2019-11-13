@@ -98,13 +98,13 @@ public class WorkspaceController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
-    @GetMapping(path="/changeRole")
+    @GetMapping(path="/changeRole")//TODO SAVE ME!!!!
     public @ResponseBody ResponseEntity changeRole(int rId, int uId) {
         if(userRepository.existsByID(uId))
                 User u = userRepository.findByID(uId);
         else
             return new ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
-        Iterable<Message> list = mRepo.getAllMessagesByWorkspace(w.getId());
-        return new ResponseEntity(list, HttpStatus.OK);
+        u.rId = rId;//TODO OH GOD THIS ISN'T RIGHT!!!!!
+        return new ResponseEntity(u, HttpStatus.OK);//TODO oh god what do I put in here
     }
 }
