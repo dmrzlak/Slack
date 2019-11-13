@@ -347,10 +347,6 @@ public class InputController {
     }
 
     private static void GetPinned(String[] userArgs) {
-        if (userArgs.length != 0) {
-            System.out.println("Invalid number of arguments\n");
-            return;
-        }
         if (curChannel == null || curWorkspace == null) {
             if (curWorkspace == null) {
                 System.out.println("You are not in a workspace\n");
