@@ -15,6 +15,8 @@ import java.net.URISyntaxException;
  * This is our Data Provider for the frontend app. THis will cal to the backend controllers via HTTPRequests.
  * The idea goes:
  *      User --> InputController --> Model --> DBSupport --> HTTPRequest --> ModelController --> DB
+ *      User <-- InputController <-- Model <-- DBSupport <-- HTTPRequest <-- ModelController <--
+ *   (Interface)
  * @Author Dylan Mrzlak
  */
 public class DBSupport {
@@ -44,9 +46,8 @@ public class DBSupport {
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
-//        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Content-Type", "application/json");
 
-        con.setRequestProperty("Content-Type", "application/xml");
         String contentType = con.getHeaderField("Content-Type");
 
         //We want to know if we did good, or if Big Backend is mad at us
@@ -80,7 +81,8 @@ public class DBSupport {
         return new HTTPResponse(status, content.toString());
     }
 
-    //Prints an error for stating the a request couldn't finish for whatever reason. Helps keep the app from being pissy
+    //Prints an error for stating the a request couldn't finish for whatever reason.
+    // Helps keep the app from breaking completely
     public static String handleErr() {
         System.out.println("Unable to handle the request, please check your connection, try again");
         return null;
@@ -88,7 +90,6 @@ public class DBSupport {
 
     /**
      * Creates a request to the backend to make a Workspace
-     *
      * @param name
      * @return
      * @Author Dylan Mrzlak
@@ -102,6 +103,13 @@ public class DBSupport {
         }
     }
 
+
+    /**
+     * Builds the request to join a workspace
+     * @param workspaceName
+     * @param name
+     * @return
+     */
     public static HTTPResponse joinWorkspace(String workspaceName, String name) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.joinWorkspace(workspaceName, name));
@@ -111,6 +119,13 @@ public class DBSupport {
         }
     }
 
+
+    /**
+     * Builds a request to create a user
+     * @param name
+     * @param password
+     * @return
+     */
     public static HTTPResponse createUser(String name, String password) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.createUser(name, password));
@@ -122,7 +137,6 @@ public class DBSupport {
 
     /**
      * Sets a message as pinned
-     *
      * @param id
      * @return
      * @Author Joseph Hudson
@@ -136,6 +150,14 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to send a message
+     * @param senderName
+     * @param workspaceName
+     * @param channelName
+     * @param message
+     * @return
+     */
     public static HTTPResponse sendMessage(String senderName, String workspaceName, String channelName, String message) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.sendMessage(senderName, workspaceName, channelName, message));
@@ -145,6 +167,12 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to create a channel
+     * @param workspaceName
+     * @param name
+     * @return
+     */
     public static HTTPResponse createChannel(String workspaceName, String name) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.addNewChannel(workspaceName, name));
@@ -154,6 +182,13 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to send a DM
+     * @param senderName
+     * @param receiver
+     * @param message
+     * @return
+     */
     public static HTTPResponse sendDirectMessage(String senderName, String receiver, String message) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.sendDirectMessage(senderName, receiver, message));
@@ -163,6 +198,11 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to view users in a workspace
+     * @param workspaceName
+     * @return
+     */
     public static HTTPResponse viewUsers(String workspaceName) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUsersInWorkspace(workspaceName));
@@ -219,6 +259,10 @@ public class DBSupport {
         }
     }
 
+     /** Builds a request to get a channel name
+     * @param cId
+     * @return
+     */
     public static HTTPResponse getChannelName(int cId) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getChannelName(cId));
@@ -228,14 +272,26 @@ public class DBSupport {
         }
     }
 
+    /**
+     * Builds a request to get a user by id
+     * @param senderId
+     * @return
+     */
     public static HTTPResponse getUserNameByID(Integer senderId){
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUserNameById(senderId));
             return response;
         } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
-        }    }
+        }
+    }
 
+    /**
+     * Builds a request to sign in a user
+     * @param username
+     * @param password
+     * @return
+     */
     public static HTTPResponse signin(String username, String password) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.signin(username, password));
@@ -282,10 +338,10 @@ public class DBSupport {
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
         public static String sendDirectMessage(String sender, String reciever, String message){
-            return BASE_URL+"/message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
+            return BASE_URL+"message/directMessage?senderName="+sender+"&recieverName="+reciever+"&message="+message;
         }
         public static String sendMessage(String sender, String workspace, String channelName, String message){
-            return BASE_URL+"/message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
+            return BASE_URL+"message/channelMessage?senderName="+sender+"&workSpaceName="+workspace+"&channelName="+channelName+"&message="+message;
         }
 
         public static String createWorkspace(String name){
@@ -309,7 +365,7 @@ public class DBSupport {
         }
 
         public static String getUsersInWorkspace(String workspaceName) {
-            return BASE_URL+"workspace/getUsers/?name="+workspaceName;
+            return BASE_URL+"workspace/getUsers?name="+workspaceName;
         }
 
         public static String addNewChannel(String workspaceName, String name) {
@@ -323,7 +379,7 @@ public class DBSupport {
         }
 
         public static String getAllMessages(String workspaceName) {
-            return BASE_URL+"workspace/getAllMessages/?workspaceName="+workspaceName;
+            return BASE_URL+"workspace/getAllMessages?workspaceName="+workspaceName;
         }
 
         public static String getChannelName(int cId) {

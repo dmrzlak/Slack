@@ -15,10 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+
+/**
+ * Controller for the Messages in the server
+ * We set a Mapping to a specified value, and all http requests that use that
+ *      (BASE_URL + /mapping)
+ * Come here. This class handles all login for the given section
+ */
 @Controller    // This means that this class is a Controller
 @RequestMapping(path="/message") // This means URL's start with /demo (after Application path)
 public class MessageController {
 
+    /**
+     * Repo section
+     * Autowired gives the controller access to the specified repositories (tables)
+     */
     @Autowired
     private MessageRepository messageRepository;
     @Autowired
@@ -31,7 +42,16 @@ public class MessageController {
     private WorkspaceXRefRepository workspaceXRefRepository;
 
 
-
+    /**
+     * Send a direct message to a user
+     * Due to our DB (We didn't want two tables that share a lot of common fields)
+     * We simply set the messages wID and cID to null
+     * By passing in the rID we can denote it's a channel message
+     * @param senderName
+     * @param recieverName
+     * @param message
+     * @return
+     */
     @RequestMapping(path="/directMessage")
     @ResponseBody
     ResponseEntity directMessage(@RequestParam String senderName, @RequestParam String recieverName, @RequestParam String message){
@@ -52,6 +72,17 @@ public class MessageController {
         return new ResponseEntity(m, HttpStatus.OK);
     }
 
+    /**
+     * Send a direct message to a channel
+     * Due to our DB (We didn't want two tables that share a lot of common fields)
+     * We simply set the messages rID to null
+     * By passing in the wID and cID we can denote it's a channel message
+     * @param senderName
+     * @param workSpaceName
+     * @param channelName
+     * @param message
+     * @return
+     */
     @RequestMapping(path="/channelMessage")
     @ResponseBody
     ResponseEntity channelMessage(@RequestParam String senderName, @RequestParam String workSpaceName,
