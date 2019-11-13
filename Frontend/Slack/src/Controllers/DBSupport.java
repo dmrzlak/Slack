@@ -244,6 +244,15 @@ public class DBSupport {
             return new HTTPResponse(406, handleErr());
         }    }
 
+    public static HTTPResponse unpinMessage(int id) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.unpinMessage(id));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -328,6 +337,10 @@ public class DBSupport {
         public static String signin(String username, String password) {
             return BASE_URL+"user/login?username="+username+"&password="+password;
 
+        }
+
+        public static String getPinnedMessages(String workspaceName, String channelName) {
+            return BASE_URL+"channel/getPinnedMessages?workspaceName="+workspaceName+"&channelName="+channelName;
         }
     }
 }

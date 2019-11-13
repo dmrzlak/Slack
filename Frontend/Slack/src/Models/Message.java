@@ -50,11 +50,6 @@ public class Message {
         this.pinned = pinned;
     }
 
-    public static DBSupport.HTTPResponse getAllMessages(String name) {
-        DBSupport.HTTPResponse res = DBSupport.getAllMessages(name);
-        return res;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -120,4 +115,15 @@ public class Message {
         DBSupport.HTTPResponse res = DBSupport.sendDirectMessage(senderName, receiver, message);
         return res;
     }
+
+    public static DBSupport.HTTPResponse getAllMessages(String name) {
+        DBSupport.HTTPResponse res = DBSupport.getAllMessages(name);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.getPinnedMessages(workspaceName, channelName);
+        return res;
+    }
+
 }

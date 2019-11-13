@@ -108,8 +108,8 @@ public class ChannelController {
     @GetMapping(path="/getPinnedMessages")
     public @ResponseBody ResponseEntity getPinnedMessages(String workspaceName, String channelName) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
-        Channel c = channelRepository.find(w.getID(), channelName);
-        Iterable<Message> list = mRepo.getPinnedMessagesByChannel(w.getId(), c.getID());
+        Channel c = channelRepository.find(w.getId(), channelName);
+        Iterable<Message> list = mRepo.getPinnedMessagesByChannel(w.getId(), c.getId());
         return new ResponseEntity(list, HttpStatus.OK);
     }
 }

@@ -33,6 +33,7 @@ public class InputController {
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
     private static final String PIN_MESSAGE = "pin message";
+    private static final String UNPIN_MESSAGE = "unpin message";
     private static final String LOG_MESSAGES = "log messages";
     private static final String VIEW_MENTIONS = "view mentions";
     private static final String GET_PINNED = "get pinned";
@@ -88,6 +89,9 @@ public class InputController {
                     break;
                 case PIN_MESSAGE:
                     PinMessage(userArgs);
+                    break;
+                case UNPIN_MESSAGE:
+                    UnpinMessage(userArgs);
                     break;
                 case SEND_DM:
                     SendDM(userArgs);
@@ -163,8 +167,7 @@ public class InputController {
         DBSupport.HTTPResponse response = Message.getAllMessages(curWorkspace.getName());
         if (response.code >= 300) {
             System.out.println(response.response);
-        }
-        else {
+        } else {
             System.out.println("Retrieval for: " + curWorkspace.getName() + " successful");
             Message[] messages = gson.fromJson(response.response, Message[].class);
             String workspaceName = curWorkspace.getName();
@@ -289,12 +292,12 @@ public class InputController {
         }
     }
 
-    private static void GetPinned(String[] userArgs) {//TODO
+    private static void GetPinned(String[] userArgs) {
         if (userArgs.length != 0) {
             System.out.println("Invalid number of arguments\n");
             return;
         }
-        if(curChannel == null || curWorkspace == null){
+        if (curChannel == null || curWorkspace == null) {
             if (curWorkspace == null) {
                 System.out.println("You are not in a workspace\n");
             }
@@ -302,26 +305,25 @@ public class InputController {
                 System.out.println("You are not in a channel\n");
             }
             return;
-        }
-        else{
+        } else {
             //get messages, then return them
             System.out.println("Getting the pinned messages for: " + curChannel.getName());
-            DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName() ,curChannel.getName());
+            DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
             if (response.code >= 300) {
                 System.out.println(response.response);
-            }
-            else {
+            } else {
                 System.out.println("Retrieval for: " + curChannel.getName() + " successful");
                 Message[] messages = gson.fromJson(response.response, Message[].class);
                 int i = 0;
-                while(i < messages.length){
-                    System.out.println("Message ID: " + messages[i].getID());
-                    System.out.println("Sender ID: " + messages[i].getSenderID());
+                while (i < messages.length) {
+                    System.out.println("Message ID: " + messages[i].getId());
+                    System.out.println("Sender ID: " + messages[i].getSenderId());
                     System.out.println("Message: " + messages[i].getContent());
                     i++;
                 }
 
             }
+        }
     }
 
     private static void PinMessage(String[] userArgs) {
@@ -344,27 +346,27 @@ public class InputController {
         }
     }
 
-        private static void UnpinMessage(String[] userArgs) {
-            if (curUser == null) {
-                System.out.println("You need to create a user or sign in to continue");
-                return;
-            }
-            if (userArgs.length != 1) {
-                System.out.println("Invalid Number or Arguments");
-                return;
-            }
-            DBSupport.HTTPResponse pinMessage = Workspace.unpinMessage(userArgs[0]);
-            if (unpinMessage.code > 300) {
-                System.out.println(unpinMessage.response);
-            } else {
-                System.out.println("Pinned message");
-                Message m = gson.fromJson(unpinMessage.response, Message.class);
-                System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                        + m.getContent().replaceAll("_SS_", " "));
-            }
+    private static void UnpinMessage(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
         }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse unpinMessage = Workspace.unpinMessage(userArgs[0]);
+        if (unpinMessage.code > 300) {
+            System.out.println(unpinMessage.response);
+        } else {
+            System.out.println("Pinned message");
+            Message m = gson.fromJson(unpinMessage.response, Message.class);
+            System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
+                    + m.getContent().replaceAll("_SS_", " "));
+        }
+    }
 
-        private static void SendMessage(String[] userArgs) {
+    private static void SendMessage(String[] userArgs) {
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
@@ -436,13 +438,11 @@ public class InputController {
                 "view users: view users\n" +
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> <message>\n" +
-                "pin message: pin message - <message>\n" +
+                "pin message: pin message - <messageId>\n" +
+                "unpin message: unpin message - <messageId>\n" +
                 "log messages: log messages\n" +
                 "view mentions: view mentions\n");
     }
-
-
-
 
 
     private static void WriteFile(String[] linesToWrite, String filePath) {
@@ -452,7 +452,7 @@ public class InputController {
             //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
             // Get that relative directory and if it doesn't exist. Make it
             File dir = new File("..\\..\\logs\\");
-            if(!dir.exists()){
+            if (!dir.exists()) {
                 dir.mkdir();
             }
             //Get the file for to write to.
@@ -460,7 +460,7 @@ public class InputController {
             //If it does exist, delete it, and make a new one
             File toWrite = new File(dir + filePath + ".txt");
             FileWriter fw;
-            if(toWrite.exists())
+            if (toWrite.exists())
                 toWrite.delete();
             toWrite.createNewFile();
             //Set it to be writable
@@ -468,7 +468,7 @@ public class InputController {
             //Prepare to start writing the file. Making a file Writer, and then iteration through the data
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
-            for(String line: linesToWrite){
+            for (String line : linesToWrite) {
                 fw.write(line);
             }
             //Close the writer to prevent memory leaks
@@ -478,8 +478,7 @@ public class InputController {
             System.out.println("File " + filePath + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             //Lots of methods have the chance to throw an error (although they shouldn't now)
             //So we want to print that error.
             e.printStackTrace();

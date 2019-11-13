@@ -7,6 +7,8 @@ public class User {
     private String name;
     private String password;
     private Integer userId;
+
+
     public User(String uName, String uPassword){
         name = uName;
         password = uPassword;
