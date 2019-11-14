@@ -427,11 +427,11 @@ public class DBSupport {
         }
 
         public static String sendText(String name, String content) {
-            return BASE_URL + "/textfile/send?name=" + name + "&content=" + content;
+            return BASE_URL + "textfile/send?name=" + name + "&content=" + content;
         }
 
         public static String getText(String name) {
-            return BASE_URL + "/textfile/download?name" + name;
+            return BASE_URL + "textfile/download?name=" + name;
         }
 
         public static String createWorkspace(String name) {

@@ -37,12 +37,13 @@ public class Textfile {
     public void setId(Integer id) {
         this.id = id;
     }
+
     public String getName() {
-        return content;
+        return name;
     }
 
-    public void setName(String content) {
-        this.content = content;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getContent() {

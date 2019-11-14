@@ -165,7 +165,9 @@ public class InputController {
                     temp = scan.nextLine();
                     content += temp + "\n";
                 }
+                scan.close();
                 content = ReplaceSpecChars(content);
+                filename= filename.substring(0, filename.length() - 4);
                 DBSupport.HTTPResponse response = Textfile.sendText(filename, content);
 
                 if (response.code >= 300) {
@@ -205,7 +207,7 @@ public class InputController {
         } else {
             Textfile t = gson.fromJson(response.response, Textfile.class);
             String[] file = t.getContent().split("\n");
-            WriteFile(file,"..\\..\\files\\", t.getName());
+            WriteFile(file,"..\\..\\files\\", "\\" + t.getName());
         }
     }
 
@@ -745,13 +747,13 @@ public class InputController {
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
             for (String line : linesToWrite) {
-                fw.write(line);
+                fw.write(line + "\n");
             }
             //Close the writer to prevent memory leaks
             fw.close();
             //set the file to read only. Gotta keep our logs pure and clean
             toWrite.setReadOnly();
-            System.out.println("File " + filePath + "Written to: \n" +
+            System.out.println("File " + fileName + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
         } catch (IOException e) {
