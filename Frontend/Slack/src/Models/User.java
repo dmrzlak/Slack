@@ -67,6 +67,12 @@ public class User {
         password = username;
     }
 
+
+    public static DBSupport.HTTPResponse searchUser(String name){
+        DBSupport.HTTPResponse res = DBSupport.searchUser(name);
+        return res;
+    }
+
     public static DBSupport.HTTPResponse createUser(String name, String password){
         DBSupport.HTTPResponse res = DBSupport.createUser(name, password);
         return res;

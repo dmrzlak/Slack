@@ -1,8 +1,7 @@
 package com.slack.server.workspace;
 
-import com.slack.server.messages.Message;
 import com.slack.server.messages.MessageRepository;
-import com.slack.server.user.User;
+import com.slack.server.messages.Message;
 import com.slack.server.user.UserRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
 import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
@@ -82,6 +81,18 @@ public class WorkspaceController {
     public @ResponseBody ResponseEntity getWorkspaceByName(@RequestParam String name){
         if(workspaceRepository.existsByName(name)) return new ResponseEntity(workspaceRepository.findbyName(name), HttpStatus.OK);
         return new ResponseEntity("Workspace does not exist", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(path="/search")
+    public @ResponseBody ResponseEntity searchWorkspace(@RequestParam String name){
+        Iterable<Workspace> list;
+        if(name.equals("-1")){
+            list = workspaceRepository.findAll();
+        }else {
+            name = "%" + name + "%";
+            list =  workspaceRepository.searchWorkspace(name);
+        }
+        return new ResponseEntity(list, HttpStatus.OK);
     }
 
     /**

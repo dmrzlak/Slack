@@ -1,10 +1,8 @@
 import Controllers.DBSupport;
-import Models.Message;
-import Models.Channel;
-import Models.User;
-import Models.Workspace;
+import Models.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -39,6 +37,11 @@ public class InputController {
     private static final String CHANGE_ROLE = "change role";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
+    private static final String SEARCH_WORKSPACE = "search workspace";
+    private static final String SEARCH_USER = "search user";
+    private static final String SEND_TEXTFILE = "send textfile";
+    private static final String DOWNLOAD_TEXTFILE = "download textfile";
+
     private static Gson gson = new Gson();
     private static User curUser = null;
     private static Workspace curWorkspace = null;
@@ -108,6 +111,18 @@ public class InputController {
                 case VIEW_MENTIONS:
                     ViewMentions(userArgs);
                     break;
+                case SEARCH_USER:
+                    searchUser(userArgs);
+                    break;
+                case SEARCH_WORKSPACE:
+                    searchWorkspace(userArgs);
+                    break;
+                case DOWNLOAD_TEXTFILE:
+                    downloadTextfile(userArgs);
+                    break;
+                case SEND_TEXTFILE:
+                    sendTextfile(userArgs);
+                    break;
                 case GET_PINNED:
                     GetPinned(userArgs);
                     break;
@@ -121,6 +136,86 @@ public class InputController {
         } while (input.hasNextLine());
 
     }
+
+
+    private static void sendTextfile(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        String filename = userArgs[0];
+        if(filename.contains("/")){
+            filename = filename.substring( filename.lastIndexOf('/') + 1);
+        }
+        else{
+            filename = filename.substring( filename.lastIndexOf('\\') + 1);
+        }
+
+        String content = "";
+        File toRead = new File(userArgs[0]);
+        if(toRead.exists()){
+            Scanner scan = null;
+            try {
+                scan = new Scanner(toRead);
+                String temp;
+                while (scan.hasNextLine()) {
+                    temp = scan.nextLine();
+                    content += temp + "\n";
+                }
+                scan.close();
+                content = ReplaceSpecChars(content);
+                filename= filename.substring(0, filename.length() - 4);
+                DBSupport.HTTPResponse response = Textfile.sendText(filename, content);
+
+                if (response.code >= 300) {
+                    System.out.println(response.response);
+                } else {
+                    System.out.print("file sent!");
+                }
+            }
+            catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("File not found, please try again");
+        }
+    }
+
+    private static void downloadTextfile(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        String filename = userArgs[0];
+
+        DBSupport.HTTPResponse response = Textfile.getText(filename);
+
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        } else {
+            Textfile t = gson.fromJson(response.response, Textfile.class);
+            String[] file = t.getContent().split("\n");
+            WriteFile(file,"..\\..\\files\\", "\\" + t.getName());
+        }
+    }
+
 
     /**
      * Takes "no" arguments and will print the mentions for the current user in a channel.
@@ -153,7 +248,7 @@ public class InputController {
             Message[] mentions = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your mentions:");
             for (Message mention : mentions) {
-                String printMention = "\t" + mention.getContent().replaceAll("_SS_", " ");
+                String printMention = "\t" + mention.getContent();
                 System.out.println(printMention);
             }
         }
@@ -198,13 +293,66 @@ public class InputController {
             //      "LOG_<WORKSPACENAME>_<DATE>
             DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH-mm");
             Date date = new Date();
-            String filePath = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
+            String fileName = "\\LOG_" + workspaceName + "_" + dateFormat.format(date);
             System.out.println("Formatting");
             //We want to format the data as we want, and then take the new list and write the file with it
             String[] linesToWrite = LogMessagesFormat(messages);
             System.out.println("Writing");
             //write said file
-            WriteFile(linesToWrite, filePath);
+            WriteFile(linesToWrite, "..\\..\\logs\\", fileName);
+        }
+    }
+
+    /**
+     * searches for user
+     * args name of user
+     */
+    private static void searchWorkspace(String[] userArgs){
+            if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        String Wname;
+        if(userArgs.length == 0){
+            Wname = "-1";
+        }else{
+            Wname = userArgs[0];
+        }
+        System.out.println("Searching for workspace...");
+        DBSupport.HTTPResponse response = Workspace.searchWorkspace(Wname);
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        }
+        else {
+            System.out.println("Workspaces like: " + Wname);
+            Workspace[] workspacesFound = gson.fromJson(response.response, Workspace[].class);
+            for(int i = 0; i < workspacesFound.length;i++) {
+                System.out.println(workspacesFound[i].getName());
+            }
+        }
+    }
+    private static void searchUser(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        String Uname;
+        if(userArgs.length == 0){
+            Uname = "-1";
+        }else{
+            Uname = userArgs[0];
+        }
+        System.out.println("Searching for User...");
+        DBSupport.HTTPResponse response = User.searchUser(Uname);
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        }
+        else {
+            System.out.println("Users with name like: " + Uname);
+            User[] userFound = gson.fromJson(response.response, User[].class);
+            for(int i = 0; i < userFound.length;i++) {
+                System.out.println("\t" + userFound[i].getName());
+            }
         }
     }
 
@@ -471,12 +619,13 @@ public class InputController {
         }
     }
 
+
     /**
      * Send a message to the channel. Takes the content and will put it into the server.
      * @param userArgs
      * @author thomas mcandrew
      */
-    private static void SendMessage(String[] userArgs) {
+    private static void SendTextFile(String[] userArgs) {
         //null checks for the stuff that's required to send a message
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -508,10 +657,51 @@ public class InputController {
             System.out.println(sendMessage.response);
         } else {
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
+    /**
+     * Send a message to the channel. Takes the content and will put it into the server.
+     * @param userArgs
+     * @author thomas mcandrew
+     */
+    private static void SendMessage(String[] userArgs) {
+        //null checks for the stuff that's required to send a message
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        if (userArgs.length < 1) {
+            System.out.println("Invalid number of arguments");
+            return;
+        }
+        //Format the message in a way that the data can be sent fully, uncorrupted
+        //using %20 to replace 'spaces' in the message
+        //We don't use http bodies, so the url is not a fan of spaces
+        String message = "";
+        for (int i = 0; i < userArgs.length; i++) {
+            message += userArgs[i] + " ";
+        }
+        message = message.trim();
+        message = ReplaceSpecChars(message);
+        //Send the message to the server, and acknowledge the search
+        DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
+        if (sendMessage.code > 300) {
+            System.out.println(sendMessage.response);
+        } else {
+            Message m = gson.fromJson(sendMessage.response, Message.class);
+            System.out.println("Message Sent: \n\t" + m.getContent());
+        }
+    }
 
     /**
      * Send a message to a user. Takes the content and will put it into the server.
@@ -525,13 +715,14 @@ public class InputController {
             return;
         }
         //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
+        //using %20 to replace 'spaces' in the message
         //We don't use http bodies, so the url is not a fan of spaces
         String directMessage = "";
         for (int i = 1; i < userArgs.length; i++) {
-            directMessage += userArgs[i] + "_SS_";
+            directMessage += userArgs[i] + " ";
         }
         directMessage = directMessage.trim();
+        directMessage = ReplaceSpecChars(directMessage);
         DBSupport.HTTPResponse dm = Message.sendDirectMessage(curUser.getName(), userArgs[0], directMessage);
         if (dm.code > 300) {
             System.out.println(dm.response);
@@ -539,10 +730,17 @@ public class InputController {
             System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
 
-            System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
+
+
+    //////////////////////
+    //                  //
+    //      Helpers     //
+    //                  //
+    //////////////////////
     /**
      * Print the base instructions for the app, just a welcome to the app and a short description on how to operate it
       */
@@ -563,8 +761,10 @@ public class InputController {
                 "login: login - <username> <password>\n" +
                 "create workspace: create workspace - <name of workspace>\n" +
                 "join workspace: join - <name of workspace>\n" +
+                "search workspace: search workspace - <name of workspace>\n" +
                 "create channel: create channel - <workspace name> <channel name>\n" +
                 "view users: view users\n" +
+                "search user: search user - <name of user>\n"+
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> <message>\n" +
                 "pin message: pin message - <messageId>\n" +
@@ -573,21 +773,20 @@ public class InputController {
                 "view mentions: view mentions\n");
     }
 
-
-    private static void WriteFile(String[] linesToWrite, String filePath) {
+    private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
         //Below is how we'll write to a file
         try {
             //We want to put it in the source directory of the entire project so for Dylan (the author):
             //  "C:\Users\dmrz0\OneDrive\Desktop\Slack\logs\FILENAME"
             // Get that relative directory and if it doesn't exist. Make it
-            File dir = new File("..\\..\\logs\\");
-            if (!dir.exists()) {
+            File dir = new File(filePath);
+            if(!dir.exists()){
                 dir.mkdir();
             }
             //Get the file for to write to.
             // It shouldn't really exist unless a user logs twice within a minute
             //If it does exist, delete it, and make a new one
-            File toWrite = new File(dir + filePath + ".txt");
+            File toWrite = new File(dir + fileName + ".txt");
             FileWriter fw;
             if (toWrite.exists())
                 toWrite.delete();
@@ -598,13 +797,13 @@ public class InputController {
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
             for (String line : linesToWrite) {
-                fw.write(line);
+                fw.write(line + "\n");
             }
             //Close the writer to prevent memory leaks
             fw.close();
             //set the file to read only. Gotta keep our logs pure and clean
             toWrite.setReadOnly();
-            System.out.println("File " + filePath + "Written to: \n" +
+            System.out.println("File " + fileName + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
         } catch (IOException e) {
@@ -647,9 +846,23 @@ public class InputController {
                 senderName = uRepsonse.response;
             }
             messageString = "[" + curWorkspace.getName() + "].[" + channelName + "]\t" + "FROM: " + senderName +
-                    "\n\tMESSAGE: " + message.getContent().replaceAll("_SS_", " ") + "\n";
+                    "\n\tMESSAGE: " + message.getContent() + "\n";
             file[i] = messageString;
         }
         return file;
     }
+
+    private static String ReplaceSpecChars(String input) {
+        //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
+        // it to something that url's can handle
+        String content = input;
+        content = content.replaceAll("&", " AND ");
+        content = content.replaceAll("\\?", " QM ");
+        content = content.replaceAll("\\\\", " BCKSLSH ");
+        content = content.replaceAll(" ", "%20");
+        content = content.replaceAll("\t", "%09");
+        content = content.replaceAll("\n", "%0A");
+        return content;
+    }
+
 }
