@@ -424,6 +424,7 @@ public class InputController {
             //make one, We can change the name whenever, but every new workspace gets the same name for it's first channel
             System.out.println("Creating Default Channel");
             CreateChannel(new String[]{w.getName(), "Welcome"});
+            ChangeRole(new String[]{"ADMIN", curUser.getName()});
         }
     }
 
