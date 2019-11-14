@@ -68,6 +68,12 @@ public class User {
         password = username;
     }
 
+
+    public static DBSupport.HTTPResponse searchUser(String name){
+        DBSupport.HTTPResponse res = DBSupport.searchUser(name);
+        return res;
+    }
+
     public static DBSupport.HTTPResponse createUser(String name, String password){
         DBSupport.HTTPResponse res = DBSupport.createUser(name, password);
         return res;
@@ -85,6 +91,11 @@ public class User {
 
     public static DBSupport.HTTPResponse deleteFriend(String uName, String fName) {
         DBSupport.HTTPResponse res = DBSupport.deleteFriend(uName, fName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.getPinnedMessages(workspaceName, channelName);
         return res;
     }
 

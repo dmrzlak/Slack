@@ -56,6 +56,10 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse searchWorkspace(String name){
+        DBSupport.HTTPResponse res = DBSupport.searchWorkspace(name);
+        return res;
+    }
     /**
      * Calls DBSupport and returns the response
      * @param name
@@ -74,6 +78,16 @@ public class Workspace {
      */
     public static DBSupport.HTTPResponse pinMessage(String mId) {
         DBSupport.HTTPResponse res = DBSupport.pinMessage(Integer.parseInt(mId));
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse unpinMessage(String mId) {
+        DBSupport.HTTPResponse res = DBSupport.unpinMessage(Integer.parseInt(mId));
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse changeRole(String workspace, String username,int newRole) {
+        DBSupport.HTTPResponse res = DBSupport.changeRole(workspace, username, newRole);
         return res;
     }
 

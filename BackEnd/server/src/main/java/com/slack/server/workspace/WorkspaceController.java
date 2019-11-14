@@ -1,5 +1,6 @@
 package com.slack.server.workspace;
 
+
 import com.slack.server.messages.Message;
 import com.slack.server.messages.MessageRepository;
 import com.slack.server.user.User;
@@ -33,14 +34,15 @@ public class WorkspaceController {
      */
     @Autowired
     private WorkspaceRepository workspaceRepository;
-    @Autowired
-    private WorkspaceXRefRepository xRefRepository;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private MessageRepository mRepo;
+
+    @Autowired
+    private WorkspaceXRefRepository xRefRepository;
 
     /**
      * Create and put a Workspaceinto the table
@@ -83,6 +85,18 @@ public class WorkspaceController {
         return new ResponseEntity("Workspace does not exist", HttpStatus.NOT_FOUND);
     }
 
+    @GetMapping(path="/search")
+    public @ResponseBody ResponseEntity searchWorkspace(@RequestParam String name){
+        Iterable<Workspace> list;
+        if(name.equals("-1")){
+            list = workspaceRepository.findAll();
+        }else {
+            name = "%" + name + "%";
+            list =  workspaceRepository.searchWorkspace(name);
+        }
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
+
     /**
      * Get all the users in a given workspace
      * @param name
@@ -105,9 +119,25 @@ public class WorkspaceController {
     @GetMapping(path="/switch")
     public @ResponseBody ResponseEntity switchWorkspace(String workspaceName, int userId) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
-        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        if (w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         boolean inWorkspace = xRefRepository.exists(w.getId(), userId);
-        if(inWorkspace) return new ResponseEntity(w, HttpStatus.OK);
+        if (inWorkspace) return new ResponseEntity(w, HttpStatus.OK);
         return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
+    }
+
+    @GetMapping(path="/changeRole")
+    public @ResponseBody ResponseEntity changeRole(String workspace, String username, int rId) {
+        if(! userRepository.existsByName(username))
+            return new ResponseEntity("User: " + username + " Not found", HttpStatus.NOT_FOUND);
+        User u = userRepository.findByName(username);
+        if(!workspaceRepository.existsByName(workspace))
+            return new ResponseEntity("User: " + username + " Not found", HttpStatus.NOT_FOUND);
+        Workspace w =  workspaceRepository.findbyName(workspace);
+        if(!xRefRepository.exists(w.getId(), u.getId()))
+            return new ResponseEntity("User: " + username + " Not in workspace", HttpStatus.NOT_ACCEPTABLE);
+        WorkspaceXRef x = xRefRepository.find(w.getId(), u.getId());
+        x.setrId(rId);
+        xRefRepository.save(x);
+        return new ResponseEntity(x, HttpStatus.OK);
     }
 }

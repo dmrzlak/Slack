@@ -133,13 +133,26 @@ public class ChannelController {
     @GetMapping(path="/switch")
     public @ResponseBody ResponseEntity switchChannel(String workspaceName, String channelName, int userId) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
-        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        if (w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
         boolean inWorkspace = XRefRepo.exists(w.getId(), userId);
-        if(!inWorkspace)
+        if (!inWorkspace)
             return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
         Channel c = channelRepository.find(w.getId(), channelName);
-        if(c == null)
+        if (c == null)
             return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
         return new ResponseEntity(c, HttpStatus.OK);
+    }
+    /**
+     * @param workspaceName
+     * @param channelName
+     * @return
+     * @Author Joseph Hudson
+     */
+    @GetMapping(path="/getPinnedMessages")
+    public @ResponseBody ResponseEntity getPinnedMessages(String workspaceName, String channelName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        Iterable<Message> list = mRepo.getPinnedMessagesByChannel(w.getId(), c.getId());
+        return new ResponseEntity(list, HttpStatus.OK);
     }
 }
