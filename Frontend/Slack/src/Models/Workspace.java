@@ -86,4 +86,14 @@ public class Workspace {
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;
     }
+
+    public static DBSupport.HTTPResponse getWorkspaceByName(String workspaceName) {
+        DBSupport.HTTPResponse res = DBSupport.getWorkspaceByName(workspaceName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse switchWorkspace(String workspaceName, int userId) {
+        DBSupport.HTTPResponse res = DBSupport.switchWorkspace(workspaceName, userId);
+        return res;
+    }
 }

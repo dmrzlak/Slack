@@ -36,6 +36,11 @@ public class InputController {
     private static final String VIEW_MENTIONS = "view mentions";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
+    private static final String VIEW_FRIENDS = "view friends";
+    private static final String ADD_FRIEND = "add friend";
+    private static final String SWITCH_WORKSPACE = "switch workspace";
+    private static final String SWITCH_CHANNEL = "switch channel";
+    private static final String DELETE_FRIEND = "delete friend";
     private static Gson gson = new Gson();
     private static User curUser = null;
     private static Workspace curWorkspace = null;
@@ -100,6 +105,21 @@ public class InputController {
                     break;
                 case VIEW_MENTIONS:
                     ViewMentions(userArgs);
+                    break;
+                case VIEW_FRIENDS:
+                    ViewFriends(userArgs);
+                    break;
+                case ADD_FRIEND:
+                    AddFriend(userArgs);
+                    break;
+                case SWITCH_WORKSPACE:
+                    SwitchWorkspace(userArgs);
+                    break;
+                case SWITCH_CHANNEL:
+                    SwitchChannel(userArgs);
+                    break;
+                case DELETE_FRIEND:
+                    DeleteFriend(userArgs);
                     break;
                 default:
                     System.out.println("Invalid Input please try again :(");
@@ -260,7 +280,7 @@ public class InputController {
             //Whenever a new workspace is created, the creator should automatically join it
             JoinWorkspace(new String[]{w.getName()});
             //We don't want to force a user to need to create a channel just to send messages, so now we automatically
-            //make one, We can change the name whenever, but every new workspace gets the same name for it's first channel
+            //make one, We can change the name whenever, but every new workspace gets the same name for its first channel
             System.out.println("Creating Default Channel");
             CreateChannel(new String[]{w.getName(), "Welcome"});
         }
@@ -431,10 +451,111 @@ public class InputController {
         if (dm.code > 300) {
             System.out.println(dm.response);
         } else {
-            System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
 
             System.out.println("Message Sent: \n\t" + m.getContent().replaceAll("_SS_", " "));
+        }
+    }
+
+    private static void ViewFriends(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        DBSupport.HTTPResponse viewFriends = User.viewFriends(curUser.getId());
+        if (viewFriends.code > 300) {
+            System.out.println("You're a lonely one.");
+        } else {
+            String[] friendList = gson.fromJson(viewFriends.response, String[].class);
+            System.out.println("\nFriend list: ");
+            for (int i = 0; i < friendList.length; i++) {
+                System.out.println("\t" + friendList[i]);
+            }
+            System.out.println(friendList.length + " friends found. \n");
+        }
+    }
+
+    private static void AddFriend(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse addFriend = User.addFriend(curUser.getName(), userArgs[0]);
+        if (addFriend.code > 300) {
+            System.out.println(addFriend.response);
+        } else {
+            User u = gson.fromJson(addFriend.response, User.class);
+            System.out.println("Added friend " + u.getName());
+        }
+    }
+
+    private static void SwitchWorkspace(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace != null && curWorkspace.getName().equals(userArgs[0])) {
+            System.out.println("You are already in this workspace!");
+            return;
+        }
+        DBSupport.HTTPResponse switchWorkspace = Workspace.switchWorkspace(userArgs[0], curUser.getId());
+        if (switchWorkspace.code > 300) {
+            System.out.println(switchWorkspace.response);
+        } else {
+            //Find the workspace first
+            DBSupport.HTTPResponse wResponse = Workspace.getWorkspaceByName(userArgs[0]);
+            if (wResponse.code > 300) {
+                System.out.println(wResponse.response);
+            }
+            Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+            curWorkspace = w;
+
+            //Then set to default channel
+            DBSupport.HTTPResponse cResponse = Channel.getChannelByName(userArgs[0], "Welcome");
+            if (cResponse.code > 300) {
+                System.out.println(cResponse.response);
+            } else {
+                Channel c = gson.fromJson(cResponse.response, Channel.class);
+                curChannel = c;
+                System.out.println("Changed workspace and entered default channel");
+            }
+        }
+    }
+
+    private static void SwitchChannel(String[] userArgs) {
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        DBSupport.HTTPResponse response = Channel.Switch(curWorkspace.getName(), userArgs[0], curUser.getId());
+        if(response.code > 300) {
+            System.out.println(response.response);
+        } else {
+            Channel c = gson.fromJson(response.response, Channel.class);
+            curChannel = c;
+            System.out.println("Changed Channel");
+        }
+    }
+
+    private static void DeleteFriend(String[] userArgs) {
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse deleteFriend = User.deleteFriend(curUser.getName(), userArgs[0]);
+        if (deleteFriend.code > 300) {
+            System.out.println(deleteFriend.response);
+        } else {
+            User u = gson.fromJson(deleteFriend.response, User.class);
+            System.out.println("Removed friend " + u.getName());
         }
     }
 
@@ -464,7 +585,12 @@ public class InputController {
                 "direct message: send to - <user> <message>\n" +
                 "pin message: pin message - <message>\n" +
                 "log messages: log messages\n" +
-                "view mentions: view mentions\n");
+                "view mentions: view mentions\n" +
+                "view friends: view friends\n" +
+                "add friend: add friend - <name>\n" +
+                "delete friend: delete friend - <name>\n" +
+                "switch workspace: switch workspace - <workspace name>\n" +
+                "switch channel: switch channel - <channel name>\n");
     }
 
 

@@ -4,6 +4,8 @@ import com.slack.server.messages.Message;
 import com.slack.server.messages.MessageRepository;
 import com.slack.server.user.User;
 import com.slack.server.user.UserRepository;
+import com.slack.server.workspaceXRef.WorkspaceXRef;
+import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,8 @@ public class WorkspaceController {
      */
     @Autowired
     private WorkspaceRepository workspaceRepository;
+    @Autowired
+    private WorkspaceXRefRepository xRefRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -98,4 +102,12 @@ public class WorkspaceController {
         return new ResponseEntity(list, HttpStatus.OK);
     }
 
+    @GetMapping(path="/switch")
+    public @ResponseBody ResponseEntity switchWorkspace(String workspaceName, int userId) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        boolean inWorkspace = xRefRepository.exists(w.getId(), userId);
+        if(inWorkspace) return new ResponseEntity(w, HttpStatus.OK);
+        return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
+    }
 }

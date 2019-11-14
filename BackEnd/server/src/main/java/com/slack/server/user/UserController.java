@@ -4,6 +4,8 @@ import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
 import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
+import com.slack.server.userXRef.UserXRef;
+import com.slack.server.userXRef.UserXRefRepository;
 //import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.lang.reflect.Parameter;
 
 /**
  * Controller for the Messages in the server
@@ -36,6 +40,9 @@ public class UserController {
 
     @Autowired
     private WorkspaceXRefRepository wXRefRepo;
+
+    @Autowired
+    private UserXRefRepository uXRefRepo;
 
 
     /**
@@ -141,5 +148,45 @@ public class UserController {
 
     }
 
+    @GetMapping(path = "/viewFriends")
+    public @ResponseBody ResponseEntity viewFriends(@RequestParam int uId) {
+        Iterable<String> list = uRepo.viewFriends(uId);
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
 
+    @GetMapping(path = "/addFriend")
+    public @ResponseBody ResponseEntity addFriend(@RequestParam String uName, @RequestParam String fName){
+        User u = uRepo.findByName(uName);
+        User f = uRepo.findByName(fName);
+        if(f == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(uXRefRepo.exists(f.getId(), u.getId())) return new ResponseEntity("User already a friend", HttpStatus.NOT_ACCEPTABLE);
+
+        //Create the XREF and put it in DB
+        UserXRef x = new UserXRef();
+        x.setfId(f.getId());
+        x.setuId(u.getId());
+        uXRefRepo.save(x);
+
+        UserXRef x1 = new UserXRef();
+        x1.setuId(f.getId());
+        x1.setfId(u.getId());
+        uXRefRepo.save(x1);
+
+        return new ResponseEntity(f, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/removeFriend")
+    public @ResponseBody ResponseEntity removeFriend(@RequestParam String uName, @RequestParam String fName) {
+        User u = uRepo.findByName(uName);
+        User f = uRepo.findByName(fName);
+        if(f == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(!uXRefRepo.exists(f.getId(), u.getId())) return new ResponseEntity("User isn't your real friend", HttpStatus.NOT_ACCEPTABLE);
+
+        uXRefRepo.delete(f.getId(), u.getId());
+        uXRefRepo.delete(u.getId(), f.getId());
+
+        return new ResponseEntity(f, HttpStatus.OK);
+    }
 }

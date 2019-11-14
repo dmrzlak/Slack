@@ -45,6 +45,16 @@ public class Channel {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getChannelByName(String workspaceName, String name) {
+        DBSupport.HTTPResponse res = DBSupport.getChannelByName(workspaceName, name);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse Switch(String workspaceName, String channelName, Integer userId) {
+        DBSupport.HTTPResponse res = DBSupport.SwitchChannel(workspaceName, channelName, userId);
+        return res;
+    }
+
     public Integer getId() {
         return id;
     }

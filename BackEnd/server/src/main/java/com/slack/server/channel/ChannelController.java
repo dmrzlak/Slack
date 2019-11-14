@@ -5,6 +5,8 @@ import com.slack.server.messages.MessageRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 //import javafx.util.Pair;
+import com.slack.server.workspaceXRef.WorkspaceXRef;
+import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,9 @@ public class ChannelController {
 
     @Autowired
     private MessageRepository mRepo;
+
+    @Autowired
+    private WorkspaceXRefRepository XRefRepo;
 
     /**
      * Create a channel for the DB and put them into the table
@@ -123,5 +128,18 @@ public class ChannelController {
         if(c == null) return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
         return new ResponseEntity(c.getName(), HttpStatus.OK);
 
+    }
+
+    @GetMapping(path="/switch")
+    public @ResponseBody ResponseEntity switchChannel(String workspaceName, String channelName, int userId) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        if(w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
+        boolean inWorkspace = XRefRepo.exists(w.getId(), userId);
+        if(!inWorkspace)
+            return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        if(c == null)
+            return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(c, HttpStatus.OK);
     }
 }

@@ -27,4 +27,8 @@ public interface UserRepository extends CrudRepository<User, Integer>{
             "where x.wId = (select id from Workspace w where w.name = :wName)")
     Iterable<String> findUsers(@Param("wName") String name);
 
+    @Query("Select u.name "+
+            "From User u Left Join UserXRef x on u.id = x.uId "+
+            "where x.fId = (select id from User u where u.id = :uId)")
+    Iterable<String> viewFriends(@Param("uId") int uId);
 }
