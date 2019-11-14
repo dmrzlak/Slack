@@ -715,23 +715,32 @@ public class InputController {
     /**
      * Print the commands that have been implemented thus far
      */
+
+    /*
+    SEND_TEXTFILE = "send textfile";
+    DOWNLOAD_TEXTFILE = "download textfile"; 
+     */
     private static void printHelp() {
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using ' ' to separate arguments\n\n" +
-                "create user: create user - <name> <password>\n" +
-                "login: login - <username> <password>\n" +
-                "create workspace: create workspace - <name of workspace>\n" +
-                "join workspace: join - <name of workspace>\n" +
-                "search workspace: search workspace - <name of workspace>\n" +
-                "create channel: create channel - <workspace name> <channel name>\n" +
-                "view users: view users\n" +
-                "search user: search user - <name of user>\n"+
-                "send to group: send - <message>\n" +
-                "direct message: send to - <user> <message>\n" +
-                "pin message: pin message - <messageId>\n" +
-                "unpin message: unpin message - <messageId>\n" +
-                "log messages: log messages\n" +
-                "view mentions: view mentions\n");
+                "create user:       create user - <name> <password>\n" +
+                "login:             login - <username> <password>\n" +
+                "create workspace:  create workspace - <name of workspace>\n" +
+                "join workspace:    join - <name of workspace>\n" +
+                "search workspace:  search workspace - <name of workspace> (Search Field not required)\n" +
+                "create channel:    create channel - <workspace name> <channel name>\n" +
+                "view mentions:     view mentions\n" +
+                "view pinned:       get pinned\n" +
+                "view users:        view users\n" +
+                "search user:       search user - <name of user> (Search Field not required)\n"+
+                "send to group:     send - <message>\n" +
+                "direct message:    send to - <user> <message>\n" +
+                "pin message:       pin message - <messageId>\n" +
+                "unpin message:     unpin message - <messageId>\n" +
+                "send a text file:  send file - <filepath>\n" +
+                "download a file:   download file - <name> (.txt only)\n" +
+                "change role:       change role - <RoleName> <Username>\n" +
+                "log messages:      log messages\n" );
     }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
