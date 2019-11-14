@@ -331,6 +331,7 @@ public class InputController {
             }
         }
     }
+
     private static void searchUser(String[] userArgs){
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -573,6 +574,7 @@ public class InputController {
                     + m.getContent());
         }
     }
+
      private static void ChangeRole(String[] userArgs) {
          if (curUser == null) {
              System.out.println("You need to create a user or sign in to continue");
@@ -616,48 +618,6 @@ public class InputController {
             System.out.println(changeRole.response);
         } else {
             System.out.println("Changed role of " + userArgs[1] + " to " + strRole);
-        }
-    }
-
-
-    /**
-     * Send a message to the channel. Takes the content and will put it into the server.
-     * @param userArgs
-     * @author thomas mcandrew
-     */
-    private static void SendTextFile(String[] userArgs) {
-        //null checks for the stuff that's required to send a message
-        if (curUser == null) {
-            System.out.println("You need to create a user or sign in to continue");
-            return;
-        }
-        if (curWorkspace == null) {
-            System.out.println("User not in workspace");
-            return;
-        }
-        if (curChannel == null) {
-            System.out.println("User not in Channel;");
-            return;
-        }
-        if (userArgs.length < 1) {
-            System.out.println("Invalid number of arguments");
-            return;
-        }
-        //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
-        //We don't use http bodies, so the url is not a fan of spaces
-        String message = "";
-        for (int i = 0; i < userArgs.length; i++) {
-            message += userArgs[i] + "_SS_";
-        }
-        message = message.trim();
-        //Send the message to the server, and acknowledge the search
-        DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
-        if (sendMessage.code > 300) {
-            System.out.println(sendMessage.response);
-        } else {
-            Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent());
         }
     }
 
