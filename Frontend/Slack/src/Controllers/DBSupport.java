@@ -1,14 +1,10 @@
 package Controllers;
 
-import Models.Message;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.*;
 import java.io.IOException;
-import java.net.MulticastSocket;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
@@ -309,6 +305,15 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse changeRole(String workspace, String username, int newRole) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.changeRole(workspace, username, newRole));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      * @author Dylan Mrzlak
@@ -390,8 +395,8 @@ public class DBSupport {
             return BASE_URL+"user/getUsername?senderId="+senderId;
         }
 
-        public static String changeRole(int rId, int uId){
-            return BASE_URL+"workspace/changeRole?rId="+rId+"&uId"+uId;
+        public static String changeRole(String workspace, String username, int rId){
+            return BASE_URL+"workspace/changeRole?workspace=" + workspace + "&username=" + username + "&rId=" + rId;
         }
 
         public static String signin(String username, String password) {

@@ -41,15 +41,15 @@ public class WorkspaceXRef {
         return rId;
     }
 
-    public void setuId(int rId) {
-        this.rId = rId;
-    }
-
     public void setuId(int uId) {
         this.uId = uId;
     }
 
     public void setwId(int wId) {
         this.wId = wId;
+    }
+
+    public void setrId(int rId) {
+        this.rId = rId;
     }
 }

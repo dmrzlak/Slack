@@ -82,19 +82,16 @@ public class Workspace {
         return res;
     }
 
-<<<<<<< HEAD
-    public static DBSupport.HTTPResponse changeRole(int newRole, String uId) {
-        DBSupport.HTTPResponse res = DBSupport.changeRole(newRole, Integer.parseInt(uId));
+    public static DBSupport.HTTPResponse changeRole(String workspace, String username,int newRole) {
+        DBSupport.HTTPResponse res = DBSupport.changeRole(workspace, username, newRole);
         return res;
     }
 
-=======
     /**
      * Calls DBSupport and returns the response
      * @param workspaceName
      * @return
      */
->>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
         return res;

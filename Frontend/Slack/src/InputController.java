@@ -43,6 +43,7 @@ public class InputController {
     private static User curUser = null;
     private static Workspace curWorkspace = null;
     private static Channel curChannel = null;
+    private static final String[] roles = new String[]{"USER", "MOD", "ADMIN"};
 
     public static void main(String[] args) {
         //If this line get mad, check your dependencies, may have dropped
@@ -110,15 +111,9 @@ public class InputController {
                 case GET_PINNED:
                     GetPinned(userArgs);
                     break;
-<<<<<<< HEAD
-                case UNPIN_MESSAGE:
-                    UnpinMessage(userArgs);
-                    break;
                 case CHANGE_ROLE:
                     ChangeRole(userArgs);
                     break;
-=======
->>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
                 default:
                     System.out.println("Invalid Input please try again :(");
                     break;
@@ -366,24 +361,6 @@ public class InputController {
             System.out.println("You are not in a channel\n");
             return;
         }
-<<<<<<< HEAD
-        else{
-            //get messages, then return them
-            System.out.println("Getting the pinned messages for: " + curChannel.getName());
-            DBSupport.HTTPResponse response = User.getPinnedMessages(curWorkspace.getName() ,curChannel.getName());
-            if (response.code >= 300) {
-                System.out.println(response.response);
-            }
-            else {
-                System.out.println("Retrieval for: " + curChannel.getName() + " successful");
-                Message[] messages = gson.fromJson(response.response, Message[].class);
-                int i = 0;
-                while(i < messages.length){
-                    System.out.println("[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                            + m.getContent().replaceAll("_SS_", " "));
-                    i++;
-                }
-=======
         //get messages, then return them
         System.out.println("Getting the pinned messages for: " + curChannel.getName());
         DBSupport.HTTPResponse response = Message.getPinnedMessages(curWorkspace.getName(), curChannel.getName());
@@ -394,12 +371,11 @@ public class InputController {
             Message[] messages = gson.fromJson(response.response, Message[].class);
             int i = 0;
             while (i < messages.length) {
-                System.out.print("Message ID: " + messages[i].getId());
-                System.out.print(", Sender ID: " + messages[i].getSenderId());
-                System.out.print(", Message: " + messages[i].getContent().replaceAll("_SS_", " ");
+                System.out.println("Message ID: " + messages[i].getId() +
+                        ", Sender ID: " + messages[i].getSenderId() +
+                        ", Message: " + messages[i].getContent());
                 i++;
             }
->>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
 
         }
     }
@@ -426,30 +402,10 @@ public class InputController {
             System.out.println("Pinned message");
             Message m = gson.fromJson(pinMessage.response, Message.class);
             System.out.println("Message Pinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                    + m.getContent().replaceAll("_SS_", " "));
+                    + m.getContent());
         }
     }
 
-<<<<<<< HEAD
-        private static void UnpinMessage(String[] userArgs) {
-            if (curUser == null) {
-                System.out.println("You need to create a user or sign in to continue");
-                return;
-            }
-            if (userArgs.length != 1) {
-                System.out.println("Invalid Number or Arguments");
-                return;
-            }
-            DBSupport.HTTPResponse pinMessage = Workspace.unpinMessage(userArgs[0]);
-            if (unpinMessage.code > 300) {
-                System.out.println(unpinMessage.response);
-            } else {
-                System.out.println("Unpinned message");
-                Message m = gson.fromJson(unpinMessage.response, Message.class);
-                System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                        + m.getContent().replaceAll("_SS_", " "));
-            }
-=======
     private static void UnpinMessage(String[] userArgs) {
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -466,50 +422,55 @@ public class InputController {
             System.out.println("Pinned message");
             Message m = gson.fromJson(unpinMessage.response, Message.class);
             System.out.println("Message Unpinned: \n\t" + "[" + m.getwId() + "." + m.getcID() + "." + m.getId() + "]"
-                    + m.getContent().replaceAll("_SS_", " "));
->>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
+                    + m.getContent());
+        }
+    }
+     private static void ChangeRole(String[] userArgs) {
+         if (curUser == null) {
+             System.out.println("You need to create a user or sign in to continue");
+             return;
+         }
+         if (curWorkspace == null) {
+             System.out.println("User not in workspace");
+             return;
+         }
+         if (curChannel == null) {
+             System.out.println("User not in Channel;");
+             return;
+         }
+        if (userArgs.length != 2) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        //1 user, 2 moderator, 3 admin
+        int role;
+        String strRole;
+        String toComp = userArgs[0].toUpperCase();
+        switch(toComp){
+            case "USER":
+                role = 1;
+                strRole = "User";
+                break;
+            case "MOD":
+                role = 2;
+                strRole = "Moderator";
+                break;
+            case "ADMIN":
+                role = 3;
+                strRole = "Admin";
+                break;
+            default:
+                System.out.println("Invalid Role name input");
+                return;
+        }
+        DBSupport.HTTPResponse changeRole = Workspace.changeRole(curWorkspace.getName(), userArgs[1], role);
+        if (changeRole.code > 300) {
+            System.out.println(changeRole.response);
+        } else {
+            System.out.println("Changed role of " + userArgs[1] + " to " + strRole);
         }
     }
 
-<<<<<<< HEAD
-        private static void ChangeRole(String[] userArgs) {
-            if (userArgs.length != 2) {
-                System.out.println("Invalid Number or Arguments");
-                return;
-            }//1 mute, 2 user, 3 moderator, 4 admin
-            int role;
-            String strRole;
-            String toComp = userArgs[0].toLowerCase();
-            if (toComp.equals("mute")){
-                role = 1;
-                strRole = "Mute";
-            }
-            else if (toComp.equals("user")) {
-                role = 2;
-                strRole = "User";
-            }
-            else if(toComp.equals("mod")){
-                role = 3;
-                strRole = "Moderator";
-            }
-            else if(toComp.equals("admin")){
-                role = 4;
-                strRole = "Admin";
-            }
-            else{
-                System.out.println("Invalid Role name input");
-                return;
-            }
-            DBSupport.HTTPResponse changeRole = Workspace.changeRole(rId, userArgs[1]);
-            if (changeRole.code > 300) {
-                System.out.println(changeRole.response);
-            } else {
-                System.out.println("Changed role of " + userArgs[1] + " to " + strRole);
-            }
-        }
-
-        private static void SendMessage(String[] userArgs) {
-=======
     /**
      * Send a message to the channel. Takes the content and will put it into the server.
      * @param userArgs
@@ -517,7 +478,6 @@ public class InputController {
      */
     private static void SendMessage(String[] userArgs) {
         //null checks for the stuff that's required to send a message
->>>>>>> 43223d979bb9706128896c35d91e8a2b56bc14cd
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
             return;
