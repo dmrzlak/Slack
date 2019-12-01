@@ -40,6 +40,9 @@ public class InputController {
     private static final String SEARCH_USER = "search user";
     private static final String SEND_TEXTFILE = "send textfile";
     private static final String DOWNLOAD_TEXTFILE = "download textfile";
+    private static final String FAVORITE_MESSAGE = "favorite message";
+    private static final String UNFAVORITE_MESSAGE = "unfavorite message";
+    private static final String GET_FAVORITES = "veiw favorites";
 
     private static Gson gson = new Gson();
     private static User curUser = null;
@@ -715,6 +718,9 @@ public class InputController {
                 "search user: search user - <name of user>\n"+
                 "send to group: send - <message>\n" +
                 "direct message: send to - <user> <message>\n" +
+                "favorite message: favorite message - <message>\n"+
+                "unfavorite message: unfavorite message - <message>\n"+
+                "veiw favorites: veiw favorites\n"+
                 "pin message: pin message - <messageId>\n" +
                 "unpin message: unpin message - <messageId>\n" +
                 "log messages: log messages\n" +

@@ -22,6 +22,8 @@ public interface MessageRepository extends CrudRepository<Message, Integer> {
     @Query("Select m From Message m where m.recipientID = :rId")
     Iterable<Message> getUsersMessages(@Param("rId") int rId);
 
+    @Query("Select m from Message m where m.wId = :wId and m.cID = :cId and m.id in (select f.messageId from Favorie f where f.userId = :uId)")
+    Iterable<Message> findFavorite(@Param("wId") int wId, @Param("cId") int cId, @Param("uId") int uId);
 
     @Query("Select m From Message m where m.pinned = 1 and m.wId = :wId AND m.cId = :cId")
     Iterable<Message> getPinnedMessagesByChannel(@Param("wId") int wId, @Param("cId") int cId);

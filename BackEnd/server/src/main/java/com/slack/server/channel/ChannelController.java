@@ -1,7 +1,11 @@
 package com.slack.server.channel;
 
+import com.slack.server.favorites.Favorite;
+import com.slack.server.favorites.FavoriteRepository;
 import com.slack.server.messages.Message;
 import com.slack.server.messages.MessageRepository;
+import com.slack.server.user.User;
+import com.slack.server.user.UserRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 //import javafx.util.Pair;
@@ -36,7 +40,13 @@ public class ChannelController {
     private ChannelRepository channelRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private MessageRepository mRepo;
+
+    @Autowired
+    private FavoriteRepository favoriteXRefRepo;
 
     /**
      * Create a channel for the DB and put them into the table
@@ -138,4 +148,47 @@ public class ChannelController {
         Iterable<Message> list = mRepo.getPinnedMessagesByChannel(w.getId(), c.getId());
         return new ResponseEntity(list, HttpStatus.OK);
     }
+
+       @GetMapping(path="/getFavoriteMessages")
+    public @ResponseBody ResponseEntity getFavoriteMessages(String workspaceName, String channelName,int uId) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        if(w == null){
+            return new ResponseEntity("Workspace Not Found!!1",HttpStatus.NOT_FOUND);
+        }
+
+        Channel c = channelRepository.find(w.getId(), channelName);
+           if(c == null){
+               return new ResponseEntity("Channel Not Found!!1",HttpStatus.NOT_FOUND);
+           }
+           User u = userRepository.findByID(uId);
+           if(u == null){
+               return new ResponseEntity("User Not Found!!1",HttpStatus.NOT_FOUND);
+
+           }
+        Iterable<Message> list = mRepo.findFavorite(w.getId(), c.getId(),uId);
+        return new ResponseEntity(list, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(path="/favoriteMessage")
+    @ResponseBody
+    ResponseEntity favoriteMessage(@RequestParam Integer userID,@RequestParam Integer messageID, boolean favorite){
+        //if favorite favorite(Add to favorite repo) the message if exists.
+        //else delete from XRef if exists
+        //Return response of a string for all paths
+        if(!favorite){
+            if(favoriteXRefRepo.exists(userID, messageID)) {
+                favoriteXRefRepo.deleteByIds(userID, messageID);
+                return new ResponseEntity("Successfully unfavoritted message!", HttpStatus.OK);
+            }
+            return new ResponseEntity("Favorited message not found.", HttpStatus.NOT_FOUND);
+
+        }
+        Favorite f = new Favorite();
+        f.setMessageID(messageID);
+        f.setUserID(userID);
+        favoriteXRefRepo.save(f);
+        return new ResponseEntity("Successfully favoritted message", HttpStatus.OK);
+    }
+
 }
