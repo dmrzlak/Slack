@@ -122,6 +122,15 @@ public class UserController {
         return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
 
     }
+ /** get a user via name
+     */
+    @GetMapping(path="/getId")
+    public @ResponseBody ResponseEntity getUserById(@RequestParam String username){
+        User u = uRepo.findByName(username);
+        if(u== null)
+            return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(u.getId(), HttpStatus.OK);
+    }
 
     /**
      * When accessed, will add a user to a workspace. In the workspaceXRef table, if a user and a workspace are in the
@@ -230,13 +239,14 @@ public class UserController {
     public @ResponseBody ResponseEntity clearUser(@RequestParam String username){
         User u = uRepo.findByName(username);
         if(u == null) return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
-        uHistoryRepo.save(u);
+        UserHistory u1 = new UserHistory(u);
+        uHistoryRepo.save(u1);
         wXRefRepo.removeByUserId(u.getId());
         uXRefRepo.removeByUserId(u.getId());
         aXRefRepo.removeByUserId(u.getId());
         aXRefRepo.removeByOwnerId(u.getId());
         aRepo.removeByOwnerId(u.getId());
-
+        uRepo.delete(u);
         return new ResponseEntity("User deleted, sorry to see you go", HttpStatus.OK);
     }
 }

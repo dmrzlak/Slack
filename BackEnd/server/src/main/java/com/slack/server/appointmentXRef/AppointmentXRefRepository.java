@@ -21,7 +21,7 @@ public interface AppointmentXRefRepository extends CrudRepository<AppointmentXRe
 
     @Transactional
     @Modifying
-    @Query("delete from AppointmentXRef x where x.aId = (Select a.Id from Apointment a where a.ownerId = :id)")
+    @Query("delete from AppointmentXRef x where x.aId in (Select a.id from Appointment a where a.ownerId = :id)")
     void removeByOwnerId(@Param("id")int uId);
 
     @Query("SELECT CASE WHEN COUNT(x) > 0 THEN true ELSE false END FROM AppointmentXRef x " +

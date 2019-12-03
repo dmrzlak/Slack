@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +50,17 @@ public class AppointmentController {
      */
     @GetMapping(path="/create")
     public @ResponseBody ResponseEntity createAppointment(@RequestParam String name, @RequestParam String description,
-                                                          @RequestParam Date time, @RequestParam int user){
+                                                          @RequestParam String timeString, @RequestParam int user){
         //We want to save the owner's name for easy reporting later on, so we want to pull that specific user
         User u = userRepo.findByID(user);
         if(u == null) return new ResponseEntity("Owner not found", HttpStatus.NOT_FOUND);
-
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date time = null;
+        try {
+            time = dateFormat.parse(timeString);
+        } catch (ParseException e) {
+            return new ResponseEntity("Invalid Date, Try Again", HttpStatus.NOT_FOUND);
+        }
         //Create the appointment to save it into the repo
         Appointment a = new Appointment();
         a.setName(name);
@@ -126,6 +135,7 @@ public class AppointmentController {
             boolean isAccepted = appointmentXRefRepo.find(u.getId(), appt.getId()).getAccepted();
             appt1.cloneFromAppt(appt);
             appt1.setAccepted(isAccepted);
+            listToRet.add(appt1);
         }
         return new ResponseEntity(listToRet, HttpStatus.OK);
     }
@@ -140,16 +150,18 @@ public class AppointmentController {
         if(a == null)
             return new ResponseEntity("Appointment Not Found", HttpStatus.NOT_FOUND);
 
-        if(!appointmentXRefRepo.exists(u.getId(), aId))
+        AppointmentXRef x = appointmentXRefRepo.find(u.getId(), aId);
+        if(x == null)
             new ResponseEntity("Cannot leave an appointment you are not it", HttpStatus.NOT_FOUND);
 
         if(a.getOwnerId() == u.getId()){
             //We want to remove all xRefs, since this is essentially the owner cancelling the appointment
             appointmentXRefRepo.removeAllById(aId);
-            return new ResponseEntity("Successfully cancelled Appointment", HttpStatus.OK);
+            appointmentRepo.delete(a);
+        return new ResponseEntity("Successfully cancelled Appointment", HttpStatus.OK);
         }
         else{
-            appointmentXRefRepo.removeByUserId(u.getId());
+            appointmentXRefRepo.delete(x);
             return new ResponseEntity("Successfully left Appointment", HttpStatus.OK);
         }
     }
@@ -169,6 +181,7 @@ public class AppointmentController {
             new ResponseEntity("Cannot leave an appointment you are not it", HttpStatus.NOT_FOUND);
         if(accept){
             x.setAccepted(accept);
+            appointmentXRefRepo.save(x);
             return new ResponseEntity("Successfully Accepted Invite to " + a.getName(), HttpStatus.OK);
         }
         else {

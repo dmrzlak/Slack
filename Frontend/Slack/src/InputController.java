@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -858,12 +859,18 @@ public class InputController {
         String description = input.nextLine().trim();
         System.out.println("Enter the date of the appointment in the form of YYYY-MM-DD hh:mm");
         String timeString = (input.nextLine() + ":00").trim();
-        DateFormat dateFormat = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
-        Date time = new Date(timeString);
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date time = null;
+        try {
+            time = dateFormat.parse(timeString);
+        } catch (ParseException e) {
+            System.out.println("Invalid Date, Try Again");
+        }
+
 
         name = ReplaceSpecChars(name);
         description = ReplaceSpecChars(description);
-        timeString = ReplaceSpecChars(time.toString());
+        timeString = ReplaceSpecChars(timeString);
 
         DBSupport.HTTPResponse aRes = Appointment.createAppointment(name, description, timeString, curUser.getId());
         if (aRes.code > 300) {
@@ -872,14 +879,14 @@ public class InputController {
             Appointment a = gson.fromJson(aRes.response, Appointment.class);
             System.out.println("Successfully made appointment " + a.getName());
             String userIn = "";
-            while(userIn.length() < 1 && (userIn.charAt(0) != 'n' || userIn.charAt(0) != 'y')){
+            while(userIn.length() < 1 || ( userIn.length() >= 1 && !(userIn.charAt(0) == 'n' || userIn.charAt(0) == 'y'))){
                 System.out.println("Would you like to send invites? (Y/N)");
                 userIn = input.nextLine().toLowerCase();
             }
-            if(userIn.charAt(0) == 'y'){
+            if(userIn.length() >= 1 && userIn.charAt(0) == 'y'){
                 sendInvite(a);
             }
-            else {
+            else if (userIn.length() >= 1){
                 System.out.println("No invitations will be sent.");
                 return;
             }
@@ -1027,7 +1034,7 @@ public class InputController {
             System.out.println("You need to create a user or sign in to continue");
             return;
         }
-        if(userArgs.length != 1){
+        if(userArgs.length != 2){
             System.out.println("Invalid number of arguments");
             return;
         }
@@ -1185,17 +1192,20 @@ public class InputController {
         // it to something that url's can handle
         String content = "";
         for(int i = 0; i < input.length(); i++){
-            int charcode = (int ) input.charAt(i);
-            String hex = (Integer.toHexString(charcode));
-            content += "%" + (hex.length() < 2 ? "0" : "" ) + hex;
+            char c = input.charAt(i);
+            if(isAlphaNum(c))
+                content += c;
+            else {
+                int charcode = (int) c;
+                String hex = (Integer.toHexString(charcode));
+                content += "%" + (hex.length() < 2 ? "0" : "") + hex;
+            }
         }
-//        content = content.replaceAll("&", " AND ");
-//        content = content.replaceAll("\\?", " QM ");
-//        content = content.replaceAll("\\\\", " BCKSLSH ");
-//        content = content.replaceAll(" ", "%20");
-//        content = content.replaceAll("\t", "%09");
-//        content = content.replaceAll("\n", "%0A");
+
         return content;
     }
 
+    private static boolean isAlphaNum(char c){
+        return ( c >= '0' && c <= '9') ||( c >= 'A' && c <= 'Z') ||( c >= 'a' && c <= 'z');
+    }
 }

@@ -686,14 +686,14 @@ public class DBSupport {
         }
 
         public static String createAppointment(String name, String description, String time, int user){
-          return BASE_URL + "appointment/create?name=" + name + "&description=" + description + "&time=" +
+          return BASE_URL + "appointment/create?name=" + name + "&description=" + description + "&timeString=" +
                   time + "&user=" + user;
         }
         
         public static String sendInvite(int aId,  ArrayList<Integer> userIds){
             String idString = "&userIdList=";
             for(int id : userIds){
-                idString+=idString + ",";
+                idString+=id + ",";
             }
             idString = idString.substring(0, idString.length()-1);
             return BASE_URL + "appointment/sendInvite?aId="+aId+idString;
