@@ -866,7 +866,7 @@ public class InputController {
                 "view friends:      view friends\n" +
                 "add friend:        add friend - <name>\n" +
                 "delete friend:     delete friend - <name>\n");
-    }
+     }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
         //Below is how we'll write to a file
