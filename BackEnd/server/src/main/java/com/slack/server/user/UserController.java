@@ -228,7 +228,7 @@ public class UserController {
                                                  @RequestParam String toKick) {
         Workspace w = wRepo.findByName(workspaceName);
         User u = uRepo.findByName(uName);
-        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId())
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId());
         if(uXRef.getrId() <= 0) {
             return new ResponseEntity("Must be an admin or moderator of the workspace in order to kick people", HttpStatus.NOT_ACCEPTABLE);
         }
@@ -250,18 +250,18 @@ public class UserController {
 
 
     @GetMapping(path = "/unkickUser")
-    public @ResponseBody ResponseEntity kickUser(@RequestParam String workspaceName, @RequestParam String uName,
+    public @ResponseBody ResponseEntity unkickUser(@RequestParam String workspaceName, @RequestParam String uName,
                                                  @RequestParam String toUnkick) {
         Workspace w = wRepo.findByName(workspaceName);
         User u = uRepo.findByName(uName);
-        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId())
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId());
         if(uXRef.getrId() <= 0) {
             return new ResponseEntity("Must be an admin or moderator of the workspace" +
                     " in order to unkick people", HttpStatus.NOT_ACCEPTABLE);
         }
         User unkick = uRepo.findByName(toUnkick);
         if(unkick == null) return new  ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
-        WorkspaceXRef toUnkickXRef = wXRefRepo.find(w.getId(), unkick.getId())
+        WorkspaceXRef toUnkickXRef = wXRefRepo.find(w.getId(), unkick.getId());
         if(toUnkickXRef == null){
             return new ResponseEntity("User is not a member of the workspace", HttpStatus.NOT_FOUND);
         }
