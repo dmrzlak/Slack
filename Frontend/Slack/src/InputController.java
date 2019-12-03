@@ -23,7 +23,7 @@ import com.google.gson.Gson;
  */
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
-    private static final String JOIN_WORKSPACE = "join";
+    private static final String JOIN_WORKSPACE = "join workspace";
     private static final String CREATE_CHANNEL = "create channel";
     private static final String VIEW_USERS = "view users";
     private static final String SEND = "send";
@@ -44,8 +44,8 @@ public class InputController {
     private static final String DELETE_FRIEND = "delete friend";
     private static final String SEARCH_WORKSPACE = "search workspace";
     private static final String SEARCH_USER = "search user";
-    private static final String SEND_TEXTFILE = "send textfile";
-    private static final String DOWNLOAD_TEXTFILE = "download textfile";
+    private static final String SEND_TEXTFILE = "send file";
+    private static final String DOWNLOAD_TEXTFILE = "download file";
 
     private static Gson gson = new Gson();
     private static User curUser = null;
@@ -197,7 +197,7 @@ public class InputController {
                 if (response.code >= 300) {
                     System.out.println(response.response);
                 } else {
-                    System.out.print("file sent!");
+                    System.out.println("file sent!");
                 }
             }
             catch (FileNotFoundException e) {
@@ -545,7 +545,7 @@ public class InputController {
                         ", Message: " + messages[i].getContent());
                 i++;
             }
-
+            System.out.println(messages.length + " pins found. \n");
         }
     }
 
@@ -950,13 +950,18 @@ public class InputController {
     private static String ReplaceSpecChars(String input) {
         //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
         // it to something that url's can handle
-        String content = input;
-        content = content.replaceAll("&", " AND ");
-        content = content.replaceAll("\\?", " QM ");
-        content = content.replaceAll("\\\\", " BCKSLSH ");
-        content = content.replaceAll(" ", "%20");
-        content = content.replaceAll("\t", "%09");
-        content = content.replaceAll("\n", "%0A");
+        String content = "";
+        for(int i = 0; i < input.length(); i++){
+            int charcode = (int ) input.charAt(i);
+            String hex = (Integer.toHexString(charcode));
+            content += "%" + (hex.length() < 2 ? "0" : "" ) + hex;
+        }
+//        content = content.replaceAll("&", " AND ");
+//        content = content.replaceAll("\\?", " QM ");
+//        content = content.replaceAll("\\\\", " BCKSLSH ");
+//        content = content.replaceAll(" ", "%20");
+//        content = content.replaceAll("\t", "%09");
+//        content = content.replaceAll("\n", "%0A");
         return content;
     }
 
