@@ -200,4 +200,75 @@ public class UserController {
 
         return new ResponseEntity(f, HttpStatus.OK);
     }
+
+    @GetMapping(path = "/setStatus")
+    public @ResponseBody ResponseEntity setStatus(@RequestParam String uName, @RequestParam String status) {
+        User u = uRepo.findByName(uName);
+        u.setStatus(status);
+        return new ResponseEntity(status, HttpStatus.OK)
+    }
+
+    @GetMapping(path = "/deleteStatus")
+    public @ResponseBody ResponseEntity deleteStatus(@RequestParam String uName) {
+        User u = uRepo.findByName(uName);
+        u.setStatus("");
+        return new ResponseEntity("", HttpStatus.OK)
+    }
+
+    @GetMapping(path = "/viewStatus")
+    public @ResponseBody ResponseEntity setStatus(@RequestParam String fName) {
+        User f = uRepo.findByName(fName);
+        if(f == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        String status = f.getStatus();
+        return new ResponseEntity(status, HttpStatus.OK)
+    }
+
+    @GetMapping(path = "/kickUser")
+    public @ResponseBody ResponseEntity kickUser(@RequestParam String workspaceName, @RequestParam String uName,
+                                                 @RequestParam String toKick) {
+        Workspace w = wRepo.findByName(workspaceName);
+        User u = uRepo.findByName(uName);
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId())
+        if(uXRef.getrId() <= 0) {
+            return new ResponseEntity("Must be an admin or moderator of the workspace in order to kick people", HttpStatus.NOT_ACCEPTABLE);
+        }
+        User kicked = uRepo.findByName(toKick);
+        if(kicked == null) return new  ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
+        WorkspaceXRef toKickXRef = wXRefRepo.find(w.getId(), kicked.getId())
+        if(toKickXRef == null){
+            return new ResponseEntity("User is not a member of the workspace", HttpStatus.NOT_FOUND);
+        }
+        if(toKickXRef.getrId() == -1) {
+            return new ResponseEntity("User is already kicked", HttpStatus.NOT_ACCEPTABLE);
+        }
+        if(uXRef.getrId() <= toKickXRef.getrId()){
+            return new ResponseEntity("Cannot kick people of an equal or greater role than you", HttpStatus.NOT_ACCEPTABLE);
+        }
+        toKickXRef.setrId(-1);
+        return new ResponseEntity("", HttpStatus.OK);
+    }
+
+
+    @GetMapping(path = "/unkickUser")
+    public @ResponseBody ResponseEntity kickUser(@RequestParam String workspaceName, @RequestParam String uName,
+                                                 @RequestParam String toUnkick) {
+        Workspace w = wRepo.findByName(workspaceName);
+        User u = uRepo.findByName(uName);
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId())
+        if(uXRef.getrId() <= 0) {
+            return new ResponseEntity("Must be an admin or moderator of the workspace" +
+                    " in order to unkick people", HttpStatus.NOT_ACCEPTABLE);
+        }
+        User unkick = uRepo.findByName(toUnkick);
+        if(unkick == null) return new  ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
+        WorkspaceXRef toUnkickXRef = wXRefRepo.find(w.getId(), unkick.getId())
+        if(toUnkickXRef == null){
+            return new ResponseEntity("User is not a member of the workspace", HttpStatus.NOT_FOUND);
+        }
+        if(toUnkickXRef.getrId() != -1) {
+            return new ResponseEntity("User is already not kicked", HttpStatus.NOT_ACCEPTABLE);
+        }
+        toUnkickXRef.setrId(0);
+        return new ResponseEntity("", HttpStatus.OK);
+    }
 }

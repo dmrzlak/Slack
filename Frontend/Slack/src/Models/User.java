@@ -99,4 +99,29 @@ public class User {
         return res;
     }
 
+    public static DBSupport.HTTPResponse setStatus(String uName, String status) {
+        DBSupport.HTTPResponse res = DBSupport.setStatus(uName, status);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse deleteStatus(String uName) {
+        DBSupport.HTTPResponse res = DBSupport.deleteStatus(uName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse viewStatus(String fName) {
+        DBSupport.HTTPResponse res = DBSupport.viewStatus(fName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse kickUser(String workspaceName, String uName, String toKick) {
+        DBSupport.HTTPResponse res = DBSupport.kickUser(workspaceName, uName, toKick);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse unkickUser(String workspaceName, String uName, String toUnkick) {
+        DBSupport.HTTPResponse res = DBSupport.unkickUser(workspaceName, uName, toUnkick);
+        return res;
+    }
+
 }

@@ -595,5 +595,25 @@ public class DBSupport {
         public static String getPinnedMessages(String workspaceName, String channelName) {
             return BASE_URL + "channel/getPinnedMessages?workspaceName=" + workspaceName + "&channelName=" + channelName;
         }
+
+        public static String setStatus(String uName, String status) {
+            return BASE_URL + "user/setStatus?uName=" + uName + "&status=" + status;
+        }
+
+        public static String deleteStatus(String uName) {
+            return BASE_URL + "user/deleteStatus?uName=" + uName;
+        }
+
+        public static String viewStatus(String fName) {
+            return BASE_URL + "user/viewStatus?fName=" + fName;
+        }
+
+        public static String kickUser(String workspaceName, String uName, String toKick) {
+            return BASE_URL + "user/kickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toKick" + toKick;
+        }
+
+        public static String kickUser(String workspaceName, String uName, String toUnkick) {
+            return BASE_URL + "user/unkickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toUnkick" + toUnkick;
+        }
     }
 }

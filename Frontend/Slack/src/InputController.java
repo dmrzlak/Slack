@@ -46,6 +46,10 @@ public class InputController {
     private static final String SEARCH_USER = "search user";
     private static final String SEND_TEXTFILE = "send file";
     private static final String DOWNLOAD_TEXTFILE = "download file";
+    private static final String SET_STATUS = "set status";
+    private static final String DELETE_STATUS = "delete status";
+    private static final String VIEW_STATUS = "view status";
+    private static final String KICK_USER "kick";
 
     private static Gson gson = new Gson();
     private static User curUser = null;
@@ -147,6 +151,18 @@ public class InputController {
                     break;
                 case CHANGE_ROLE:
                     ChangeRole(userArgs);
+                    break;
+                case SET_STATUS:
+                    SetStatus(userArgs);
+                    break;
+                case DELETE_STATUS:
+                    DeleteStatus(userArgs);
+                    break;
+                case VIEW_STATUS:
+                    ViewStatus(userArgs);
+                    break;
+                case KICK_USER:
+                    KickUser(userArgs);
                     break;
                 default:
                     System.out.println("Invalid Input please try again :(");
@@ -812,6 +828,86 @@ public class InputController {
         } else {
             User u = gson.fromJson(deleteFriend.response, User.class);
             System.out.println("Removed friend " + u.getName());
+        }
+    }
+
+
+    //CHECKPOINT joeIter3
+    private static void SetStatus(String[] userArgs){
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length == 0) {
+            System.out.println("Invalid Number of Arguments");
+            return;
+        }
+        String status = "";
+        for (int i = 0; i < userArgs.length; i++) {
+            status += userArgs[i] + " ";
+        }
+        status = status.trim();
+        status = ReplaceSpecChars(status);
+        DBSupport.HTTPResponse setStatus = User.setStatus(curUser.getName(), status);
+        if (setStatus.code > 300) {
+            System.out.println(setStatus.response);//Should never happen
+        } else {
+            //print successful response
+        }
+    }
+
+    private static void DeleteStatus(String[] userArgs){
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 0) {
+            System.out.println("Invalid Number of Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse deleteStatus = User.deleteStatus(curUser.getName());
+        if (deleteStatus.code > 300) {
+            System.out.println(deleteStatus.response);//Should never happen
+        } else {
+            //print successful response
+        }
+    }
+
+    private static void ViewStatus(String[] userArgs){
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number of Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse viewStatus = User.viewStatus(userArgs[0]);
+        if (viewStatus.code > 300) {
+            System.out.println(viewStatus.response);
+        } else {
+            //print successful response
+        }
+    }
+
+    private static void KickUser(String[] userArgs){
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if(curWorkspace == null){
+            System.out.println("You need to enter a workspace to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number of Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse kickUser = User.kickUser(curWorkspace.getName(), curUser.getName(), userArgs[0]);
+        if (kickUser.code > 300) {
+            System.out.println(kickUser.response);
+        } else {
+            //print successful response TODO for all parts
         }
     }
 
