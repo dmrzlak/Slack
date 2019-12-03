@@ -86,6 +86,11 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse changeRole(String workspace, String username,int newRole) {
+        DBSupport.HTTPResponse res = DBSupport.changeRole(workspace, username, newRole);
+        return res;
+    }
+
     /**
      * Calls DBSupport and returns the response
      * @param workspaceName
@@ -93,6 +98,16 @@ public class Workspace {
      */
     public static DBSupport.HTTPResponse getUsersInWorkspace(String workspaceName){
         DBSupport.HTTPResponse res = DBSupport.viewUsers(workspaceName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getWorkspaceByName(String workspaceName) {
+        DBSupport.HTTPResponse res = DBSupport.getWorkspaceByName(workspaceName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse switchWorkspace(String workspaceName, int userId) {
+        DBSupport.HTTPResponse res = DBSupport.switchWorkspace(workspaceName, userId);
         return res;
     }
 }

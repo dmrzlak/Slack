@@ -23,6 +23,22 @@ public class Channel {
         return res;
     }
 
+    public static DBSupport.HTTPResponse veiwFavorites(int wID, int cID, int uID){
+        DBSupport.HTTPResponse res = DBSupport.viewFavorites(wID,cID,uID);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse favoriteMessage(int uID, int mID){
+        DBSupport.HTTPResponse res = DBSupport.favoriteMessage(uID,mID);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse unFavoriteMessage(int uID,int mID){
+        DBSupport.HTTPResponse res = DBSupport.unFavoriteMessage(uID,mID);
+        return res;
+    }
+
+
     /**
      * Calls DBSupport and returns the response
      * @param userName
@@ -42,6 +58,16 @@ public class Channel {
      */
     public static DBSupport.HTTPResponse getChannelName(int cId) {
         DBSupport.HTTPResponse res = DBSupport.getChannelName(cId);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getChannelByName(String workspaceName, String name) {
+        DBSupport.HTTPResponse res = DBSupport.getChannelByName(workspaceName, name);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse Switch(String workspaceName, String channelName, Integer userId) {
+        DBSupport.HTTPResponse res = DBSupport.SwitchChannel(workspaceName, channelName, userId);
         return res;
     }
 

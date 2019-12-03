@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -23,7 +24,7 @@ import com.google.gson.Gson;
  */
 public class InputController {
     private static final String CREATE_WORKSPACE = "create workspace";
-    private static final String JOIN_WORKSPACE = "join";
+    private static final String JOIN_WORKSPACE = "join workspace";
     private static final String CREATE_CHANNEL = "create channel";
     private static final String VIEW_USERS = "view users";
     private static final String SEND = "send";
@@ -34,20 +35,28 @@ public class InputController {
     private static final String LOG_MESSAGES = "log messages";
     private static final String VIEW_MENTIONS = "view mentions";
     private static final String GET_PINNED = "get pinned";
+    private static final String CHANGE_ROLE = "change role";
     private static final String LOGIN = "login";
     private static final String HELP = "help";
+    private static final String VIEW_FRIENDS = "view friends";
+    private static final String ADD_FRIEND = "add friend";
+    private static final String SWITCH_WORKSPACE = "switch workspace";
+    private static final String SWITCH_CHANNEL = "switch channel";
+    private static final String DELETE_FRIEND = "delete friend";
     private static final String SEARCH_WORKSPACE = "search workspace";
     private static final String SEARCH_USER = "search user";
-    private static final String SEND_TEXTFILE = "send textfile";
-    private static final String DOWNLOAD_TEXTFILE = "download textfile";
     private static final String FAVORITE_MESSAGE = "favorite message";
     private static final String UNFAVORITE_MESSAGE = "unfavorite message";
     private static final String GET_FAVORITES = "veiw favorites";
+    private static final String SEND_TEXTFILE = "send file";
+    private static final String DOWNLOAD_TEXTFILE = "download file";
+
 
     private static Gson gson = new Gson();
     private static User curUser = null;
     private static Workspace curWorkspace = null;
     private static Channel curChannel = null;
+    private static final String[] roles = new String[]{"USER", "MOD", "ADMIN"};
 
     public static void main(String[] args) {
         //If this line get mad, check your dependencies, may have dropped
@@ -112,6 +121,20 @@ public class InputController {
                 case VIEW_MENTIONS:
                     ViewMentions(userArgs);
                     break;
+                case VIEW_FRIENDS:
+                    ViewFriends(userArgs);
+                    break;
+                case ADD_FRIEND:
+                    AddFriend(userArgs);
+                    break;
+                case SWITCH_WORKSPACE:
+                    SwitchWorkspace(userArgs);
+                    break;
+                case SWITCH_CHANNEL:
+                    SwitchChannel(userArgs);
+                    break;
+                case DELETE_FRIEND:
+                    DeleteFriend(userArgs);
                 case SEARCH_USER:
                     searchUser(userArgs);
                     break;
@@ -127,14 +150,93 @@ public class InputController {
                 case GET_PINNED:
                     GetPinned(userArgs);
                     break;
-                default:
+                case CHANGE_ROLE:
+                    ChangeRole(userArgs);
+                    break;
+                case FAVORITE_MESSAGE:
+                    favoriteMessage(userArgs);
+                    break;
+                case UNFAVORITE_MESSAGE:
+                    unfavoriteMessage(userArgs);
+                    break;
+                case GET_FAVORITES:
+                    getFavorites(userArgs);
+                    break;
+                    default:
                     System.out.println("Invalid Input please try again :(");
                     break;
             }
         } while (input.hasNextLine());
 
     }
+    private static void getFavorites(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        DBSupport.HTTPResponse response = Channel.veiwFavorites(curWorkspace.getId(),curChannel.getId(),curUser.getId());
+        if (response.code >= 300) {
+            System.out.println(response.response);
+        } else {
+            Message[] favorites = gson.fromJson(response.response, Message[].class);
+            System.out.println("These are the your favorited messages:");
+            for (Message favorite : favorites) {
+                String printMention = "\t" + favorite.getContent();
+                System.out.println(printMention);
+            }
+        }
+    }
+    private static void unfavoriteMessage(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        DBSupport.HTTPResponse uResponse = Channel.unFavoriteMessage(curUser.getId(),Integer.parseInt(userArgs[0]));
+        if (uResponse.code > 300) {
+            System.out.println(uResponse.response);
+        } else {
+            System.out.println("Un-Favorited Message");
+        }
 
+    }
+
+    private static void favoriteMessage(String[] userArgs){
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("User not in workspace");
+            return;
+        }
+        if (curChannel == null) {
+            System.out.println("User not in Channel;");
+            return;
+        }
+        DBSupport.HTTPResponse uResponse = Channel.favoriteMessage(curUser.getId(),Integer.parseInt(userArgs[0]));
+        if (uResponse.code > 300) {
+            System.out.println(uResponse.response);
+        } else {
+            System.out.println("Favorited Message");
+        }
+
+    }
 
     private static void sendTextfile(String[] userArgs){
         if (curUser == null) {
@@ -168,13 +270,15 @@ public class InputController {
                     temp = scan.nextLine();
                     content += temp + "\n";
                 }
+                scan.close();
                 content = ReplaceSpecChars(content);
+                filename= filename.substring(0, filename.length() - 4);
                 DBSupport.HTTPResponse response = Textfile.sendText(filename, content);
 
                 if (response.code >= 300) {
                     System.out.println(response.response);
                 } else {
-                    System.out.print("file sent!");
+                    System.out.println("file sent!");
                 }
             }
             catch (FileNotFoundException e) {
@@ -208,7 +312,7 @@ public class InputController {
         } else {
             Textfile t = gson.fromJson(response.response, Textfile.class);
             String[] file = t.getContent().split("\n");
-            WriteFile(file,"..\\..\\files\\", t.getName());
+            WriteFile(file,"..\\..\\files\\", "\\" + t.getName());
         }
     }
 
@@ -327,6 +431,7 @@ public class InputController {
             }
         }
     }
+
     private static void searchUser(String[] userArgs){
         if (curUser == null) {
             System.out.println("You need to create a user or sign in to continue");
@@ -416,9 +521,10 @@ public class InputController {
             //Whenever a new workspace is created, the creator should automatically join it
             JoinWorkspace(new String[]{w.getName()});
             //We don't want to force a user to need to create a channel just to send messages, so now we automatically
-            //make one, We can change the name whenever, but every new workspace gets the same name for it's first channel
+            //make one, We can change the name whenever, but every new workspace gets the same name for its first channel
             System.out.println("Creating Default Channel");
             CreateChannel(new String[]{w.getName(), "Welcome"});
+            ChangeRole(new String[]{"ADMIN", curUser.getName()});
         }
     }
 
@@ -515,12 +621,12 @@ public class InputController {
             Message[] messages = gson.fromJson(response.response, Message[].class);
             int i = 0;
             while (i < messages.length) {
-                System.out.print("Message ID: " + messages[i].getId());
-                System.out.print(", Sender ID: " + messages[i].getSenderId());
-                System.out.print(", Message: " + messages[i].getContent());
+                System.out.println("Message ID: " + messages[i].getId() +
+                        ", Sender ID: " + messages[i].getSenderId() +
+                        ", Message: " + messages[i].getContent());
                 i++;
             }
-
+            System.out.println(messages.length + " pins found. \n");
         }
     }
 
@@ -570,45 +676,49 @@ public class InputController {
         }
     }
 
-
-    /**
-     * Send a message to the channel. Takes the content and will put it into the server.
-     * @param userArgs
-     * @author thomas mcandrew
-     */
-    private static void SendTextFile(String[] userArgs) {
-        //null checks for the stuff that's required to send a message
-        if (curUser == null) {
-            System.out.println("You need to create a user or sign in to continue");
+     private static void ChangeRole(String[] userArgs) {
+         if (curUser == null) {
+             System.out.println("You need to create a user or sign in to continue");
+             return;
+         }
+         if (curWorkspace == null) {
+             System.out.println("User not in workspace");
+             return;
+         }
+         if (curChannel == null) {
+             System.out.println("User not in Channel;");
+             return;
+         }
+        if (userArgs.length != 2) {
+            System.out.println("Invalid Number or Arguments");
             return;
         }
-        if (curWorkspace == null) {
-            System.out.println("User not in workspace");
-            return;
+        //1 user, 2 moderator, 3 admin
+        int role;
+        String strRole;
+        String toComp = userArgs[0].toUpperCase();
+        switch(toComp){
+            case "USER":
+                role = 1;
+                strRole = "User";
+                break;
+            case "MOD":
+                role = 2;
+                strRole = "Moderator";
+                break;
+            case "ADMIN":
+                role = 3;
+                strRole = "Admin";
+                break;
+            default:
+                System.out.println("Invalid Role name input");
+                return;
         }
-        if (curChannel == null) {
-            System.out.println("User not in Channel;");
-            return;
-        }
-        if (userArgs.length < 1) {
-            System.out.println("Invalid number of arguments");
-            return;
-        }
-        //Format the message in a way that the data can be sent fully, uncorrupted
-        //using _SS_ to replace 'spaces' in the message
-        //We don't use http bodies, so the url is not a fan of spaces
-        String message = "";
-        for (int i = 0; i < userArgs.length; i++) {
-            message += userArgs[i] + "_SS_";
-        }
-        message = message.trim();
-        //Send the message to the server, and acknowledge the search
-        DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
-        if (sendMessage.code > 300) {
-            System.out.println(sendMessage.response);
+        DBSupport.HTTPResponse changeRole = Workspace.changeRole(curWorkspace.getName(), userArgs[1], role);
+        if (changeRole.code > 300) {
+            System.out.println(changeRole.response);
         } else {
-            Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent());
+            System.out.println("Changed role of " + userArgs[1] + " to " + strRole);
         }
     }
 
@@ -678,10 +788,111 @@ public class InputController {
         if (dm.code > 300) {
             System.out.println(dm.response);
         } else {
-            System.out.println("Joining Workspace");
             Message m = gson.fromJson(dm.response, Message.class);
 
             System.out.println("Message Sent: \n\t" + m.getContent());
+        }
+    }
+
+    private static void ViewFriends(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        DBSupport.HTTPResponse viewFriends = User.viewFriends(curUser.getId());
+        if (viewFriends.code > 300) {
+            System.out.println("You're a lonely one.");
+        } else {
+            String[] friendList = gson.fromJson(viewFriends.response, String[].class);
+            System.out.println("\nFriend list: ");
+            for (int i = 0; i < friendList.length; i++) {
+                System.out.println("\t" + friendList[i]);
+            }
+            System.out.println(friendList.length + " friends found. \n");
+        }
+    }
+
+    private static void AddFriend(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse addFriend = User.addFriend(curUser.getName(), userArgs[0]);
+        if (addFriend.code > 300) {
+            System.out.println(addFriend.response);
+        } else {
+            User u = gson.fromJson(addFriend.response, User.class);
+            System.out.println("Added friend " + u.getName());
+        }
+    }
+
+    private static void SwitchWorkspace(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace != null && curWorkspace.getName().equals(userArgs[0])) {
+            System.out.println("You are already in this workspace!");
+            return;
+        }
+        DBSupport.HTTPResponse switchWorkspace = Workspace.switchWorkspace(userArgs[0], curUser.getId());
+        if (switchWorkspace.code > 300) {
+            System.out.println(switchWorkspace.response);
+        } else {
+            //Find the workspace first
+            DBSupport.HTTPResponse wResponse = Workspace.getWorkspaceByName(userArgs[0]);
+            if (wResponse.code > 300) {
+                System.out.println(wResponse.response);
+            }
+            Workspace w = gson.fromJson(wResponse.response, Workspace.class);
+            curWorkspace = w;
+
+            //Then set to default channel
+            DBSupport.HTTPResponse cResponse = Channel.getChannelByName(userArgs[0], "Welcome");
+            if (cResponse.code > 300) {
+                System.out.println(cResponse.response);
+            } else {
+                Channel c = gson.fromJson(cResponse.response, Channel.class);
+                curChannel = c;
+                System.out.println("Changed workspace and entered default channel");
+            }
+        }
+    }
+
+    private static void SwitchChannel(String[] userArgs) {
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        DBSupport.HTTPResponse response = Channel.Switch(curWorkspace.getName(), userArgs[0], curUser.getId());
+        if(response.code > 300) {
+            System.out.println(response.response);
+        } else {
+            Channel c = gson.fromJson(response.response, Channel.class);
+            curChannel = c;
+            System.out.println("Changed Channel");
+        }
+    }
+
+    private static void DeleteFriend(String[] userArgs) {
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse deleteFriend = User.deleteFriend(curUser.getName(), userArgs[0]);
+        if (deleteFriend.code > 300) {
+            System.out.println(deleteFriend.response);
+        } else {
+            User u = gson.fromJson(deleteFriend.response, User.class);
+            System.out.println("Removed friend " + u.getName());
         }
     }
 
@@ -705,26 +916,41 @@ public class InputController {
     /**
      * Print the commands that have been implemented thus far
      */
+
+    /*
+    SEND_TEXTFILE = "send textfile";
+    DOWNLOAD_TEXTFILE = "download textfile"; 
+     */
     private static void printHelp() {
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using ' ' to separate arguments\n\n" +
-                "create user: create user - <name> <password>\n" +
-                "login: login - <username> <password>\n" +
-                "create workspace: create workspace - <name of workspace>\n" +
-                "join workspace: join - <name of workspace>\n" +
-                "search workspace: search workspace - <name of workspace>\n" +
-                "create channel: create channel - <workspace name> <channel name>\n" +
-                "view users: view users\n" +
-                "search user: search user - <name of user>\n"+
-                "send to group: send - <message>\n" +
-                "direct message: send to - <user> <message>\n" +
-                "favorite message: favorite message - <message>\n"+
-                "unfavorite message: unfavorite message - <message>\n"+
-                "veiw favorites: veiw favorites\n"+
-                "pin message: pin message - <messageId>\n" +
-                "unpin message: unpin message - <messageId>\n" +
-                "log messages: log messages\n" +
-                "view mentions: view mentions\n");
+                "create user:           create user - <name> <password>\n" +
+                "login:                 login - <username> <password>\n" +
+                "create workspace:      create workspace - <name of workspace>\n" +
+                "join workspace:        join - <name of workspace>\n" +
+                "switch workspace:      switch workspace - <workspace name>\n" +
+                "search workspace:      search workspace - <name of workspace> (Search Field not required)\n" +
+                "create channel:        create channel - <workspace name> <channel name>\n" +
+                "switch channel:        switch channel - <channel name>\n" +
+                "view mentions:         view mentions\n" +
+                "view pinned:           get pinned\n" +
+                "view users:            view users\n" +
+                "search user:           search user - <name of user> (Search Field not required)\n"+
+                "send to group:         send - <message>\n" +
+                "direct message:        send to - <user> <message>\n" +
+                "favorite message:      favorite message - <message>\n"+
+                "unfavorite message:    unfavorite message - <message>\n"+
+                "veiw favorites:        view favorites\n"+
+                "pin message:           pin message - <messageId>\n" +
+                "unpin message:         unpin message - <messageId>\n" +
+                "send a text file:      send file - <filepath>\n" +
+                "download a file:       download file - <name> (.txt only)\n" +
+                "change role:           change role - <RoleName> <Username>\n" +
+                "log messages:          log messages\n" +
+                "view friends:          view friends\n" +
+                "add friend:            add friend - <name>\n" +
+                "delete friend:         delete friend - <name>\n");
+
     }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
@@ -751,13 +977,13 @@ public class InputController {
             //and writing those lines into the file.
             fw = new FileWriter(toWrite);
             for (String line : linesToWrite) {
-                fw.write(line);
+                fw.write(line + "\n");
             }
             //Close the writer to prevent memory leaks
             fw.close();
             //set the file to read only. Gotta keep our logs pure and clean
             toWrite.setReadOnly();
-            System.out.println("File " + filePath + "Written to: \n" +
+            System.out.println("File " + fileName + "Written to: \n" +
                     "Absolute Path: " + toWrite.getCanonicalPath() + "\n" +
                     "Relative Path: " + toWrite.getPath() + "\n");
         } catch (IOException e) {
@@ -809,14 +1035,42 @@ public class InputController {
     private static String ReplaceSpecChars(String input) {
         //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
         // it to something that url's can handle
+        String content = "";
+        for(int i = 0; i < input.length(); i++){
+            int charcode = (int ) input.charAt(i);
+            String hex = (Integer.toHexString(charcode));
+            content += "%" + (hex.length() < 2 ? "0" : "" ) + hex;
+        }
+//        content = content.replaceAll("&", " AND ");
+//        content = content.replaceAll("\\?", " QM ");
+//        content = content.replaceAll("\\\\", " BCKSLSH ");
+//        content = content.replaceAll(" ", "%20");
+//        content = content.replaceAll("\t", "%09");
+//        content = content.replaceAll("\n", "%0A");
+        try{
+            return ReplaceBadWords(content);
+        }catch(Exception e){
+            return content;
+        }
+    }
+    private static String ReplaceBadWords(String input) throws FileNotFoundException {
         String content = input;
-        content = content.replaceAll("&", " AND ");
-        content = content.replaceAll("\\?", " QM ");
-        content = content.replaceAll("\\\\", " BCKSLSH ");
-        content = content.replaceAll(" ", "%20");
-        content = content.replaceAll("\t", "%09");
-        content = content.replaceAll("\n", "%0A");
+        Scanner s = new Scanner(new File("wordFilter"));
+        ArrayList<String> words = new ArrayList<String>();
+        ArrayList<String> replacement = new ArrayList<String>();
+        String temp;
+        String[] temp2 = new String[2];
+        while(s.hasNext()){
+            temp = s.nextLine();
+            temp2 = temp.split("|");
+            words.add(temp2[0]);
+            replacement.add(temp2[1]);
+        }
+        for(int i = 0; i < words.size(); i++)
+            content = content.replace(words.get(i), replacement.get(i));
+
         return content;
     }
+
 
 }

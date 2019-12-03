@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller    // This means that this class is a Controller
-@RequestMapping(path="/user") // This means URL's start with /demo (after Application path)
+@RequestMapping(path="/textfile") // This means URL's start with /demo (after Application path)
 public class TextfileController {
 
     @Autowired

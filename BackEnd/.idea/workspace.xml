@@ -2,14 +2,30 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="56dd8ad1-0d62-4336-bc35-a12d792cf1db" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/BackEnd.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BackEnd.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/workspace/WorkspaceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/workspace/WorkspaceRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/.idea/Frontend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/.idea/Frontend.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Controllers/DBSupport.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Controllers/DBSupport.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/InputController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/InputController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Channel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Workspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Workspace.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />

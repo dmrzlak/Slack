@@ -1,14 +1,10 @@
 package Controllers;
 
-import Models.Message;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.*;
 import java.io.IOException;
-import java.net.MulticastSocket;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
@@ -389,6 +385,104 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse changeRole(String workspace, String username, int newRole) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.changeRole(workspace, username, newRole));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse viewFriends(int uId) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.viewFriends(uId));
+            return response;
+        }   catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse addFriend(String name, String fName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.addFriend(name, fName));
+            return response;
+        }   catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse getWorkspaceByName(String name) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getWorkspaceByName(name));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse getChannelByName(String workspaceName, String name) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getChannelByName(workspaceName, name));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse switchWorkspace(String workspaceName, int userId) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.switchWorkspace(workspaceName, userId));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse SwitchChannel(String workspaceName, String channelName, Integer userId) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.switchChannel(workspaceName, channelName, userId));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse deleteFriend(String uName, String fName) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.deleteFriend(uName, fName));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse viewFavorites(int wID, int cID, int uID) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.viewFavorites(wID,cID,uID));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    public static HTTPResponse favoriteMessage(int uID,int mID) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.favoriteMessage(uID,mID));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse unFavoriteMessage(int uID,int mID) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.unfavoriteMessage(uID,mID));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     /**
      * Model for the HTPPResponse rebuilding, that way the objects can handle the data themselve
      *
@@ -418,6 +512,17 @@ public class DBSupport {
         //For 2+ params:
         //      BASE_URL + CONTROLLER_MAPPING + / + REQUESTMAPPING + ?PARAM1_NAME=PARAM1&PARAM2_NAME=PARAM2....
 
+
+        public static String viewFavorites(int wID, int cID, int uID){
+            return BASE_URL + "/channel/getFavoriteMessages?wID=" + wID + "&cID=" + cID + "&uID="+ uID;
+        }
+        public static String favoriteMessage(int uID, int mID){
+            return BASE_URL + "/favorite/favoriteMessage?uId="+uID+"&mID="+mID+"&favorite="+true;
+        }
+        public static String unfavoriteMessage(int uID, int mID){
+            return BASE_URL + "/favorite/favoriteMessage?uId="+uID+"&mID="+mID+"&favorite="+false;
+        }
+
         public static String sendDirectMessage(String sender, String reciever, String message) {
             return BASE_URL + "message/directMessage?senderName=" + sender + "&recieverName=" + reciever + "&message=" + message;
         }
@@ -427,11 +532,11 @@ public class DBSupport {
         }
 
         public static String sendText(String name, String content) {
-            return BASE_URL + "/textfile/send?name=" + name + "&content=" + content;
+            return BASE_URL + "textfile/send?name=" + name + "&content=" + content;
         }
 
         public static String getText(String name) {
-            return BASE_URL + "/textfile/download?name" + name;
+            return BASE_URL + "textfile/download?name=" + name;
         }
 
         public static String createWorkspace(String name) {
@@ -455,7 +560,7 @@ public class DBSupport {
         }
 
         public static String getUsersInWorkspace(String workspaceName) {
-            return BASE_URL + "workspace/getUsers?name=" + workspaceName;
+            return BASE_URL+"workspace/getUsers?name="+workspaceName;
         }
 
         public static String searchWorkspace(String workspaceName) {
@@ -488,8 +593,40 @@ public class DBSupport {
             return BASE_URL + "user/getUsername?senderId=" + senderId;
         }
 
+        public static String changeRole(String workspace, String username, int rId){
+            return BASE_URL+"workspace/changeRole?workspace=" + workspace + "&username=" + username + "&rId=" + rId;
+        }
+
         public static String signin(String username, String password) {
-            return BASE_URL + "user/login?username=" + username + "&password=" + password;
+            return BASE_URL+"user/login?username="+username+"&password="+password;
+        }
+
+        public static String viewFriends(int uId) {
+            return BASE_URL+"user/viewFriends?uId="+uId;
+        }
+
+        public static String addFriend(String uName, String fName) {
+            return BASE_URL+"user/addFriend?uName="+uName+"&fName="+fName;
+        }
+
+        public static String getWorkspaceByName(String name) {
+            return BASE_URL+"workspace/get?name="+name;
+        }
+
+        public static String getChannelByName(String workspaceName, String name) {
+            return BASE_URL+"channel/get?workspaceName="+workspaceName+"&name="+name;
+        }
+
+        public static String switchWorkspace(String workspaceName, int userId) {
+            return BASE_URL+"workspace/switch?workspaceName="+workspaceName+"&userId="+userId;
+        }
+
+        public static String switchChannel(String workspaceName, String channelName, Integer userId) {
+            return BASE_URL+"channel/switch?workspaceName="+workspaceName+"&channelName="+channelName+"&userId="+userId;
+        }
+
+        public static String deleteFriend(String uName, String fName) {
+            return BASE_URL+"user/removeFriend?uName="+uName+"&fName="+fName;
         }
 
         public static String getPinnedMessages(String workspaceName, String channelName) {

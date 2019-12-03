@@ -19,6 +19,7 @@ public class WorkspaceXRef {
 
     private Integer wId;
     private Integer uId;
+    private Integer rId;// default needs to be 2
 
     public Integer getId() {
         return id;
@@ -36,11 +37,19 @@ public class WorkspaceXRef {
         return wId;
     }
 
+    public int getrId() {
+        return rId;
+    }
+
     public void setuId(int uId) {
         this.uId = uId;
     }
 
     public void setwId(int wId) {
         this.wId = wId;
+    }
+
+    public void setrId(int rId) {
+        this.rId = rId;
     }
 }
