@@ -141,4 +141,19 @@ public class WorkspaceController {
         xRefRepository.save(x);
         return new ResponseEntity(x, HttpStatus.OK);
     }
+
+    @GetMapping(path="/getRole")
+    public @ResponseBody ResponseEntity getRole(String workspace, String username) {
+        if(! userRepository.existsByName(username))
+            return new ResponseEntity("User: " + username + " Not found", HttpStatus.NOT_FOUND);
+        User u = userRepository.findByName(username);
+        if(!workspaceRepository.existsByName(workspace))
+            return new ResponseEntity("User: " + username + " Not found", HttpStatus.NOT_FOUND);
+        Workspace w =  workspaceRepository.findbyName(workspace);
+        if(!xRefRepository.exists(w.getId(), u.getId()))
+            return new ResponseEntity("User: " + username + " Not in workspace", HttpStatus.NOT_ACCEPTABLE);
+        WorkspaceXRef x = xRefRepository.find(w.getId(), u.getId());
+        x.getrId();
+        return new ResponseEntity(x.getrId(), HttpStatus.OK);
+    }
 }
