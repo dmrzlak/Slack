@@ -394,6 +394,15 @@ public class DBSupport {
         }
     }
 
+    public static HTTPResponse getRole(String workspace, String username) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getRole(workspace, username));
+            return response;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
     public static HTTPResponse viewFriends(int uId) {
         try {
             HTTPResponse response = serverRequest(ParamBuilder.viewFriends(uId));
@@ -453,6 +462,42 @@ public class DBSupport {
             HTTPResponse res = serverRequest(ParamBuilder.deleteFriend(uName, fName));
             return res;
         } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse muteUser(String uName, String mName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.muteUser(uName, mName));
+            return response;
+        }   catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse unmuteUser(String uName, String mName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.unmuteUser(uName, mName));
+            return response;
+        }   catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse setDesc(String workspaceName, String channelName, String desc) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.setDesc(workspaceName, channelName, desc));
+            return response;
+        }   catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse getDesc(String workspaceName, String channelName) {
+        try {
+            HTTPResponse response = serverRequest(ParamBuilder.getDesc(workspaceName, channelName));
+            return response;
+        }   catch (Exception e) {
             return new HTTPResponse(406, handleErr());
         }
     }
@@ -560,6 +605,10 @@ public class DBSupport {
             return BASE_URL+"workspace/changeRole?workspace=" + workspace + "&username=" + username + "&rId=" + rId;
         }
 
+        public static String getRole(String workspace, String username){
+            return BASE_URL+"workspace/getRole?workspace=" + workspace + "&username=" + username;
+        }
+
         public static String signin(String username, String password) {
             return BASE_URL+"user/login?username="+username+"&password="+password;
         }
@@ -595,5 +644,22 @@ public class DBSupport {
         public static String getPinnedMessages(String workspaceName, String channelName) {
             return BASE_URL + "channel/getPinnedMessages?workspaceName=" + workspaceName + "&channelName=" + channelName;
         }
+
+        public static String muteUser(String uName, String mName) {
+            return BASE_URL+"user/muteUser?uName="+uName+"&mName="+mName;
+        }
+
+        public static String unmuteUser(String uName, String mName) {
+            return BASE_URL+"user/unmuteUser?uName="+uName+"&mName="+mName;
+        }
+
+        public static String setDesc(String workspaceName, String channelName, String desc) {
+            return BASE_URL+"channel/setDescription?workspaceName="+workspaceName+"&channelName="+channelName+"&desc="+desc;
+        }
+
+        public static String getDesc(String workspaceName, String channelName) {
+            return BASE_URL+"channel/getDescription?workspaceName="+workspaceName+"&channelName="+channelName;
+        }
+
     }
 }

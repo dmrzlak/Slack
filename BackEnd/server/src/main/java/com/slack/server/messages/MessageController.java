@@ -2,6 +2,7 @@ package com.slack.server.messages;
 
 import com.slack.server.channel.Channel;
 import com.slack.server.channel.ChannelRepository;
+import com.slack.server.muteXRef.MuteXRefRepository;
 import com.slack.server.user.User;
 import com.slack.server.user.UserRepository;
 import com.slack.server.workspace.Workspace;
@@ -40,6 +41,8 @@ public class MessageController {
     private ChannelRepository channelRepository;
     @Autowired
     private WorkspaceXRefRepository workspaceXRefRepository;
+    @Autowired
+    private MuteXRefRepository mXRefRepo;
 
 
     /**
@@ -61,6 +64,9 @@ public class MessageController {
         User recipient = userRepository.findByName(recieverName);
         if(recipient == null)
             return new ResponseEntity("User recipient Not Found!!!", HttpStatus.NOT_FOUND);
+
+        if(mXRefRepo.exists(recipient.getId(), sender.getId())) return new ResponseEntity("Unable to send: User has muted you!", HttpStatus.NOT_ACCEPTABLE);
+
         Message m = new Message();
         m.setSenderId(sender.getId());
         m.setRecipientID(recipient.getId());

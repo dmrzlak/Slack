@@ -46,6 +46,10 @@ public class InputController {
     private static final String SEARCH_USER = "search user";
     private static final String SEND_TEXTFILE = "send file";
     private static final String DOWNLOAD_TEXTFILE = "download file";
+    private static final String MUTE_USER = "mute";
+    private static final String UNMUTE_USER = "unmute";
+    private static final String SET_CH_DET = "set channel details";
+    private static final String GET_CH_DET = "channel details";
 
     private static Gson gson = new Gson();
     private static User curUser = null;
@@ -147,6 +151,18 @@ public class InputController {
                     break;
                 case CHANGE_ROLE:
                     ChangeRole(userArgs);
+                    break;
+                case MUTE_USER:
+                    muteUser(userArgs);
+                    break;
+                case UNMUTE_USER:
+                    unmuteUser(userArgs);
+                    break;
+                case SET_CH_DET:
+                    setDetails(userArgs);
+                    break;
+                case GET_CH_DET:
+                    getDetails(userArgs);
                     break;
                 default:
                     System.out.println("Invalid Input please try again :(");
@@ -812,6 +828,94 @@ public class InputController {
         } else {
             User u = gson.fromJson(deleteFriend.response, User.class);
             System.out.println("Removed friend " + u.getName());
+        }
+    }
+
+    private static void muteUser(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse muteUser = User.muteUser(curUser.getName(), userArgs[0]);
+        if (muteUser.code > 300) {
+            System.out.println(muteUser.response);
+        } else {
+            User u = gson.fromJson(muteUser.response, User.class);
+            System.out.println("Muted user " + u.getName());
+        }
+    }
+
+    private static void unmuteUser(String[] userArgs) {
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse unmuteUser = User.unmuteUser(curUser.getName(), userArgs[0]);
+        if (unmuteUser.code > 300) {
+            System.out.println(unmuteUser.response);
+        } else {
+            User u = gson.fromJson(unmuteUser.response, User.class);
+            System.out.println("Unmuted user " + u.getName());
+        }
+    }
+
+    private static void setDetails(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("You must be in a workspace to do this!");
+        }
+        DBSupport.HTTPResponse getRole = Workspace.getRole(curWorkspace.getName(), curUser.getName());
+        int role = gson.fromJson(getRole.response, int.class);
+
+        if (role <= 1) {
+            System.out.println("You do not have sufficient permissions");
+            if(role == -1) {
+                curWorkspace = null;
+                curChannel = null;
+            }
+            return;
+        }
+        String details = "";
+        for (int i = 1; i < userArgs.length; i++) {
+            details += userArgs[i] + " ";
+        }
+        details = ReplaceSpecChars(details);
+        DBSupport.HTTPResponse setDetails = Channel.setDesc(curWorkspace.getName(), userArgs[0], details);
+        if (setDetails.code > 300) {
+            System.out.println(setDetails.response);
+        } else {
+            System.out.println("Changed channel "+userArgs[0]+"'s description to: \n\t" + setDetails.response);
+        }
+    }
+
+    private static void getDetails(String[] userArgs) {
+        if (curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if (curWorkspace == null) {
+            System.out.println("You must be in a workspace to do this!");
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number or Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse getDesc = Channel.getDesc(curWorkspace.getName(), userArgs[0]);
+        if (getDesc.code > 300) {
+            System.out.println(getDesc.response);
+        } else {
+            System.out.println(userArgs[0] + ": \n\t" + getDesc.response);
         }
     }
 

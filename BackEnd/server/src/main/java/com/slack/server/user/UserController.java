@@ -1,5 +1,7 @@
 package com.slack.server.user;
 
+import com.slack.server.muteXRef.MuteXRef;
+import com.slack.server.muteXRef.MuteXRefRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
@@ -43,6 +45,9 @@ public class UserController {
 
     @Autowired
     private UserXRefRepository uXRefRepo;
+
+    @Autowired
+    private MuteXRefRepository mXRefRepo;
 
 
     /**
@@ -199,5 +204,35 @@ public class UserController {
         uXRefRepo.delete(u.getId(), f.getId());
 
         return new ResponseEntity(f, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/muteUser")
+    public @ResponseBody ResponseEntity muteUser(@RequestParam String uName, @RequestParam String mName){
+        User u = uRepo.findByName(uName);
+        User m = uRepo.findByName(mName);
+        if(m == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(mXRefRepo.exists(u.getId(), m.getId())) return new ResponseEntity("User already blocked. Use \"unblock - <user>\"", HttpStatus.NOT_ACCEPTABLE);
+
+        //Create the XREF and put it in DB
+        MuteXRef x = new MuteXRef();
+        x.setuId(u.getId());
+        x.setmId(m.getId()); //Mute XRef is currently backwards...
+        mXRefRepo.save(x);
+
+        return new ResponseEntity(m, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/unmuteUser")
+    public @ResponseBody ResponseEntity unmuteUser(@RequestParam String uName, @RequestParam String mName) {
+        User u = uRepo.findByName(uName);
+        User m = uRepo.findByName(mName);
+        if(m == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(!mXRefRepo.exists(u.getId(), m.getId())) return new ResponseEntity("User isn't muted", HttpStatus.NOT_ACCEPTABLE);
+
+        mXRefRepo.delete(u.getId(), m.getId());
+
+        return new ResponseEntity(m, HttpStatus.OK);
     }
 }

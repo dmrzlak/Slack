@@ -91,6 +91,11 @@ public class Workspace {
         return res;
     }
 
+    public static DBSupport.HTTPResponse getRole(String workspace, String username) {
+        DBSupport.HTTPResponse res = DBSupport.getRole(workspace, username);
+        return res;
+    }
+
     /**
      * Calls DBSupport and returns the response
      * @param workspaceName

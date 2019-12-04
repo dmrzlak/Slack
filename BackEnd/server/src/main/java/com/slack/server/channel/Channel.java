@@ -19,6 +19,9 @@ public class Channel {
 
     private String name;
 
+    private String details;
+
+
     public Integer getId() {
         return id;
     }
@@ -42,5 +45,9 @@ public class Channel {
     public void setName(String name) {
         this.name = name;
     }
+
+    public void setDetails(String details){this.details = details;}
+
+    public String getDetails(){return details;}
 
 }
