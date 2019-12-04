@@ -1284,35 +1284,6 @@ public class InputController {
     private static void printHelp() {
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using ' ' to separate arguments\n\n" +
-<<<<<<< HEAD
-                "create user:           create user - <name> <password>\n" +
-                "login:                 login - <username> <password>\n" +
-                "create workspace:      create workspace - <name of workspace>\n" +
-                "join workspace:        join - <name of workspace>\n" +
-                "switch workspace:      switch workspace - <workspace name>\n" +
-                "search workspace:      search workspace - <name of workspace> (Search Field not required)\n" +
-                "create channel:        create channel - <workspace name> <channel name>\n" +
-                "switch channel:        switch channel - <channel name>\n" +
-                "view mentions:         view mentions\n" +
-                "view pinned:           get pinned\n" +
-                "view users:            view users\n" +
-                "search user:           search user - <name of user> (Search Field not required)\n"+
-                "send to group:         send - <message>\n" +
-                "direct message:        send to - <user> <message>\n" +
-                "favorite message:      favorite message - <message>\n"+
-                "unfavorite message:    unfavorite message - <message>\n"+
-                "veiw favorites:        view favorites\n"+
-                "pin message:           pin message - <messageId>\n" +
-                "unpin message:         unpin message - <messageId>\n" +
-                "send a text file:      send file - <filepath>\n" +
-                "download a file:       download file - <name> (.txt only)\n" +
-                "change role:           change role - <RoleName> <Username>\n" +
-                "log messages:          log messages\n" +
-                "view friends:          view friends\n" +
-                "add friend:            add friend - <name>\n" +
-                "delete friend:         delete friend - <name>\n");
-
-=======
                 "create user:               create user - <name> <password>\n" +
                 "login:                     login - <username> <password>\n" +
                 "delete user:               delete user\n" +
@@ -1330,6 +1301,8 @@ public class InputController {
                 "direct message:            send to - <user> <message>\n" +
                 "pin message:               pin message - <messageId>\n" +
                 "unpin message:             unpin message - <messageId>\n" +
+                "favorite message:          favorite message - <message>\n"+
+                "unfavorite message:        unfavorite message - <message>\n"+
                 "send a text file:          send file - <filepath>\n" +
                 "download a file:           download file - <name> (.txt only)\n" +
                 "change role:               change role - <RoleName> <Username>\n" +
@@ -1339,9 +1312,9 @@ public class InputController {
                 "delete friend:             delete friend - <name>\n" +
                 "create appointment:        create appointment (User prompts occur)\n" +
                 "view appointments:         view appointments - <Type of appointment to see> (\"pending\"\\\"accepted\"\\empty argument) \n" +
-                "respond to an appointment: respond appointment - \n" +
-                "delete an appointment:     delete appointment - \n");
->>>>>>> master
+                "respond to an appointment: respond appointment - <appointmentId>\n" +
+                "delete an appointment:     delete appointment - <appointmentID>\n"
+        );
     }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
