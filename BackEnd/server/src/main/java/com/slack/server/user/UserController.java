@@ -1,5 +1,8 @@
 package com.slack.server.user;
 
+import com.slack.server.appointment.Appointment;
+import com.slack.server.appointment.AppointmentRepository;
+import com.slack.server.appointmentXRef.AppointmentXRefRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
@@ -34,6 +37,8 @@ public class UserController {
      */
     @Autowired
     private UserRepository uRepo;
+    @Autowired
+    private UserHistoricalRepository uHistoryRepo;
 
     @Autowired
     private WorkspaceRepository wRepo;
@@ -44,6 +49,11 @@ public class UserController {
     @Autowired
     private UserXRefRepository uXRefRepo;
 
+    @Autowired
+    private AppointmentXRefRepository aXRefRepo;
+
+    @Autowired
+    private AppointmentRepository aRepo;
 
     /**
      * Create a user for the DB and put them into the table
@@ -112,6 +122,15 @@ public class UserController {
         return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
 
     }
+ /** get a user via name
+     */
+    @GetMapping(path="/getId")
+    public @ResponseBody ResponseEntity getUserById(@RequestParam String username){
+        User u = uRepo.findByName(username);
+        if(u== null)
+            return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(u.getId(), HttpStatus.OK);
+    }
 
     /**
      * When accessed, will add a user to a workspace. In the workspaceXRef table, if a user and a workspace are in the
@@ -137,6 +156,7 @@ public class UserController {
         WorkspaceXRef x = new WorkspaceXRef();
         x.setwId(w.getId());
         x.setuId(u.getId());
+        x.setrId(0);
         wXRefRepo.save(x);
 
         //Return OK status (200) and workspace
@@ -157,6 +177,20 @@ public class UserController {
         }
         return new ResponseEntity("User Does Not Exist", HttpStatus.NOT_FOUND);
 
+    }
+
+    /**
+     * Find a user by id, and return its username
+     * @param senderId
+     * @return
+     */
+    @GetMapping(path = "/getHistoricUsername")
+    public @ResponseBody ResponseEntity getHistoricUserNameById(Integer senderId) {
+        if(uHistoryRepo.existsById(senderId)) {
+            User user = uRepo.findByID(senderId);
+            return new ResponseEntity(user.getName(), HttpStatus.OK);
+        }
+        return new ResponseEntity("User Does Not Exist", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping(path = "/viewFriends")
@@ -199,5 +233,95 @@ public class UserController {
         uXRefRepo.delete(u.getId(), f.getId());
 
         return new ResponseEntity(f, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/setStatus")
+    public @ResponseBody ResponseEntity setStatus(@RequestParam String uName, @RequestParam String status) {
+        User u = uRepo.findByName(uName);
+        u.setStatus(status);
+        uRepo.save(u);
+        return new ResponseEntity(status, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/deleteStatus")
+    public @ResponseBody ResponseEntity deleteStatus(@RequestParam String uName) {
+        User u = uRepo.findByName(uName);
+        u.setStatus("");
+        uRepo.save(u);
+        return new ResponseEntity("", HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/viewStatus")
+    public @ResponseBody ResponseEntity setStatus(@RequestParam String fName) {
+        User f = uRepo.findByName(fName);
+        if(f == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        String status = f.getStatus();
+        return new ResponseEntity(status, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/kickUser")
+    public @ResponseBody ResponseEntity kickUser(@RequestParam String workspaceName, @RequestParam String uName,
+                                                 @RequestParam String toKick) {
+        Workspace w = wRepo.findbyName(workspaceName);
+        User u = uRepo.findByName(uName);
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId());
+        if(uXRef.getrId() <= 0) {
+            return new ResponseEntity("Must be an admin or moderator of the workspace in order to kick people", HttpStatus.NOT_ACCEPTABLE);
+        }
+        User kicked = uRepo.findByName(toKick);
+        if(kicked == null) return new  ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
+        WorkspaceXRef toKickXRef = wXRefRepo.find(w.getId(), kicked.getId());
+        if(toKickXRef == null){
+            return new ResponseEntity("User is not a member of the workspace", HttpStatus.NOT_FOUND);
+        }
+        if(toKickXRef.getrId() == -1) {
+            return new ResponseEntity("User is already kicked", HttpStatus.NOT_ACCEPTABLE);
+        }
+        if(uXRef.getrId() <= toKickXRef.getrId()){
+            return new ResponseEntity("Cannot kick people of an equal or greater role than you", HttpStatus.NOT_ACCEPTABLE);
+        }
+        toKickXRef.setrId(-1);
+        wXRefRepo.save(toKickXRef);
+        return new ResponseEntity("Successfully Kicked", HttpStatus.FORBIDDEN);
+    }
+
+
+    @GetMapping(path = "/unkickUser")
+    public @ResponseBody ResponseEntity unkickUser(@RequestParam String workspaceName, @RequestParam String uName,
+                                                 @RequestParam String toUnkick) {
+        Workspace w = wRepo.findbyName(workspaceName);
+        User u = uRepo.findByName(uName);
+        WorkspaceXRef uXRef = wXRefRepo.find(w.getId(), u.getId());
+        if (uXRef.getrId() <= 0) {
+            return new ResponseEntity("Must be an admin or moderator of the workspace" +
+                    " in order to unkick people", HttpStatus.NOT_ACCEPTABLE);
+        }
+        User unkick = uRepo.findByName(toUnkick);
+        if (unkick == null) return new ResponseEntity("User does not exist", HttpStatus.NOT_FOUND);
+        WorkspaceXRef toUnkickXRef = wXRefRepo.find(w.getId(), unkick.getId());
+        if (toUnkickXRef == null) {
+            return new ResponseEntity("User is not a member of the workspace", HttpStatus.NOT_FOUND);
+        }
+        if (toUnkickXRef.getrId() != -1) {
+            return new ResponseEntity("User is already not kicked", HttpStatus.NOT_ACCEPTABLE);
+        }
+        toUnkickXRef.setrId(0);
+
+        return new ResponseEntity("", HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/clear")
+    public @ResponseBody ResponseEntity clearUser(@RequestParam String username){
+        User u = uRepo.findByName(username);
+        if(u == null) return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        UserHistory u1 = new UserHistory(u);
+        uHistoryRepo.save(u1);
+        wXRefRepo.removeByUserId(u.getId());
+        uXRefRepo.removeByUserId(u.getId());
+        aXRefRepo.removeByUserId(u.getId());
+        aXRefRepo.removeByOwnerId(u.getId());
+        aRepo.removeByOwnerId(u.getId());
+        uRepo.delete(u);
+        return new ResponseEntity("User deleted, sorry to see you go", HttpStatus.OK);
     }
 }

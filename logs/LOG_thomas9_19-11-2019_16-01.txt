@@ -1,0 +1,12 @@
+[thomas9].[Welcome]	FROM: dylan
+	MESSAGE: hello
+
+[thomas9].[Welcome]	FROM: dylan
+	MESSAGE: hello 2
+
+[thomas9].[demo]	FROM: dylan
+	MESSAGE: demo
+
+[thomas9].[demo]	FROM: dylan
+	MESSAGE: demo 2
+

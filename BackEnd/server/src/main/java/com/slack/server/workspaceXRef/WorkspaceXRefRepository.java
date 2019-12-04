@@ -1,8 +1,11 @@
 package com.slack.server.workspaceXRef;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+
+import javax.transaction.Transactional;
 
 /**
  * Interface for the given db table. Springboot will make all of the CRUD functions for us
@@ -15,4 +18,9 @@ public interface WorkspaceXRefRepository extends CrudRepository<WorkspaceXRef, I
 
     @Query("SELECT x FROM WorkspaceXRef x WHERE x.wId = :wId AND x.uId = :uId")
     WorkspaceXRef find(@Param("wId") int wId, @Param("uId") int uId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from WorkspaceXRef x where x.uId = :id")
+    void removeByUserId(@Param("id")int uId);
 }

@@ -19,7 +19,7 @@ public class WorkspaceXRef {
 
     private Integer wId;
     private Integer uId;
-    private Integer rId;// default needs to be 2
+    private Integer rId;// default needs to be 2 // -1 is kicked
 
     public Integer getId() {
         return id;

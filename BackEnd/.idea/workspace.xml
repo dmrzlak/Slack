@@ -3,21 +3,15 @@
   <component name="ChangeListManager">
     <list default="true" id="56dd8ad1-0d62-4336-bc35-a12d792cf1db" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/user/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/slack/server/workspace/WorkspaceRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/slack/server/workspace/WorkspaceRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/.idea/Frontend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/.idea/Frontend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Controllers/DBSupport.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Controllers/DBSupport.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/InputController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/InputController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Channel.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Channel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Workspace.java" beforeDir="false" afterPath="$PROJECT_DIR$/../Frontend/Slack/src/Models/Workspace.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="BackEnd" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -29,6 +23,17 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GroovyConsoleState">
+    <option name="list">
+      <list>
+        <Entry>
+          <option name="url" value="file://$APPLICATION_CONFIG_DIR$/consoles/groovy/groovy_console.groovy" />
+          <option name="moduleName" value="BackEnd" />
+          <option name="title" value="BackEnd (Bundled Groovy 2.4.17)" />
+        </Entry>
+      </list>
+    </option>
   </component>
   <component name="ProjectId" id="1SuNWijq2L1nXexPb73JtpwqLoV" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -83,6 +88,9 @@
       <option name="presentableId" value="Default" />
       <updated>1572409553630</updated>
       <workItem from="1572989997634" duration="594000" />
+      <workItem from="1575140498010" duration="253000" />
+      <workItem from="1575140919432" duration="820000" />
+      <workItem from="1575142008444" duration="26000" />
     </task>
     <servers />
   </component>

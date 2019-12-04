@@ -50,7 +50,7 @@ public class WorkspaceController {
      * @return
      * @author Dylan Mrzlak
      */
-    @GetMapping(path="/add") // Map ONLY POST Requests
+    @GetMapping(path="/add")
     public @ResponseBody ResponseEntity addNewWorkspace (@RequestParam String name) {
         // @ResponseBody means the returned String is the response, not a view name
         // @RequestParam means it is a parameter from the GET or POST request
@@ -120,7 +120,8 @@ public class WorkspaceController {
     public @ResponseBody ResponseEntity switchWorkspace(String workspaceName, int userId) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
         if (w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
-        boolean inWorkspace = xRefRepository.exists(w.getId(), userId);
+        WorkspaceXRef x = xRefRepository.find(w.getId(), userId);
+        boolean inWorkspace = x != null && x.getrId() > -1;
         if (inWorkspace) return new ResponseEntity(w, HttpStatus.OK);
         return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
     }

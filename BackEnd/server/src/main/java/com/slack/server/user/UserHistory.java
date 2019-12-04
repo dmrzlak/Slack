@@ -9,10 +9,9 @@ import javax.persistence.*;
  * @Author Dylan Mrzlak
  */
 @Entity // This tells Hibernate to make a table out of this class
-public class User {
+public class UserHistory {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     //Role id; 1 mute, 2 user, 3 mod, 4 admin
@@ -21,7 +20,20 @@ public class User {
 
     private String password;
 
-    private String status;
+    public UserHistory() {
+    }
+
+    public UserHistory(Integer id, String name, String password) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+    }
+
+    public UserHistory(User u) {
+        this.id = u.getId();
+        this.name = u.getName();
+        this.password = u.getPassword();
+    }
 
     public Integer getId() {
         return id;
@@ -39,12 +51,8 @@ public class User {
         this.name = name;
     }
 
-    public String getPassword(){ return password;}
+    public String getPassword(){ return password;};
 
     public void setPassword(String password){this.password = password; }
-
-    public void setStatus(String status){this.status = status; }
-
-    public String getStatus(){return status; }
 
 }
