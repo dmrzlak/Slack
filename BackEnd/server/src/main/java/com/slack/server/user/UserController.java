@@ -245,7 +245,7 @@ public class UserController {
             return new ResponseEntity("Cannot kick people of an equal or greater role than you", HttpStatus.NOT_ACCEPTABLE);
         }
         toKickXRef.setrId(-1);
-        return new ResponseEntity("", HttpStatus.OK);
+        return new ResponseEntity("Successfully Kicked", HttpStatus.FORBIDDEN);
     }
 
 
@@ -269,6 +269,7 @@ public class UserController {
             return new ResponseEntity("User is already not kicked", HttpStatus.NOT_ACCEPTABLE);
         }
         toUnkickXRef.setrId(0);
+
         return new ResponseEntity("", HttpStatus.OK);
     }
 }
