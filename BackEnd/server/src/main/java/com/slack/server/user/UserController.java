@@ -1,5 +1,8 @@
 package com.slack.server.user;
 
+import com.slack.server.appointment.Appointment;
+import com.slack.server.appointment.AppointmentRepository;
+import com.slack.server.appointmentXRef.AppointmentXRefRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
 import com.slack.server.workspaceXRef.WorkspaceXRef;
@@ -34,6 +37,8 @@ public class UserController {
      */
     @Autowired
     private UserRepository uRepo;
+    @Autowired
+    private UserHistoricalRepository uHistoryRepo;
 
     @Autowired
     private WorkspaceRepository wRepo;
@@ -44,6 +49,11 @@ public class UserController {
     @Autowired
     private UserXRefRepository uXRefRepo;
 
+    @Autowired
+    private AppointmentXRefRepository aXRefRepo;
+
+    @Autowired
+    private AppointmentRepository aRepo;
 
     /**
      * Create a user for the DB and put them into the table
@@ -112,6 +122,15 @@ public class UserController {
         return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
 
     }
+ /** get a user via name
+     */
+    @GetMapping(path="/getId")
+    public @ResponseBody ResponseEntity getUserById(@RequestParam String username){
+        User u = uRepo.findByName(username);
+        if(u== null)
+            return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity(u.getId(), HttpStatus.OK);
+    }
 
     /**
      * When accessed, will add a user to a workspace. In the workspaceXRef table, if a user and a workspace are in the
@@ -159,6 +178,20 @@ public class UserController {
 
     }
 
+    /**
+     * Find a user by id, and return its username
+     * @param senderId
+     * @return
+     */
+    @GetMapping(path = "/getHistoricUsername")
+    public @ResponseBody ResponseEntity getHistoricUserNameById(Integer senderId) {
+        if(uHistoryRepo.existsById(senderId)) {
+            User user = uRepo.findByID(senderId);
+            return new ResponseEntity(user.getName(), HttpStatus.OK);
+        }
+        return new ResponseEntity("User Does Not Exist", HttpStatus.NOT_FOUND);
+    }
+
     @GetMapping(path = "/viewFriends")
     public @ResponseBody ResponseEntity viewFriends(@RequestParam int uId) {
         Iterable<String> list = uRepo.viewFriends(uId);
@@ -199,5 +232,21 @@ public class UserController {
         uXRefRepo.delete(u.getId(), f.getId());
 
         return new ResponseEntity(f, HttpStatus.OK);
+    }
+
+
+    @GetMapping(path = "/clear")
+    public @ResponseBody ResponseEntity clearUser(@RequestParam String username){
+        User u = uRepo.findByName(username);
+        if(u == null) return new ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+        UserHistory u1 = new UserHistory(u);
+        uHistoryRepo.save(u1);
+        wXRefRepo.removeByUserId(u.getId());
+        uXRefRepo.removeByUserId(u.getId());
+        aXRefRepo.removeByUserId(u.getId());
+        aXRefRepo.removeByOwnerId(u.getId());
+        aRepo.removeByOwnerId(u.getId());
+        uRepo.delete(u);
+        return new ResponseEntity("User deleted, sorry to see you go", HttpStatus.OK);
     }
 }

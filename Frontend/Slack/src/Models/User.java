@@ -43,6 +43,16 @@ public class User {
         return res;
     }
 
+    public static DBSupport.HTTPResponse clearUser(String username) {
+        DBSupport.HTTPResponse res = DBSupport.clearUser(username);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getUserIdByName(String username) {
+        DBSupport.HTTPResponse res = DBSupport.getUserIdByName(username);
+        return res;
+    }
+
 
     public Integer getId() {
         return id;

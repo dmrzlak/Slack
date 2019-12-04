@@ -16,4 +16,9 @@ public interface UserXRefRepository extends CrudRepository<UserXRef, Integer> {
     @Modifying
     @Query("DELETE FROM UserXRef x WHERE x.fId = :fId AND x.uId = :uId")
     void delete(@Param("fId") int fId, @Param("uId") int uId);
+
+    @Transactional
+    @Modifying
+    @Query("delete from UserXRef x where x.fId = :id OR x.uId = :id")
+    void removeByUserId(@Param("id")int uId);
 }
