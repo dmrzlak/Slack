@@ -69,6 +69,7 @@ public class ChannelController {
         Channel c = new Channel();
         c.setwId(w.getId());
         c.setName(name);
+        c.setDetails(null);
         channelRepository.save(c);
         return new ResponseEntity(c, HttpStatus.OK);
     }
@@ -141,6 +142,14 @@ public class ChannelController {
 
     }
 
+    /**
+     * Channel switching functionality
+     * @param workspaceName
+     * @param channelName
+     * @param userId
+     * @return
+     * @Author Logan Garrett
+     */
     @GetMapping(path="/switch")
     public @ResponseBody ResponseEntity switchChannel(String workspaceName, String channelName, int userId) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
@@ -208,5 +217,39 @@ public class ChannelController {
         favoriteXRefRepo.save(f);
         return new ResponseEntity("Successfully favoritted message", HttpStatus.OK);
     }
+    /**
+     * Sets a channel's specified description
+     * @param workspaceName
+     * @param channelName
+     * @param desc
+     * @Author Logan Garrett
+     */
+    @GetMapping(path="/setDescription")
+    public @ResponseBody ResponseEntity setDescription(String workspaceName, String channelName, String desc) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        if (c == null)
+            return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        c.setDetails(desc);
+        channelRepository.save(c);
+        return new ResponseEntity(c.getDetails(), HttpStatus.OK);
+    }
 
+    /**
+     * Gets a specified channel's description
+     * @param workspaceName
+     * @param channelName
+     * @Author Logan Garrett
+     */
+    @GetMapping(path="/getDescription")
+    public @ResponseBody ResponseEntity getDescription(String workspaceName, String channelName) {
+        Workspace w = workspaceRepository.findbyName(workspaceName);
+        Channel c = channelRepository.find(w.getId(), channelName);
+        if (c == null)
+            return new ResponseEntity("Channel not found", HttpStatus.NOT_FOUND);
+        if(c.getDetails() == null) {
+            return new ResponseEntity("This channel has no description", HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity(c.getDetails(), HttpStatus.OK);
+    }
 }

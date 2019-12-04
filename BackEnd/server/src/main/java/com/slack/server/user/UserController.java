@@ -1,5 +1,7 @@
 package com.slack.server.user;
 
+import com.slack.server.muteXRef.MuteXRef;
+import com.slack.server.muteXRef.MuteXRefRepository;
 import com.slack.server.appointment.Appointment;
 import com.slack.server.appointment.AppointmentRepository;
 import com.slack.server.appointmentXRef.AppointmentXRefRepository;
@@ -50,6 +52,9 @@ public class UserController {
     private UserXRefRepository uXRefRepo;
 
     @Autowired
+    private MuteXRefRepository mXRefRepo;
+
+	@Autowired
     private AppointmentXRefRepository aXRefRepo;
 
     @Autowired
@@ -309,6 +314,36 @@ public class UserController {
 
         return new ResponseEntity("", HttpStatus.OK);
     }
+
+    @GetMapping(path = "/muteUser")
+    public @ResponseBody ResponseEntity muteUser(@RequestParam String uName, @RequestParam String mName){
+        User u = uRepo.findByName(uName);
+        User m = uRepo.findByName(mName);
+        if(m == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(mXRefRepo.exists(u.getId(), m.getId())) return new ResponseEntity("User already blocked. Use \"unblock - <user>\"", HttpStatus.NOT_ACCEPTABLE);
+
+        //Create the XREF and put it in DB
+        MuteXRef x = new MuteXRef();
+        x.setuId(u.getId());
+        x.setmId(m.getId()); //Mute XRef is currently backwards...
+        mXRefRepo.save(x);
+
+        return new ResponseEntity(m, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/unmuteUser")
+    public @ResponseBody ResponseEntity unmuteUser(@RequestParam String uName, @RequestParam String mName) {
+        User u = uRepo.findByName(uName);
+        User m = uRepo.findByName(mName);
+        if(m == null) return new  ResponseEntity("User not found", HttpStatus.NOT_FOUND);
+
+        if(!mXRefRepo.exists(u.getId(), m.getId())) return new ResponseEntity("User isn't muted", HttpStatus.NOT_ACCEPTABLE);
+
+        mXRefRepo.delete(u.getId(), m.getId());
+
+        return new ResponseEntity(m, HttpStatus.OK);
+	}
 
     @GetMapping(path = "/clear")
     public @ResponseBody ResponseEntity clearUser(@RequestParam String username){

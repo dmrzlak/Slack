@@ -129,4 +129,14 @@ public class User {
         return res;
     }
 
+    public static DBSupport.HTTPResponse muteUser(String uName, String mName) {
+        DBSupport.HTTPResponse res = DBSupport.muteUser(uName, mName);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse unmuteUser(String uName, String mName) {
+        DBSupport.HTTPResponse res = DBSupport.unmuteUser(uName, mName);
+        return res;
+    }
+
 }

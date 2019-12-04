@@ -71,6 +71,16 @@ public class Channel {
         return res;
     }
 
+    public static DBSupport.HTTPResponse setDesc(String workspaceName, String channelName, String desc) {
+        DBSupport.HTTPResponse res = DBSupport.setDesc(workspaceName, channelName, desc);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getDesc(String workspaceName, String channelName) {
+        DBSupport.HTTPResponse res = DBSupport.getDesc(workspaceName, channelName);
+        return res;
+    }
+
     public Integer getId() {
         return id;
     }
