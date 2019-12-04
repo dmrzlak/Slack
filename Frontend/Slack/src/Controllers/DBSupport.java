@@ -740,11 +740,11 @@ public class DBSupport {
         }
 
         public static String kickUser(String workspaceName, String uName, String toKick) {
-            return BASE_URL + "user/kickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toKick" + toKick;
+            return BASE_URL + "user/kickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toKick=" + toKick;
         }
 
         public static String unkickUser(String workspaceName, String uName, String toUnkick) {
-            return BASE_URL + "user/unkickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toUnkick" + toUnkick;
+            return BASE_URL + "user/unkickUser?workspaceName=" + workspaceName + "&uName=" + uName + "&toUnkick=" + toUnkick;
         }
 
         public static String clearUser(String name){

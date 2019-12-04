@@ -6,6 +6,7 @@ import com.slack.server.user.User;
 import com.slack.server.user.UserRepository;
 import com.slack.server.workspace.Workspace;
 import com.slack.server.workspace.WorkspaceRepository;
+import com.slack.server.workspaceXRef.WorkspaceXRef;
 import com.slack.server.workspaceXRef.WorkspaceXRefRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -96,6 +97,12 @@ public class MessageController {
         Channel channel = channelRepository.find(workspace.getId(),channelName);
         if(channel == null)
             return new ResponseEntity("Channel Not Found :(", HttpStatus.NOT_FOUND);
+        WorkspaceXRef x = workspaceXRefRepository.find(workspace.getId(), sender.getId());
+        if(x == null)
+            return new ResponseEntity("You are not in this workspace", HttpStatus.NOT_FOUND);
+        if(x.getrId() == -1)
+            return new ResponseEntity("YOu have been kicked from this Workspace", HttpStatus.FORBIDDEN);
+
         Message m = new Message();
         m.setSenderId(sender.getId());
         m.setRecipientID(null);
@@ -103,7 +110,7 @@ public class MessageController {
         m.setwId(workspace.getId());
         m.setcID(channel.getId());
         m.setPinned(false);
-        messageRepository.save(m);
+        m = messageRepository.save(m);
         return new ResponseEntity(m, HttpStatus.OK);
     }
 

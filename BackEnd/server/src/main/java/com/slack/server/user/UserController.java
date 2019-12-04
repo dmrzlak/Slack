@@ -156,6 +156,7 @@ public class UserController {
         WorkspaceXRef x = new WorkspaceXRef();
         x.setwId(w.getId());
         x.setuId(u.getId());
+        x.setrId(0);
         wXRefRepo.save(x);
 
         //Return OK status (200) and workspace
@@ -238,6 +239,7 @@ public class UserController {
     public @ResponseBody ResponseEntity setStatus(@RequestParam String uName, @RequestParam String status) {
         User u = uRepo.findByName(uName);
         u.setStatus(status);
+        uRepo.save(u);
         return new ResponseEntity(status, HttpStatus.OK);
     }
 
@@ -245,6 +247,7 @@ public class UserController {
     public @ResponseBody ResponseEntity deleteStatus(@RequestParam String uName) {
         User u = uRepo.findByName(uName);
         u.setStatus("");
+        uRepo.save(u);
         return new ResponseEntity("", HttpStatus.OK);
     }
 
@@ -278,6 +281,7 @@ public class UserController {
             return new ResponseEntity("Cannot kick people of an equal or greater role than you", HttpStatus.NOT_ACCEPTABLE);
         }
         toKickXRef.setrId(-1);
+        wXRefRepo.save(toKickXRef);
         return new ResponseEntity("Successfully Kicked", HttpStatus.FORBIDDEN);
     }
 

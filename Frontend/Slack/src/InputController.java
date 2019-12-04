@@ -439,6 +439,8 @@ public class InputController {
             System.out.println("Login Successful");
             User u = gson.fromJson(uResponse.response, User.class);
             curUser = u;
+            curChannel = null;
+            curWorkspace = null;
         }
     }
 
@@ -719,10 +721,15 @@ public class InputController {
         //Send the message to the server, and acknowledge the search
         DBSupport.HTTPResponse sendMessage = Message.sendMessage(curUser.getName(), curWorkspace.getName(), curChannel.getName(), message);
         if (sendMessage.code > 300) {
+            if(sendMessage.code == 403) {
+                curWorkspace = null;
+                curChannel = null;
+            }
+
             System.out.println(sendMessage.response);
         } else {
             Message m = gson.fromJson(sendMessage.response, Message.class);
-            System.out.println("Message Sent: \n\t" + m.getContent());
+            System.out.println("Message Sent " + m.getId() + ": \n\t" + m.getContent());
         }
     }
 
@@ -1095,7 +1102,7 @@ public class InputController {
         if (setStatus.code > 300) {
             System.out.println(setStatus.response);//Should never happen
         } else {
-            System.out.println("Successfully changed your status to: \n" + status);
+            System.out.println("Successfully changed your status to: \n" + setStatus.response);
         }
     }
 
@@ -1200,7 +1207,7 @@ public class InputController {
                 "using ' ' to separate arguments\n\n" +
                 "create user:               create user - <name> <password>\n" +
                 "login:                     login - <username> <password>\n" +
-                "delate user:               delete user\n" +
+                "delete user:               delete user\n" +
                 "create workspace:          create workspace - <name of workspace>\n" +
                 "join workspace:            join - <name of workspace>\n" +
                 "switch workspace:          switch workspace - <workspace name>\n" +

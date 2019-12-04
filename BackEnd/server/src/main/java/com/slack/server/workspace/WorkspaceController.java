@@ -120,7 +120,8 @@ public class WorkspaceController {
     public @ResponseBody ResponseEntity switchWorkspace(String workspaceName, int userId) {
         Workspace w = workspaceRepository.findbyName(workspaceName);
         if (w == null) return new ResponseEntity("Workspace not found", HttpStatus.NOT_FOUND);
-        boolean inWorkspace = xRefRepository.exists(w.getId(), userId);
+        WorkspaceXRef x = xRefRepository.find(w.getId(), userId);
+        boolean inWorkspace = x != null && x.getrId() > -1;
         if (inWorkspace) return new ResponseEntity(w, HttpStatus.OK);
         return new ResponseEntity("Not in workspace, you must join it first: " + w.getName(), HttpStatus.NOT_ACCEPTABLE);
     }
