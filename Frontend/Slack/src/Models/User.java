@@ -43,6 +43,16 @@ public class User {
         return res;
     }
 
+    public static DBSupport.HTTPResponse clearUser(String username) {
+        DBSupport.HTTPResponse res = DBSupport.clearUser(username);
+        return res;
+    }
+
+    public static DBSupport.HTTPResponse getUserIdByName(String username) {
+        DBSupport.HTTPResponse res = DBSupport.getUserIdByName(username);
+        return res;
+    }
+
 
     public Integer getId() {
         return id;
@@ -91,11 +101,6 @@ public class User {
 
     public static DBSupport.HTTPResponse deleteFriend(String uName, String fName) {
         DBSupport.HTTPResponse res = DBSupport.deleteFriend(uName, fName);
-        return res;
-    }
-
-    public static DBSupport.HTTPResponse getPinnedMessages(String workspaceName, String channelName) {
-        DBSupport.HTTPResponse res = DBSupport.getPinnedMessages(workspaceName, channelName);
         return res;
     }
 
