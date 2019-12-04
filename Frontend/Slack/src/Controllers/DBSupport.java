@@ -6,6 +6,8 @@ import java.io.Reader;
 import java.net.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Date;
+import java.util.ArrayList;
 
 /**
  * This is our Data Provider for the frontend app. THis will cal to the backend controllers via HTTPRequests.
@@ -39,6 +41,7 @@ public class DBSupport {
         //By only using GET we can simplify calls on either side. The framework we're using, spring boot doesn't care
         //musch about the actual request method
         con.setRequestMethod("GET");
+        
         //We want a json to be returned in the event htat we get an object returned from the controller.
         //They don't really send Objects, but rather a string style of encoding called a json.
         //These are really simple enough to understand when looking at the JSONString
@@ -352,8 +355,14 @@ public class DBSupport {
      * @return
      */
     public static HTTPResponse getUserNameByID(Integer senderId) {
+        //Now that users may be removed completely the chance that the user may no longer be in the repo we were
+        // searching in, so now we also check against historic data that gets updated when a user removes themselves
+
+        // As this is only used for logging (no actual modifying the DB)
+        // we are safe to update to look at historical data as well
         try {
             HTTPResponse response = serverRequest(ParamBuilder.getUserNameById(senderId));
+            if(response.code == 404) response = serverRequest(ParamBuilder.getHistoricUserNameById(senderId));
             return response;
         } catch (Exception e) {
             return new HTTPResponse(406, handleErr());
@@ -465,6 +474,78 @@ public class DBSupport {
             return new HTTPResponse(406, handleErr());
         }
     }
+    
+    public static HTTPResponse clearUser(String username) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.clearUser(username));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    
+    public static HTTPResponse createAppointment(String name, String description, String time, int user) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.createAppointment(name, description, time, user));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    public static HTTPResponse sendInvite(int aId,  ArrayList<Integer> userIds){
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.sendInvite(aId, userIds));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+    
+    public static HTTPResponse getAppointments(String user, boolean accepted,  boolean pending){
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.getAppointments(user, accepted, pending));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+        
+    public static HTTPResponse deleteAppointment(String user,  int aId){
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.deleteAppointment(user, aId));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+        
+    public static HTTPResponse respondAppointment(String user,  int aId,  boolean accept){
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.respondAppointment(user, aId, accept));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    public static HTTPResponse getUserIdByName(String username) {
+        try {
+            HTTPResponse res = serverRequest(ParamBuilder.getUserIdByName(username));
+            return res;
+        } catch (Exception e) {
+            return new HTTPResponse(406, handleErr());
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static HTTPResponse muteUser(String uName, String mName) {
         try {
@@ -601,6 +682,10 @@ public class DBSupport {
             return BASE_URL + "user/getUsername?senderId=" + senderId;
         }
 
+        public static String getHistoricUserNameById(Integer senderId) {
+            return BASE_URL + "user/getHistoricUsername?senderId=" + senderId;
+        }
+
         public static String changeRole(String workspace, String username, int rId){
             return BASE_URL+"workspace/changeRole?workspace=" + workspace + "&username=" + username + "&rId=" + rId;
         }
@@ -661,5 +746,39 @@ public class DBSupport {
             return BASE_URL+"channel/getDescription?workspaceName="+workspaceName+"&channelName="+channelName;
         }
 
-    }
+        public static String clearUser(String name){
+            return BASE_URL+"user/clear?username="+name;
+        }
+
+        public static String createAppointment(String name, String description, String time, int user){
+          return BASE_URL + "appointment/create?name=" + name + "&description=" + description + "&timeString=" +
+                  time + "&user=" + user;
+        }
+        
+        public static String sendInvite(int aId,  ArrayList<Integer> userIds){
+            String idString = "&userIdList=";
+            for(int id : userIds){
+                idString+=id + ",";
+            }
+            idString = idString.substring(0, idString.length()-1);
+            return BASE_URL + "appointment/sendInvite?aId="+aId+idString;
+        }
+        
+        public static String getAppointments(String user, boolean accepted,  boolean pending){
+          return BASE_URL + "appointment/get?user="+user+"&accepted="+accepted+"&pending="+pending;
+        }
+        
+        public static String deleteAppointment(String user,  int aId){
+          return BASE_URL + "appointment/delete?user="+user+"&aId="+aId;
+        }
+        
+        public static String respondAppointment(String user,  int aId,  boolean accept){
+          return BASE_URL + "appointment/respond?user="+user+"&aId="+aId+"&accept="+accept;
+        }
+
+        public static String getUserIdByName(String username) {
+            return BASE_URL+"user/getId?username="+username;
+
+        }
+}
 }

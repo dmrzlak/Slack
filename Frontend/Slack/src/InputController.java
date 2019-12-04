@@ -6,7 +6,10 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -26,6 +29,7 @@ public class InputController {
     private static final String JOIN_WORKSPACE = "join workspace";
     private static final String CREATE_CHANNEL = "create channel";
     private static final String VIEW_USERS = "view users";
+    private static final String CLEAR_USER = "delete user";
     private static final String SEND = "send";
     private static final String SEND_DM = "send to";
     private static final String ADD_USER = "create user";
@@ -50,16 +54,20 @@ public class InputController {
     private static final String UNMUTE_USER = "unmute";
     private static final String SET_CH_DET = "set channel details";
     private static final String GET_CH_DET = "channel details";
+    private static final String CREATE_APPOINTMENT = "create appointment";
+    private static final String VIEW_APPOINTMENTS = "view appointments";
+    private static final String RESPOND_APPOINTMENT = "respond appointment";
+    private static final String DELETE_APPOINTMENT = "delete appointment";
 
+    //If this line get mad, check your dependencies, may have dropped
     private static Gson gson = new Gson();
     private static User curUser = null;
     private static Workspace curWorkspace = null;
     private static Channel curChannel = null;
     private static final String[] roles = new String[]{"USER", "MOD", "ADMIN"};
+    private static Scanner input = new Scanner(System.in);
 
     public static void main(String[] args) {
-        //If this line get mad, check your dependencies, may have dropped
-        Scanner input = new Scanner(System.in);
         String userInput = "";
 
         printInstructions();
@@ -163,6 +171,21 @@ public class InputController {
                     break;
                 case GET_CH_DET:
                     getDetails(userArgs);
+                    break;
+                case CREATE_APPOINTMENT:
+                    createAppointment();
+                    break;
+                case VIEW_APPOINTMENTS:
+                    getAppointments(userArgs);
+                    break;
+                case DELETE_APPOINTMENT:
+                    deleteAppointment(userArgs);
+                    break;
+                case RESPOND_APPOINTMENT:
+                    respondAppointment(userArgs);
+                    break;
+                case CLEAR_USER:
+                    clearUser();
                     break;
                 default:
                     System.out.println("Invalid Input please try again :(");
@@ -830,6 +853,222 @@ public class InputController {
             System.out.println("Removed friend " + u.getName());
         }
     }
+    
+    private static void clearUser(){
+        if(curUser == null){
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        DBSupport.HTTPResponse clear = User.clearUser(curUser.getName());
+        System.out.println(clear.response);
+    }
+
+    public static void createAppointment() {
+        if(curUser == null){
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        //Will be changing the userArgs for this one...
+        System.out.println("Enter the name of the appointment");
+        String name = input.nextLine().trim();
+        System.out.println("Enter the description of the appointment");
+        String description = input.nextLine().trim();
+        System.out.println("Enter the date of the appointment in the form of YYYY-MM-DD hh:mm");
+        String timeString = (input.nextLine() + ":00").trim();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date time = null;
+        try {
+            time = dateFormat.parse(timeString);
+        } catch (ParseException e) {
+            System.out.println("Invalid Date, Try Again");
+        }
+
+
+        name = ReplaceSpecChars(name);
+        description = ReplaceSpecChars(description);
+        timeString = ReplaceSpecChars(timeString);
+
+        DBSupport.HTTPResponse aRes = Appointment.createAppointment(name, description, timeString, curUser.getId());
+        if (aRes.code > 300) {
+            System.out.println(aRes.response);
+        } else {
+            Appointment a = gson.fromJson(aRes.response, Appointment.class);
+            System.out.println("Successfully made appointment " + a.getName());
+            String userIn = "";
+            while(userIn.length() < 1 || ( userIn.length() >= 1 && !(userIn.charAt(0) == 'n' || userIn.charAt(0) == 'y'))){
+                System.out.println("Would you like to send invites? (Y/N)");
+                userIn = input.nextLine().toLowerCase();
+            }
+            if(userIn.length() >= 1 && userIn.charAt(0) == 'y'){
+                sendInvite(a);
+            }
+            else if (userIn.length() >= 1){
+                System.out.println("No invitations will be sent.");
+                return;
+            }
+        }
+    }
+
+    public static void sendInvite(Appointment a){
+        String userIn = "";
+        while(userIn.length() < 1 ){
+            System.out.println("Write the usernames of the users you want to send this invite to in a comma delimited list");
+            userIn = input.nextLine().toLowerCase();
+        }
+        ArrayList<String> userNameArrList = new ArrayList<>();
+        //Turn user input into list
+        userNameArrList.addAll(Arrays.asList(userIn.split(",")));
+        //We want to get all of the user ids for the call.
+        // Makes it a little easier for the request than a huge string of usernames
+        ArrayList<Integer> userIds = new ArrayList<>();
+        for (String username : userNameArrList) {
+            username = username.trim();
+            DBSupport.HTTPResponse idRes = User.getUserIdByName(username);
+            if(idRes.code >= 300){
+                continue;
+            }
+            else{
+                userIds.add(Integer.parseInt(idRes.response));
+            }
+        }
+        //If it's empty then none of those users exist
+        if(userIds.isEmpty()){
+            System.out.println("Failed to send any invites.");
+            return;
+        }
+        //Else some users exist and we want to attempt to send invites to them
+        DBSupport.HTTPResponse invRes = Appointment.sendInvite(a.getId(), userIds);
+        //We got an error from the server.
+        // Note the server doesn't send any error for this request,
+        //So the only error would be a 500 error
+        if(invRes.code >= 300){
+            System.out.println(invRes.response);
+            return;
+        }
+        else{
+            //We want to signify which inivtes succeeded and which failed
+            ArrayList<String> successfulInvites = new ArrayList<>();
+            successfulInvites.addAll(Arrays.asList(gson.fromJson(invRes.response, String[].class)));
+            //Remove successful invites and from the user given list and we are left with the successful invites
+            String successes = "\n\t";
+            for(String successfulName : successfulInvites){
+                //Create the string of successes while removing successes from the users
+                //this will save us another loop
+                successes += successfulName + "\n\t";
+                userNameArrList.remove(successfulName);
+            }
+            System.out.println("Invite successful to:" + successes);
+
+            System.out.println("Invite unsuccessful to:" );
+            for(String unsuccessfulName : userNameArrList){
+                System.out.println("\n\t" + unsuccessfulName);
+            }
+        }
+    }
+
+    public static void getAppointments(String[] userArgs){
+        if(curUser == null){
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if(userArgs.length > 1){
+            System.out.println("Invalid number of arguments");
+            return;
+        }
+        boolean accepted = false;
+        boolean pending = false;
+        //if no args -- all appointments
+        if(userArgs.length == 0){
+            pending = true;
+            accepted = true;
+        }
+        else if(userArgs[0].equalsIgnoreCase("pending"))
+            pending = true;
+        else if(userArgs[0].equalsIgnoreCase("accepted"))
+            accepted = true;
+        else{
+            System.out.println("Could not find the expected arguments. Try: \n" +
+                    VIEW_APPOINTMENTS + ", \n" + VIEW_APPOINTMENTS + " - accepted" +
+                    ", \n or" + VIEW_APPOINTMENTS + " - pending");
+            return;
+        }
+
+        DBSupport.HTTPResponse viewRes = Appointment.getAppointments(curUser.getName(), accepted, pending);
+        if(viewRes.code >= 300){
+            System.out.println(viewRes.response);
+            return;
+        }
+        else{
+            Appointment[] appts = gson.fromJson(viewRes.response, Appointment[].class);
+            int i = 0;
+            if(pending){
+                System.out.println("Pending invites: ");
+                for(; i < appts.length; i++){
+                    if(!appts[i].isAccepted())
+                    {
+                        System.out.println("\n" + appts[i].toString());
+                    }
+                    else break;
+                }
+            }
+            if(accepted){
+                System.out.println("Accepted invites: ");
+                for(; i < appts.length; i++){
+                    if(appts[i].isAccepted()) {
+                        System.out.println("\n" + appts[i].toString());
+                    }
+                    else break;
+                }
+            }
+        }
+    }
+
+    public static void deleteAppointment(String[] userArgs){
+        if(curUser == null){
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if(userArgs.length != 1){
+            System.out.println("Invalid number of arguments");
+            return;
+        }
+        int aId = -1;
+        try {
+            aId = Integer.parseInt(userArgs[0]);
+        }
+        catch(NumberFormatException e){
+            System.out.println("First argument not a number, expecting the Appointment ID");
+            return;
+        }
+        DBSupport.HTTPResponse response = Appointment.deleteAppointment(curUser.getName(), aId);
+        System.out.println(response.response);
+
+    }
+
+    public static void respondAppointment(String[] userArgs){
+        if(curUser == null){
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if(userArgs.length != 2){
+            System.out.println("Invalid number of arguments");
+            return;
+        }
+        int aId = -1;
+        try {
+            aId = Integer.parseInt(userArgs[0]);
+        }
+        catch(NumberFormatException e){
+            System.out.println("First argument not a number, expecting the Appointment ID");
+            return;
+        }
+        if(!(userArgs[1].equalsIgnoreCase("YES") ||userArgs[1].equalsIgnoreCase("NO"))){
+            System.out.println("Second Argument not yes or no, expected a yes or no");
+        }
+        boolean accept = userArgs[1].equalsIgnoreCase("YES");
+        DBSupport.HTTPResponse response = Appointment.respondAppointment(curUser.getName(), aId, accept);
+        System.out.println(response.response);
+    }
 
     private static void muteUser(String[] userArgs) {
         if (curUser == null) {
@@ -940,37 +1179,38 @@ public class InputController {
      * Print the commands that have been implemented thus far
      */
 
-    /*
-    SEND_TEXTFILE = "send textfile";
-    DOWNLOAD_TEXTFILE = "download textfile"; 
-     */
     private static void printHelp() {
         System.out.println("Commands are sent in the order COMMAND - ARGUMENTS\n" +
                 "using ' ' to separate arguments\n\n" +
-                "create user:       create user - <name> <password>\n" +
-                "login:             login - <username> <password>\n" +
-                "create workspace:  create workspace - <name of workspace>\n" +
-                "join workspace:    join - <name of workspace>\n" +
-                "switch workspace:  switch workspace - <workspace name>\n" +
-                "search workspace:  search workspace - <name of workspace> (Search Field not required)\n" +
-                "create channel:    create channel - <workspace name> <channel name>\n" +
-                "switch channel:    switch channel - <channel name>\n" +
-                "view mentions:     view mentions\n" +
-                "view pinned:       get pinned\n" +
-                "view users:        view users\n" +
-                "search user:       search user - <name of user> (Search Field not required)\n"+
-                "send to group:     send - <message>\n" +
-                "direct message:    send to - <user> <message>\n" +
-                "pin message:       pin message - <messageId>\n" +
-                "unpin message:     unpin message - <messageId>\n" +
-                "send a text file:  send file - <filepath>\n" +
-                "download a file:   download file - <name> (.txt only)\n" +
-                "change role:       change role - <RoleName> <Username>\n" +
-                "log messages:      log messages\n" +
-                "view friends:      view friends\n" +
-                "add friend:        add friend - <name>\n" +
-                "delete friend:     delete friend - <name>\n");
-     }
+                "create user:               create user - <name> <password>\n" +
+                "login:                     login - <username> <password>\n" +
+                "delate user:               delete user\n" +
+                "create workspace:          create workspace - <name of workspace>\n" +
+                "join workspace:            join - <name of workspace>\n" +
+                "switch workspace:          switch workspace - <workspace name>\n" +
+                "search workspace:          search workspace - <name of workspace> (Search Field not required)\n" +
+                "create channel:            create channel - <workspace name> <channel name>\n" +
+                "switch channel:            switch channel - <channel name>\n" +
+                "view mentions:             view mentions\n" +
+                "view pinned:               get pinned\n" +
+                "view users:                view users\n" +
+                "search user:               search user - <name of user> (Search Field not required)\n"+
+                "send to group:             send - <message>\n" +
+                "direct message:            send to - <user> <message>\n" +
+                "pin message:               pin message - <messageId>\n" +
+                "unpin message:             unpin message - <messageId>\n" +
+                "send a text file:          send file - <filepath>\n" +
+                "download a file:           download file - <name> (.txt only)\n" +
+                "change role:               change role - <RoleName> <Username>\n" +
+                "log messages:              log messages\n" +
+                "view friends:              view friends\n" +
+                "add friend:                add friend - <name>\n" +
+                "delete friend:             delete friend - <name>\n" +
+                "create appointment:        create appointment (User prompts occur)\n" +
+                "view appointments:         view appointments - <Type of appointment to see> (\"pending\"\\\"accepted\"\\empty argument) \n" +
+                "respond to an appointment: respond appointment - \n" +
+                "delete an appointment:     delete appointment - \n");
+    }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
         //Below is how we'll write to a file
@@ -1056,17 +1296,20 @@ public class InputController {
         // it to something that url's can handle
         String content = "";
         for(int i = 0; i < input.length(); i++){
-            int charcode = (int ) input.charAt(i);
-            String hex = (Integer.toHexString(charcode));
-            content += "%" + (hex.length() < 2 ? "0" : "" ) + hex;
+            char c = input.charAt(i);
+            if(isAlphaNum(c))
+                content += c;
+            else {
+                int charcode = (int) c;
+                String hex = (Integer.toHexString(charcode));
+                content += "%" + (hex.length() < 2 ? "0" : "") + hex;
+            }
         }
-//        content = content.replaceAll("&", " AND ");
-//        content = content.replaceAll("\\?", " QM ");
-//        content = content.replaceAll("\\\\", " BCKSLSH ");
-//        content = content.replaceAll(" ", "%20");
-//        content = content.replaceAll("\t", "%09");
-//        content = content.replaceAll("\n", "%0A");
+
         return content;
     }
 
+    private static boolean isAlphaNum(char c){
+        return ( c >= '0' && c <= '9') ||( c >= 'A' && c <= 'Z') ||( c >= 'a' && c <= 'z');
+    }
 }
