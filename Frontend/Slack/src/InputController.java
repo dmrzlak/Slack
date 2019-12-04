@@ -230,7 +230,7 @@ public class InputController {
             Message[] favorites = gson.fromJson(response.response, Message[].class);
             System.out.println("These are the your favorited messages:");
             for (Message favorite : favorites) {
-                String printMention = "\t" + favorite.getContent();
+                String printMention = favorite.getId() + "\t" + favorite.getContent();
                 System.out.println(printMention);
             }
         }
@@ -249,11 +249,7 @@ public class InputController {
             return;
         }
         DBSupport.HTTPResponse uResponse = Channel.unFavoriteMessage(curUser.getId(),Integer.parseInt(userArgs[0]));
-        if (uResponse.code > 300) {
-            System.out.println(uResponse.response);
-        } else {
-            System.out.println("Un-Favorited Message");
-        }
+        System.out.println(uResponse.response);
 
     }
 
@@ -271,12 +267,7 @@ public class InputController {
             return;
         }
         DBSupport.HTTPResponse uResponse = Channel.favoriteMessage(curUser.getId(),Integer.parseInt(userArgs[0]));
-        if (uResponse.code > 300) {
-            System.out.println(uResponse.response);
-        } else {
-            System.out.println("Favorited Message");
-        }
-
+        System.out.println(uResponse.response);
     }
 
     private static void sendTextfile(String[] userArgs){
@@ -1421,18 +1412,16 @@ public class InputController {
         Scanner s = new Scanner(new File("wordFilter"));
         ArrayList<String> words = new ArrayList<String>();
         ArrayList<String> replacement = new ArrayList<String>();
-        String temp;
-        String[] temp2 = new String[2];
+        String consumed = "";
+        String[] replacmentPairs = new String[2];
         while(s.hasNext()){
-            temp = s.nextLine();
-            temp2 = temp.split("|");
-            words.add(temp2[0]);
-            replacement.add(temp2[1]);
+            consumed = s.nextLine();
+            replacmentPairs = consumed.split("|");
+            words.add(replacmentPairs[0]);
+            replacement.add(replacmentPairs[1]);
         }
         for(int i = 0; i < words.size(); i++)
             content = content.replace(words.get(i), replacement.get(i));
-
-
         return content;
     }
 
