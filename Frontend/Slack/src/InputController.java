@@ -54,6 +54,7 @@ public class InputController {
     private static final String DELETE_STATUS = "delete status";
     private static final String VIEW_STATUS = "view status";
     private static final String KICK_USER = "kick";
+    private static final String UNKICK_USER = "unkick";
     private static final String CREATE_APPOINTMENT = "create appointment";
     private static final String VIEW_APPOINTMENTS = "view appointments";
     private static final String RESPOND_APPOINTMENT = "respond appointment";
@@ -171,6 +172,9 @@ public class InputController {
                     break;
                 case KICK_USER:
                     KickUser(userArgs);
+                    break;
+                case UNKICK_USER:
+                    UnkickUser(userArgs);
                     break;
                 case CREATE_APPOINTMENT:
                     createAppointment();
@@ -1091,7 +1095,7 @@ public class InputController {
         if (setStatus.code > 300) {
             System.out.println(setStatus.response);//Should never happen
         } else {
-            //print successful response
+            System.out.println("Successfully changed your status to: \n" + status);
         }
     }
 
@@ -1108,7 +1112,7 @@ public class InputController {
         if (deleteStatus.code > 300) {
             System.out.println(deleteStatus.response);//Should never happen
         } else {
-            //print successful response
+            System.out.println("Successfully deleted your status message");
         }
     }
 
@@ -1125,7 +1129,8 @@ public class InputController {
         if (viewStatus.code > 300) {
             System.out.println(viewStatus.response);
         } else {
-            //print successful response
+            System.out.println("Viewing " + userArgs[0] + "'s status.");
+            System.out.println(userArgs[0] + "'s status: "+ viewStatus.response);
         }
     }
 
@@ -1146,11 +1151,30 @@ public class InputController {
         if (kickUser.code > 300) {
             System.out.println(kickUser.response);
         } else {
-            //print successful response TODO for all parts
+            System.out.println("You have successfully kicked " + userArgs[0] + " from " + curWorkspace.getName());
         }
     }
 
-
+    private static void UnkickUser(String[] userArgs){
+        if(curUser == null) {
+            System.out.println("You need to create a user or sign in to continue");
+            return;
+        }
+        if(curWorkspace == null){
+            System.out.println("You need to enter a workspace to continue");
+            return;
+        }
+        if (userArgs.length != 1) {
+            System.out.println("Invalid Number of Arguments");
+            return;
+        }
+        DBSupport.HTTPResponse unkickUser = User.unkickUser(curWorkspace.getName(), curUser.getName(), userArgs[0]);
+        if (unkickUser.code > 300) {
+            System.out.println(unkickUser.response);
+        } else {
+            System.out.println("You have successfully unkicked " + userArgs[0] + " from " + curWorkspace.getName());
+        }
+    }
 
     //////////////////////
     //                  //
