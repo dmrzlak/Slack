@@ -1493,6 +1493,10 @@ public class InputController {
     private static String ReplaceSpecChars(String input) {
         //For data fields that may contain "bad" data for our urls (spaces, tabs, stuff like that, we want to transform
         // it to something that url's can handle
+        try{
+            input =  ReplaceBadWords(input);
+        }catch(Exception e){
+        }
         String content = "";
         for(int i = 0; i < input.length(); i++){
             char c = input.charAt(i);
@@ -1504,11 +1508,7 @@ public class InputController {
                 content += "%" + (hex.length() < 2 ? "0" : "") + hex;
             }
         }
-        try{
-            return ReplaceBadWords(content);
-        }catch(Exception e){
-            return content;
-        }
+        return content;
     }
     private static String ReplaceBadWords(String input) throws FileNotFoundException {
         String content = input;
@@ -1519,7 +1519,7 @@ public class InputController {
         String[] replacmentPairs = new String[2];
         while(s.hasNext()){
             consumed = s.nextLine();
-            replacmentPairs = consumed.split("|");
+            replacmentPairs = consumed.split(" # ");
             words.add(replacmentPairs[0]);
             replacement.add(replacmentPairs[1]);
         }

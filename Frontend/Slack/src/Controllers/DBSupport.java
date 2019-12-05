@@ -686,13 +686,13 @@ public class DBSupport {
 
 
         public static String viewFavorites(int wID, int cID, int uID){
-            return BASE_URL + "/channel/getFavoriteMessages?wID=" + wID + "&cID=" + cID + "&uID="+ uID;
+            return BASE_URL + "/channel/getFavoriteMessages?wID=" + wID + "&cID=" + cID + "&uId="+ uID;
         }
         public static String favoriteMessage(int uID, int mID){
-            return BASE_URL + "/favorite/favoriteMessage?uId="+uID+"&mID="+mID+"&favorite="+true;
+            return BASE_URL + "/channel/favoriteMessage?userID="+uID+"&messageID="+mID+"&favorite="+true;
         }
         public static String unfavoriteMessage(int uID, int mID){
-            return BASE_URL + "/favorite/favoriteMessage?uId="+uID+"&mID="+mID+"&favorite="+false;
+            return BASE_URL + "/channel/favoriteMessage?userID="+uID+"&messageID="+mID+"&favorite="+false;
         }
 
         public static String sendDirectMessage(String sender, String reciever, String message) {
