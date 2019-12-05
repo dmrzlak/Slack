@@ -50,7 +50,7 @@ public class InputController {
     private static final String SEARCH_USER = "search user";
     private static final String FAVORITE_MESSAGE = "favorite message";
     private static final String UNFAVORITE_MESSAGE = "unfavorite message";
-    private static final String GET_FAVORITES = "veiw favorites";
+    private static final String GET_FAVORITES = "view favorites";
     private static final String SEND_TEXTFILE = "send file";
     private static final String DOWNLOAD_TEXTFILE = "download file";
     private static final String SET_STATUS = "set status";
@@ -1381,12 +1381,21 @@ public class InputController {
                 "create user:               create user - <name> <password>\n" +
                 "login:                     login - <username> <password>\n" +
                 "delete user:               delete user\n" +
+                "set your status:           set status - <status>\n" +
+                "delete your status:        delete status\n" +
+                "view user status:          view status - <username>\n" +
+                "kick a user:               kick - <username>\n" +
+                "unkick a user:             unkick: unkick - <username>\n" +
+                "unmute a user:             mute - <username>\n" +
+                "unmute a user:             unmute - <username>\n" +
                 "create workspace:          create workspace - <name of workspace>\n" +
                 "join workspace:            join - <name of workspace>\n" +
                 "switch workspace:          switch workspace - <workspace name>\n" +
                 "search workspace:          search workspace - <name of workspace> (Search Field not required)\n" +
                 "create channel:            create channel - <workspace name> <channel name>\n" +
                 "switch channel:            switch channel - <channel name>\n" +
+                "set channel details:       set channel details - <channelName> <details>\n" +
+                "view channel details:      channel details <channelName>\n"+
                 "view mentions:             view mentions\n" +
                 "view pinned:               get pinned\n" +
                 "view users:                view users\n" +
@@ -1407,8 +1416,7 @@ public class InputController {
                 "create appointment:        create appointment (User prompts occur)\n" +
                 "view appointments:         view appointments - <Type of appointment to see> (\"pending\"\\\"accepted\"\\empty argument) \n" +
                 "respond to an appointment: respond appointment - <appointmentId>\n" +
-                "delete an appointment:     delete appointment - <appointmentID>\n"
-        );
+                "delete an appointment:     delete appointment - <appointmentID>\n");
     }
 
     private static void WriteFile(String[] linesToWrite, String filePath, String fileName) {
